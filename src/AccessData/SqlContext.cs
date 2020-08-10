@@ -220,91 +220,85 @@ namespace AccessData
         /// <returns></returns>
         public async Task<List<CatalogueFormations>> GetAllFormationsAsync()
         {
-            List<CatalogueFormations> listFormations = new List<CatalogueFormations>();
+            var commandText = @"SELECT IdFormation, Titre, DescriptionFormation, DateDeFin, NomDeFichier, EstInterne FROM catalogueformation;";
 
-			try
-			{
-                using (var conn = new MySqlConnection(ConnectionString))
+            Func<MySqlCommand, List<CatalogueFormations>> funcCmd = (cmd) =>
+            {
+                List<CatalogueFormations> listFormations = new List<CatalogueFormations>();
+
+                using (var reader = cmd.ExecuteReader())
                 {
-                    conn.Open();
-                    var commandText = @"SELECT IdFormation, Titre, DescriptionFormation, DateDeFin, NomDeFichier, EstInterne FROM catalogueformation;";
-                    MySqlCommand cmd = new MySqlCommand(commandText, conn);
-
-                    using (var reader = cmd.ExecuteReader())
+                    while (reader.Read())
                     {
-                        while (await reader.ReadAsync())
+                        object tempDate = reader.GetValue(3);
+                        DateTime? tempDateFin = ConvertFromDBVal<DateTime?>(tempDate);
+
+                        listFormations.Add(new CatalogueFormations()
                         {
-                            //listFormations.Add(new CatalogueFormations()
-                            //{
-                            //    IdFormation = await reader.GetFieldValueAsync<int>(0),
-                            //    Titre = await reader.GetFieldValueAsync<string>(1),
-                            //    Description = await reader.GetFieldValueAsync<string>(2),
-                            //    DateDeFin = await reader.GetFieldValueAsync<DateTime?>(3),
-                            //    NomDuFichier = await reader.GetFieldValueAsync<string>(5),
-                            //    ExtensionFichier =await reader.GetFieldValueAsync<string>(6),
-                            //});
-
-                            object tempDate = reader.GetValue(3);
-                            DateTime? tempDateFin = ConvertFromDBVal<DateTime?>(tempDate);
-
-                            listFormations.Add(new CatalogueFormations()
-                            {
-                                IdFormation = reader.GetInt32(0),
-                                Titre = reader.GetString(1),
-                                Description = reader.GetString(2),
-                                DateDeFin = tempDateFin,
-                                NomDuFichier = reader.GetString(4),
-                                EstInterne = reader.GetBoolean(5)
-                            });
-                        }
+                            IdFormation = reader.GetInt32(0),
+                            Titre = reader.GetString(1),
+                            Description = reader.GetString(2),
+                            DateDeFin = tempDateFin,
+                            NomDuFichier = reader.GetString(4),
+                            EstInterne = reader.GetBoolean(5)
+                        });
                     }
-
                 }
-            }
-			catch (Exception ex)
-			{
-                var exs = ex.Message;
-			}
-            
-            return listFormations;
-        }
 
-		/// <summary>
-		/// Récupère les formations qui ne sont pas fermé à la date donnée.
-		/// </summary>
-		/// <param name="now"></param>
-		/// <returns></returns>
-		public async Task<List<CatalogueFormations>> GetAllFormationsEncoreValideAsync()
-        {
+                return listFormations;
+            };
+
             List<CatalogueFormations> listFormations = new List<CatalogueFormations>();
 
             try
             {
-                using (var conn = new MySqlConnection(ConnectionString))
-                {
-                    conn.Open();
-                    var commandText = @"SELECT IdFormation, Titre, DescriptionFormation, NomDeFichier, EstInterne FROM catalogueformation" 
-                                        + " WHERE DateDeFin IS NULL" 
-                                        + " OR DateDeFin > curdate();";
+                listFormations = await GetCoreAsync(commandText, funcCmd);
+            }
+            catch (Exception ex)
+            {
+                var exs = ex.Message;
+            }
 
-                    using (MySqlCommand cmd = new MySqlCommand(commandText, conn))
-					{
-                        using (var reader = cmd.ExecuteReader())
+            return listFormations;
+        }
+
+        /// <summary>
+        /// Récupère les formations qui ne sont pas fermé à la date donnée.
+        /// </summary>
+        /// <param name="now"></param>
+        /// <returns></returns>
+        public async Task<List<CatalogueFormations>> GetAllFormationsEncoreValideAsync()
+        {
+            var commandText = @"SELECT IdFormation, Titre, DescriptionFormation, NomDeFichier, EstInterne FROM catalogueformation"
+                            + " WHERE DateDeFin IS NULL"
+                            + " OR DateDeFin > curdate();";
+
+            Func<MySqlCommand, List<CatalogueFormations>> funcCmd = (cmd) =>
+            {
+                List<CatalogueFormations> listFormations = new List<CatalogueFormations>();
+
+                using (var reader = cmd.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        listFormations.Add(new CatalogueFormations()
                         {
-                            while (await reader.ReadAsync())
-                            {
-                                listFormations.Add(new CatalogueFormations()
-                                {
-                                    IdFormation = reader.GetInt32(0),
-                                    Titre = reader.GetString(1),
-                                    Description = reader.GetString(2),
-                                    NomDuFichier = reader.GetString(3),
-                                    EstInterne = reader.GetBoolean(4)
-                                });
-                            }
-                        }
+                            IdFormation = reader.GetInt32(0),
+                            Titre = reader.GetString(1),
+                            Description = reader.GetString(2),
+                            NomDuFichier = reader.GetString(3),
+                            EstInterne = reader.GetBoolean(4)
+                        });
                     }
                 }
+                return listFormations;
+            };
+
+            List<CatalogueFormations> listFormations = new List<CatalogueFormations>();
+
+            try
+            {
+                listFormations = await GetCoreAsync(commandText, funcCmd);
             }
             catch (Exception ex)
             {
@@ -1241,5 +1235,44 @@ namespace AccessData
                 return (T)obj;
             }
         }
+
+
+        #region Private Methods
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="commandSql"></param>
+        /// <param name="func"></param>
+        /// <returns></returns>
+        private async Task<List<T>> GetCoreAsync<T>(string commandSql, Func<MySqlCommand, List<T>> func)
+            where T : new()
+        {
+            return await Task.Run(() =>
+            {
+                List<T> result = new List<T>();
+
+                try
+                {
+                    using (var conn = new MySqlConnection(ConnectionString))
+                    {
+                        MySqlCommand cmd = new MySqlCommand(commandSql, conn);
+                        conn.Open();
+                        result = func.Invoke(cmd);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw;
+                }
+
+                return result;
+            });
+        }
+
+       
+
+        #endregion
     }
 }
