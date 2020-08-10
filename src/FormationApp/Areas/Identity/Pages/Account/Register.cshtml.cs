@@ -56,7 +56,7 @@ namespace FormationApp.Areas.Identity.Pages.Account
         {
             [Required]
             [EmailAddress]
-            [Display(Name = "Email Intradef")]
+            [Display(Name = "Email")]
             public string Email { get; set; }
 
             [Required]
@@ -83,7 +83,7 @@ namespace FormationApp.Areas.Identity.Pages.Account
 
             [Required]
             [StringLength(32)]
-            [Display(Name = "Login Intradef")]
+            [Display(Name = "Login de connexion")]
             public string Login { get; set; }
 
             [Required]

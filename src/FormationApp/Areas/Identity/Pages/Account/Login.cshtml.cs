@@ -43,7 +43,7 @@ namespace FormationApp.Areas.Identity.Pages.Account
         public class InputModel
         {
             [Required]
-            [Display(Name = "Login intradef")]
+            [Display(Name = "Login de connexion")]
             public string Login { get; set; }
 
             [Required]
