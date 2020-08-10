@@ -7,11 +7,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FormationApp", "FormationAp
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AccessData", "AccessData\AccessData.csproj", "{7F126D39-9EA6-48EB-979E-C5F2CCE25CFC}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Scripts", "Scripts", "{118D0587-60C1-4973-ABE0-ADD0F87445AC}"
-	ProjectSection(SolutionItems) = preProject
-		CteationBase.sql = CteationBase.sql
-	EndProjectSection
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
