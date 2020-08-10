@@ -1,0 +1,36 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30204.135
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FormationApp", "FormationApp\FormationApp.csproj", "{D1B2D785-75B8-472B-8915-55190DC7980B}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AccessData", "AccessData\AccessData.csproj", "{7F126D39-9EA6-48EB-979E-C5F2CCE25CFC}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Scripts", "Scripts", "{118D0587-60C1-4973-ABE0-ADD0F87445AC}"
+	ProjectSection(SolutionItems) = preProject
+		CteationBase.sql = CteationBase.sql
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{D1B2D785-75B8-472B-8915-55190DC7980B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D1B2D785-75B8-472B-8915-55190DC7980B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D1B2D785-75B8-472B-8915-55190DC7980B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D1B2D785-75B8-472B-8915-55190DC7980B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7F126D39-9EA6-48EB-979E-C5F2CCE25CFC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7F126D39-9EA6-48EB-979E-C5F2CCE25CFC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7F126D39-9EA6-48EB-979E-C5F2CCE25CFC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7F126D39-9EA6-48EB-979E-C5F2CCE25CFC}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {3D2413C5-2FEF-4138-BB9E-CE10B68E0997}
+	EndGlobalSection
+EndGlobal

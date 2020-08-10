@@ -1,0 +1,123 @@
+﻿@using AccessData.Models
+
+
+<h2>Gestion des formateurs</h2>
+
+<br />
+
+@*Affichage de la liste des formateurs*@
+<RadzenGrid AllowFiltering="true"
+			FilterCaseSensitivity="FilterCaseSensitivity.Default"
+			AllowPaging="true"
+			PageSize="10"
+			AllowSorting="true"
+			Data="@AllFormateurs"
+			TItem="FormateurView"
+			EmptyText="Il y a aucun formateur"
+			ColumnWidth="150px">
+	<Columns>
+		<RadzenGridColumn TItem="FormateurView" Property="Nom" Title="Nom" Filterable="true" Sortable="false" />
+		<RadzenGridColumn TItem="FormateurView" Property="Prenom" Title="Prénom" Filterable="true" Sortable="false" />
+		<RadzenGridColumn TItem="FormateurView" Property="Login" Title="Login" Filterable="true" Sortable="false" />
+		<RadzenGridColumn TItem="FormateurView" Property="Service" Title="Service" />
+
+		<RadzenGridColumn TItem="FormateurView" Property="EstExterne" Title="Externe MinDef" Filterable="true" Sortable="false" Width="70px">
+			<Template Context="currentFormateur">
+				<div>
+					<MatCheckbox Disabled="true" @bind-Value="currentFormateur.EstExterne" Style="margin-left: auto; margin-right: auto;" />
+				</div>
+			</Template>
+		</RadzenGridColumn>
+
+		<RadzenGridColumn TItem="FormateurView" Title="Titre formation" Filterable="false" Sortable="false">
+			<Template Context="currentFormateur">
+				<div>
+					@foreach (var formation in currentFormateur.Formations)
+					{
+						<div>@formation.TitreFormation</div>
+					}
+				</div>
+			</Template>
+		</RadzenGridColumn>
+
+	</Columns>
+</RadzenGrid>
+
+<br />
+<br />
+
+@*Ajout d'un formateur*@
+<h2>Ajout d'un nouveau formateur</h2>
+
+<br />
+
+<div class="row">
+
+	@*colonne pour afficher le résultat*@
+	<div class="col-3">
+
+		@*afficher les informations*@
+		<div>
+			<MatButton Outlined="true" TrailingIcon="add_circle" OnClick="@AddFormateur">Choisir un personnel</MatButton>
+		</div>
+
+		<br />
+
+		@if (PersonnelSelectedNouveauFormateur != null)
+		{
+			<div>
+				<MatButton Outlined="true" TrailingIcon="add_circle" OnClick="AddFormations">Choisir les formations</MatButton>
+			</div>
+
+			<br />
+
+			<div class="mat-elevation-z5">
+				<div style="margin:5px 5px 5px 5px">
+					<div>
+						<MatHeadline6>Personnel sélectionné</MatHeadline6>
+						<MatBody1>@PersonnelSelectedNouveauFormateur.Nom @PersonnelSelectedNouveauFormateur.Prenom</MatBody1>
+						<MatBody1>Service : @PersonnelSelectedNouveauFormateur.Service</MatBody1>
+					</div>
+
+					<div>
+						<MatHeadline6>Formation(s) sélectionnée(s)</MatHeadline6>
+
+						@if (ListFormationsNouveauFormateur.Count == 0)
+						{
+							<div>Aucune formation de sélectionnée</div>
+						}
+						else
+						{
+							@foreach (var item in ListFormationsNouveauFormateur)
+							{
+								<div><span class="oi oi-minus" aria-hidden="true"></span>@item.Titre</div>
+							}
+						}
+					</div>
+
+					<MatButton Outlined="true" @onclick="OnClickValider" en>Valider</MatButton>
+				</div>
+			</div>
+		}
+
+	</div>
+
+	@*colonne pour faire la recherche*@
+	<div class="col-9">
+
+		@if (AjoutPersonnel)
+		{
+			<RecherchePersonnel GetPersonnel="GetPersonnelAction" />
+		}
+
+		@if (AjoutFormation)
+		{
+			<RechercheFormation GetFormation="GetFormationAction" />
+		}
+
+	</div>
+</div>
+
+@code {
+
+}

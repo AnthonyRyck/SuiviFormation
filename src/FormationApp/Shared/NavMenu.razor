@@ -1,0 +1,77 @@
+﻿@using Microsoft.AspNetCore.Identity
+
+@inject UserManager<IdentityUser> UserManager
+
+
+<div class="top-row pl-4 navbar navbar-dark">
+	<a class="navbar-brand" href="">Application suivi Formation</a>
+	<button class="navbar-toggler" @onclick="ToggleNavMenu">
+		<span class="navbar-toggler-icon"></span>
+	</button>
+</div>
+
+<div class="@NavMenuCssClass" @onclick="ToggleNavMenu">
+	<ul class="nav flex-column">
+		<li class="nav-item px-3">
+			<NavLink class="nav-link" href="" Match="NavLinkMatch.All">
+				<span class="oi oi-home" aria-hidden="true"></span> Accueil
+			</NavLink>
+		</li>
+
+		@*Page Setting pour Gestionnaire et admin*@
+		<AuthorizeView Roles="Administrateur, Gestionnaire">
+			<li class="nav-item px-3">
+				<NavLink class="nav-link" href="gestionnaireSetting">
+					<span class="oi oi-cog" aria-hidden="true"></span> Accès Gestionnaire
+				</NavLink>
+			</li>
+		</AuthorizeView>
+
+		@*Page de Settings Admin*@
+		<AuthorizeView Roles="Administrateur">
+			<li class="nav-item px-3">
+				<NavLink class="nav-link" href="adminSetting">
+					<span class="oi oi-cog" aria-hidden="true"></span> Accès admin
+				</NavLink>
+			</li>
+		</AuthorizeView>
+
+		<li class="nav-item px-3">
+			<NavLink class="nav-link" href="catalogueFormation">
+				<span class="oi oi-book" aria-hidden="true"></span> Catalogue
+			</NavLink>
+		</li>
+
+		<li class="nav-item px-3">
+			<NavLink class="nav-link" href="sessions">
+				<span class="oi oi-calendar" aria-hidden="true"></span> Sessions
+			</NavLink>
+		</li>
+
+		<AuthorizeView>
+			<li class="nav-item px-3">
+				<NavLink class="nav-link" href="mesFormations">
+					<span class="oi oi-person" aria-hidden="true"></span> Mes Formations
+				</NavLink>
+			</li>
+		</AuthorizeView>
+
+			@*Page à supprimé une fois développement terminé*@
+			<li class="nav-item px-3">
+				<NavLink class="nav-link" href="SuiviDev">
+					<span class="oi oi-info" aria-hidden="true"></span> Suivi Dev
+				</NavLink>
+			</li>
+	</ul>
+</div>
+
+@code {
+	private bool collapseNavMenu = true;
+
+	private string NavMenuCssClass => collapseNavMenu ? "collapse" : null;
+
+	private void ToggleNavMenu()
+	{
+		collapseNavMenu = !collapseNavMenu;
+	}
+}

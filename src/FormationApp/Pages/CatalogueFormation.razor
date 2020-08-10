@@ -1,0 +1,51 @@
+﻿@page "/catalogueFormation"
+
+@using AccessData.Models
+
+<h1>Catalogue des formations</h1>
+
+<br />
+
+<div>
+	<RadzenGrid AllowFiltering="true"
+				FilterCaseSensitivity="FilterCaseSensitivity.Default"
+				AllowPaging="true"
+				PageSize="20"
+				AllowSorting="true"
+				Data="@AllFormations"
+				TItem="CatalogueFormations"
+				EmptyText="Il y a aucune formation"
+				ColumnWidth="200px">
+		<Columns>
+			<RadzenGridColumn TItem="CatalogueFormations" Property="Titre" Title="Titre" />
+
+			<RadzenGridColumn TItem="CatalogueFormations" Property="Description" Title="Description" Filterable="false" Sortable="false" />
+
+			<RadzenGridColumn TItem="CatalogueFormations" Property="EstInterne" Title="Formation interne" Filterable="true" Sortable="false" Width="70px">
+				<Template Context="currentFormation">
+					<div>
+						<MatCheckbox Disabled="true" @bind-Value="currentFormation.EstInterne" Style="margin-left: auto; margin-right: auto;" />
+					</div>
+				</Template>
+			</RadzenGridColumn>
+
+			<RadzenGridColumn TItem="CatalogueFormations" Title="Contenu Formation" Filterable="false" Sortable="false">
+				<Template Context="currentFormation">
+					<div>
+						@currentFormation.NomDuFichier
+						<MatButton Icon="attachment" Label="Télécharger" Id="@currentFormation.NomDuFichier"
+								   @onclick="@(e => DownloadOnClick(e, currentFormation.IdFormation, currentFormation.NomDuFichier))" />
+					</div>
+
+				</Template>
+			</RadzenGridColumn>
+
+		</Columns>
+	</RadzenGrid>
+
+</div>
+
+
+@code {
+ 
+}

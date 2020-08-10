@@ -1,0 +1,170 @@
+﻿@using AccessData.Models
+
+<br />
+<br />
+<h2>Gestion du catalogue de formation</h2>
+
+@*Pour Ajouter une nouvelle formation*@
+<div>
+	<MatButton OnClick="@OpenDialogNewFormation" Raised="true">Ajouter une formation au catalogue</MatButton>
+
+	<EditForm Model="@formationModel" OnValidSubmit="HandleValidSubmit">
+		<MatDialog @bind-IsOpen="@DialogIsOpenNewFormation">
+			<MatDialogTitle>Ajout d'une formation</MatDialogTitle>
+
+			<MatDialogContent>
+				<DataAnnotationsValidator />
+				<ValidationSummary />
+
+				<div class="padding-top-10">
+					<MatTextField @bind-Value="formationModel.Titre" Label="Titre de la formation" Outlined="true" />
+				</div>
+
+				<div class="padding-top-10">
+					<MatTextField @bind-Value="formationModel.Description" Label="Description" TextArea="true" FullWidth="true" />
+				</div>
+
+				<br />
+
+				<div>
+					<MatFileUpload OnChange="@UploadFiles"
+								   title="Ajouter le contenu de formation"
+								   Label="Contenu de la formation" />
+				</div>
+
+				<div>
+					@if (!string.IsNullOrEmpty(formationModel.FileName))
+					{
+						@formationModel.FileName
+					}
+				</div>
+
+				<div>
+					<MatCheckbox Label="Est interne ?" @bind-Value="formationModel.EstInterne" />
+				</div>
+			</MatDialogContent>
+
+
+			<MatDialogActions>
+				<MatButton Type="submit">Ajouter</MatButton>
+				<MatButton OnClick="@AnnulationClickNewFormation" Type="reset">Annuler</MatButton>
+			</MatDialogActions>
+		</MatDialog>
+	</EditForm>
+
+</div>
+
+<br />
+<br />
+
+@*Pour voir la liste des formations*@
+<div>
+	<RadzenGrid @ref="FormationViewGrid"
+				AllowFiltering="true"
+				FilterCaseSensitivity="FilterCaseSensitivity.Default"
+				AllowPaging="true"
+				PageSize="20"
+				AllowSorting="true"
+				Data="@AllFormations"
+				TItem="CatalogueFormations"
+				EmptyText="Il y a aucune formation"
+				RowUpdate="@OnUpdateRow"
+				ColumnWidth="200px">
+		<Columns>
+			<RadzenGridColumn TItem="CatalogueFormations" Property="Titre" Title="Titre">
+				<EditTemplate Context="currentFormation">
+					<RadzenTextBox @bind-Value="currentFormation.Titre" Style="width:100%; display: block" Name="Titre" />
+				</EditTemplate>
+			</RadzenGridColumn>
+
+			<RadzenGridColumn TItem="CatalogueFormations" Property="Description" Title="Description" Filterable="false" Sortable="false">
+				<EditTemplate Context="currentFormation">
+					<RadzenTextBox @bind-Value="currentFormation.Description" Style="width:100%; display: block" Name="Description" />
+				</EditTemplate>
+			</RadzenGridColumn>
+
+			<RadzenGridColumn TItem="CatalogueFormations" Property="EstInterne" Title="Formation interne" Filterable="true" Sortable="false">
+				<Template Context="currentFormation">
+					<RadzenCheckBox @bind-Value="currentFormation.EstInterne" Disabled="true"  />
+				</Template>
+				
+				<EditTemplate Context="currentFormation">
+					<RadzenCheckBox @bind-Value="currentFormation.EstInterne" />
+				</EditTemplate>
+			</RadzenGridColumn>
+
+			<RadzenGridColumn TItem="CatalogueFormations" Property="DateDeFin" Title="Date de fin" Filterable="false" Sortable="false">
+				<Template Context="currentFormation">
+					@if (currentFormation.DateDeFin.HasValue)
+					{
+						@String.Format("{0:dd/MM/yyyy}", currentFormation.DateDeFin.Value)
+					}
+					else
+					{
+						<div>Pas de fin</div>
+					}
+				</Template>
+
+				<EditTemplate Context="currentFormation">
+					<RadzenDatePicker @bind-Value="currentFormation.DateDeFin" Style="width:100%" />
+				</EditTemplate>
+			</RadzenGridColumn>
+
+			<RadzenGridColumn TItem="CatalogueFormations" Property="NomDuFichier" Title="Fichier de contenu" Filterable="false" Sortable="false">
+
+				<EditTemplate Context="currentFormation">
+					<MatFileUpload OnChange="@UploadFilePourMiseAJour"
+								   title="Sélectionner"
+								   Label="Déposer ou ouvrir un fichier">
+					</MatFileUpload>
+				</EditTemplate>
+			</RadzenGridColumn>
+
+			@*Colonne pour la modification*@
+			<RadzenGridColumn TItem="CatalogueFormations" Bubble="false" Filterable="false" Sortable="false" TextAlign="TextAlign.Center" Width="100px">
+				<Template Context="currentFormation">
+					<RadzenButton Icon="edit"
+								  Size="ButtonSize.Small"
+								  Click="@(args => EditRow(currentFormation))"
+								  Disabled="lineEnCoursModif" />
+				</Template>
+
+				<EditTemplate Context="currentFormation">
+					<RadzenButton Icon="save" Size="ButtonSize.Small"
+								  Click="@((args) => SaveRow(currentFormation))" />
+
+					<RadzenButton Icon="cancel" Size="ButtonSize.Small"
+								  ButtonStyle="ButtonStyle.Secondary"
+								  Click="@((args) => CancelEdit(currentFormation))" />
+				</EditTemplate>
+			</RadzenGridColumn>
+
+
+			@* NOTE: En commentaire, car techniquement il ne faut pas supprimer une formation.*@
+			@*Colonne pour la Suppression*@
+			@*<RadzenGridColumn TItem="CatalogueFormations" Context="currentFormation" Bubble="false" Filterable="false" Sortable="false" TextAlign="TextAlign.Center" Width="70px">
+			<Template Context="currentFormation">
+				<RadzenButton ButtonStyle="ButtonStyle.Danger"
+							  Icon="close"
+							  Size="ButtonSize.Small"
+							  Click="@(args => DeleteRow(currentFormation))">
+				</RadzenButton>
+			</Template>
+			<EditTemplate Context="currentFormation">
+				<RadzenButton ButtonStyle="ButtonStyle.Danger"
+							  Icon="close"
+							  Size="ButtonSize.Small"
+							  Click="@(args => DeleteRow(currentFormation))">
+				</RadzenButton>
+			</EditTemplate>
+		</RadzenGridColumn>*@
+
+		</Columns>
+	</RadzenGrid>
+
+
+</div>
+
+@code {
+
+}

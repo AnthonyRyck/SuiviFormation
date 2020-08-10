@@ -1,0 +1,54 @@
+﻿@page "/adminSetting"
+
+@attribute [Authorize(Roles = "Administrateur")]
+
+@using FormationApp.Codes.ViewModel
+
+<h3>Paramètre administrateur</h3>
+
+<RadzenGrid @ref="UsersViewGrid"
+			AllowFiltering="true"
+			FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+			AllowPaging="true"
+			PageSize="5"
+			AllowSorting="true"
+			Data="@UsersList"
+			TItem="UtilisateurView"
+			RowUpdate="@OnUpdateRow"
+			ColumnWidth="200px">
+	<Columns>
+		<RadzenGridColumn TItem="UtilisateurView" Property="Personnel.Nom" Title="Nom" />
+		<RadzenGridColumn TItem="UtilisateurView" Property="Personnel.Prenom" Title="Prénom" />
+		<RadzenGridColumn TItem="UtilisateurView" Property="UserIdentity.UserName" Title="Login Intradef" />
+		<RadzenGridColumn TItem="UtilisateurView" Property="Personnel.Service" Title="Service" />
+		<RadzenGridColumn TItem="UtilisateurView" Property="UserIdentity.Email" Title="Email" />
+
+		<RadzenGridColumn TItem="UtilisateurView" Property="RoleUtilisateur" Title="Rôle">
+			<EditTemplate Context="userView">
+				<RadzenDropDown Data="@userView.ListRolesPossible"
+								@bind-Value="userView.RoleUtilisateur"
+								Style="margin-bottom: 20px" />
+			</EditTemplate>
+		</RadzenGridColumn>
+
+		@*Colonne pour la modification*@
+		<RadzenGridColumn TItem="UtilisateurView" Bubble="false" Filterable="false" Sortable="false" TextAlign="TextAlign.Center" Width="100px">
+			<Template Context="userView">
+				<RadzenButton Icon="edit" Size="ButtonSize.Small" Click="@(args => EditRow(userView))">
+				</RadzenButton>
+			</Template>
+
+			<EditTemplate Context="userView">
+				<RadzenButton Icon="save" Size="ButtonSize.Small" Click="@((args) => SaveRow(userView))">
+				</RadzenButton>
+				<RadzenButton Icon="cancel" Size="ButtonSize.Small" ButtonStyle="ButtonStyle.Secondary" Click="@((args) => CancelEdit(userView))">
+				</RadzenButton>
+			</EditTemplate>
+		</RadzenGridColumn>
+
+	</Columns>
+</RadzenGrid>
+
+@code {
+
+}

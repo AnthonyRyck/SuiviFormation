@@ -1,0 +1,45 @@
+﻿@using AccessData.Models
+
+
+<h2>Recherche d'un personnel</h2>
+
+<div>
+	<MatTextField Label="Nom" @bind-Value="Nom" />
+	<i>Double click sur un résultat pour sélectionner</i>
+</div>
+
+<br />
+
+<div class="mat-elevation-z5">
+	<RadzenGrid FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+				AllowFiltering="true"
+				AllowPaging="true"
+				PageSize="5"
+				AllowSorting="true"
+				Data="@AllPersonnels"
+				TItem="Personnel"
+				EmptyText="Aucun personnel de trouvé"
+				RowDoubleClick="@(args => OnPersonnelDbClickedEvent(args))">
+
+		<Columns>
+			<RadzenGridColumn TItem="Personnel" Property="Nom" Title="Nom" Filterable="true" Sortable="false" />
+			<RadzenGridColumn TItem="Personnel" Property="Prenom" Title="Prénom" Filterable="true" Sortable="false" />
+			<RadzenGridColumn TItem="Personnel" Property="Login" Title="Login" Filterable="true" Sortable="false" />
+			<RadzenGridColumn TItem="Personnel" Property="Service" Title="Service" />
+
+			<RadzenGridColumn TItem="Personnel" Property="IsExterne" Title="Externe MinDef" Filterable="true" Sortable="false">
+					<Template Context="currentFormateur">
+						<div>
+							<MatCheckbox Disabled="true" @bind-Value="currentFormateur.IsExterne" Style="margin-left: auto; margin-right: auto;" />
+						</div>
+					</Template>
+				</RadzenGridColumn>
+
+		</Columns>
+	</RadzenGrid>
+
+</div>
+
+@code {
+
+}

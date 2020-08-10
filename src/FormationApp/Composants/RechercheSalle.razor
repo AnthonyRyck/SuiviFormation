@@ -1,0 +1,35 @@
+﻿@using AccessData.Models
+
+
+<h2>Recherche d'une salle</h2>
+
+<div>
+	<MatTextField Label="Nom" @bind-Value="Nom" />
+	<i>Double click sur un résultat pour sélectionner</i>
+</div>
+
+<br />
+
+<div class="mat-elevation-z5">
+	<RadzenGrid FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+				AllowFiltering="true"
+				AllowPaging="true"
+				PageSize="5"
+				AllowSorting="true"
+				Data="@AllSalles"
+				TItem="Salle"
+				EmptyText="Aucune salle de trouvée"
+				RowDoubleClick="@(args => OnSalleDbClickedEvent(args))">
+
+		<Columns>
+			<RadzenGridColumn TItem="Salle" Property="NomSalle" Title="Nom" Filterable="true" Sortable="false" />
+			<RadzenGridColumn TItem="Salle" Property="NombreDePlace" Title="Place" Filterable="true" Sortable="false" />
+			<RadzenGridColumn TItem="Salle" Property="Description" Title="Description" Filterable="false" Sortable="false" />
+		</Columns>
+	</RadzenGrid>
+
+</div>
+
+@code {
+
+}

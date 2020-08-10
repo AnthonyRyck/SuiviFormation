@@ -1,0 +1,176 @@
+﻿@page "/mesFormations"
+
+@using AccessData.Models
+
+<h1>Mes formations</h1>
+
+<br />
+
+<h4>Formations ou vous êtes inscrit et qui n'ont pas encore commencés.</h4>
+
+@*Afficage des inscriptions en cours*@
+<RadzenGrid AllowFiltering="true"
+			FilterCaseSensitivity="FilterCaseSensitivity.Default"
+			AllowPaging="true"
+			PageSize="10"
+			AllowSorting="true"
+			Data="@AllSessions"
+			TItem="SessionView"
+			EmptyText="Vous n'êtes inscrit à aucune formation"
+			ColumnWidth="150px">
+	<Columns>
+		<RadzenGridColumn TItem="SessionView" Property="TitreFormation" Title="Formation" Filterable="true" Sortable="false" />
+		<RadzenGridColumn TItem="SessionView" Property="DateDebutSession" Title="Date" Filterable="true" Sortable="false" Width="80px">
+			<Template Context="data">
+				@String.Format("{0:d}", data.DateDebutSession)
+			</Template>
+		</RadzenGridColumn>
+		<RadzenGridColumn TItem="SessionView" Property="NombreDeJour" Title="Jour" Filterable="false" Sortable="false" Width="50px" />
+		<RadzenGridColumn TItem="SessionView" Property="NombreDePlaceDispo" Title="Place dispo" Filterable="false" Sortable="false" Width="80px" />
+		<RadzenGridColumn TItem="SessionView" Property="NomDeLaSalle" Title="Salle" Filterable="false" Sortable="false" Width="80px" />
+
+		<RadzenGridColumn TItem="SessionView" Property="Nom" Title="Formateur" Filterable="false" Sortable="false">
+			<Template Context="data">
+				<div>
+					@data.Nom
+				</div>
+				<div>
+					@data.Prenom
+				</div>
+			</Template>
+		</RadzenGridColumn>
+
+		<RadzenGridColumn TItem="SessionView" Property="EstExterne" Title="Externe MinDef" Filterable="true" Sortable="false" Width="80px">
+			<Template Context="data">
+				<div>
+					<MatCheckbox Disabled="true" @bind-Value="data.EstExterne" Style="margin-left: auto; margin-right: auto;" />
+				</div>
+			</Template>
+		</RadzenGridColumn>
+
+		<RadzenGridColumn TItem="SessionView" Title="Désinscrire ?" Filterable="false" Sortable="false" Width="80px">
+			<Template Context="data">
+				<MatIconButton Icon="remove_circle" @onclick="(args => DesinscriptionOnClick(args, data.IdSession))" Style="color:red" />
+			</Template>
+		</RadzenGridColumn>
+
+	</Columns>
+</RadzenGrid>
+
+<p>
+	<hr size=4 Width="80%" align="center" noshade>
+</p>
+
+<p>
+	<h4>Formations que vous êtes inscrit et qui sont terminés.</h4>
+</p>
+
+@*Affichage des Formations suivis et terminées.*@
+<RadzenGrid AllowFiltering="true"
+			FilterCaseSensitivity="FilterCaseSensitivity.Default"
+			AllowPaging="true"
+			PageSize="10"
+			AllowSorting="true"
+			Data="@SessionInscritUserViews"
+			TItem="SessionInscritUserView"
+			EmptyText="Vous n'avez fini aucune formation">
+	<Columns>
+		<RadzenGridColumn TItem="SessionInscritUserView" Property="TitreFormation" Title="Formation" Filterable="true" Sortable="false" Width="100px" />
+		<RadzenGridColumn TItem="SessionInscritUserView" Property="DateDeLaFormation" Title="Date" Filterable="true" Sortable="false" Width="80px">
+			<Template Context="data">
+				@String.Format("{0:d}", data.DateDeLaFormation)
+			</Template>
+		</RadzenGridColumn>
+		<RadzenGridColumn TItem="SessionInscritUserView" Property="NombreJourFormation" Title="Jour" Filterable="false" Sortable="false" Width="40px" />
+		<RadzenGridColumn TItem="SessionInscritUserView" Title="Formateur" Filterable="false" Sortable="false" Width="80px">
+			<Template Context="data">
+				<div>
+					@data.NomFormateur
+				</div>
+				<div>
+					@data.PrenomFormateur
+				</div>
+			</Template>
+		</RadzenGridColumn>
+		<RadzenGridColumn TItem="SessionInscritUserView" Property="IsExterne" Title="Externe MinDef" Filterable="true" Sortable="false" Width="80px">
+			<Template Context="data">
+				<div class="center-content">
+					<MatCheckbox Disabled="true" @bind-Value="data.IsExterne" Style="margin-left: auto; margin-right: auto;" />
+				</div>
+			</Template>
+		</RadzenGridColumn>
+
+
+		<RadzenGridColumn TItem="SessionInscritUserView" Property="Note" Title="Note" Filterable="false" Sortable="false" Width="80px">
+			<Template Context="data">
+
+				@if (data.Note.HasValue)
+				{
+					<div class="center-content">
+						<FormationApp.Composants.Rating Stars="data.Note.Value" MaxStars="5" />
+					</div>
+				}
+				else if (data.IsFormationValide)
+				{
+					<MatButton OnClick="@(args => OpenDialogNewNote(data.IdSession))" Raised="true">Donner une note</MatButton>
+				}
+				else
+				{
+					<div>Formation pas encore validée.</div>
+				}
+				</Template>
+			<EditTemplate Context="data">
+
+			</EditTemplate>
+
+		</RadzenGridColumn>
+
+		<RadzenGridColumn TItem="SessionInscritUserView" Property="Commentaire" Title="Commentaire" Filterable="false" Sortable="false" Width="100px">
+				<Template Context="data">
+					@if (string.IsNullOrEmpty(data.Commentaire))
+					{
+					<div>Aucun commentaire</div>
+					}
+					else
+					{
+						<div>@data.Commentaire</div>
+					}
+				</Template>
+			</RadzenGridColumn>
+
+	</Columns>
+</RadzenGrid>
+
+
+<MatDialog @bind-IsOpen="@DialogIsOpenNewNote">
+	<MatDialogTitle>Donner une note</MatDialogTitle>
+
+	<MatDialogContent>
+		<p class="alert-warning">
+			Attention : Quand vous validerez votre note et commentaire, il ne sera plus possible de les modifier.
+		</p>
+
+		<div>
+			<label>Evaluation : </label>
+			<span>
+				<RadzenRating Stars="5"
+							  @bind-Value="@NotePourFormation"
+							  Style="margin-bottom: 20px" />
+			</span>
+		</div>
+
+		<div class="padding-top-10">
+			<MatTextField @bind-Value="@CommentairePourFormation" Label="Commentaire" TextArea="true" FullWidth="true" />
+		</div>
+	</MatDialogContent>
+
+	<MatDialogActions>
+		<MatButton OnClick="@OkClickNewNote">Ajouter</MatButton>
+		<MatButton OnClick="@AnnulerClickNewNote">Annuler</MatButton>
+	</MatDialogActions>
+</MatDialog>
+
+
+@code {
+
+}

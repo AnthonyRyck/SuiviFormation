@@ -1,0 +1,21 @@
+﻿@page "/"
+
+@using AccessData.Models
+
+@*** Visible par tous
+	- Affichage des prochaines sessions.*@
+	<h1>Calendrier des prochaines sessions</h1>
+	
+	<br />
+
+	<RadzenScheduler Data="@ProchaineSessions"
+					 TItem="DataSession"
+					 StartProperty="Start" EndProperty="End" TextProperty="Text"
+					 TodayText="Aujourd'hui"
+					 Style="height: 700px">
+		<RadzenMonthView MoreText="+{0} élément(s)" />
+	</RadzenScheduler>
+
+@code{
+
+}

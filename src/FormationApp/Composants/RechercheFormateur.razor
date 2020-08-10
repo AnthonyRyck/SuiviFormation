@@ -1,0 +1,38 @@
+﻿@using AccessData.Models;
+
+<h3>Recherche un formateur</h3>
+<h3>Formation - @TitreFormation</h3>
+
+
+@*Affichage de la liste des formateurs*@
+<RadzenGrid AllowFiltering="true"
+			FilterCaseSensitivity="FilterCaseSensitivity.Default"
+			AllowPaging="true"
+			PageSize="10"
+			AllowSorting="true"
+			Data="@ResultFormateurs"
+			TItem="FormateurView"
+			EmptyText="Aucun formateur de trouvé"
+			ColumnWidth="150px"
+			RowDoubleClick="@(args => OnFormateurDbClickedEvent(args))">
+	<Columns>
+		<RadzenGridColumn TItem="FormateurView" Property="Nom" Title="Nom" Filterable="true" Sortable="false" />
+		<RadzenGridColumn TItem="FormateurView" Property="Prenom" Title="Prénom" Filterable="true" Sortable="false" />
+		<RadzenGridColumn TItem="FormateurView" Property="Service" Title="Service" />
+
+		<RadzenGridColumn TItem="FormateurView" Property="EstExterne" Title="Externe MinDef" Filterable="true" Sortable="false" Width="70px">
+			<Template Context="currentFormateur">
+				<div>
+					<MatCheckbox Disabled="true" @bind-Value="currentFormateur.EstExterne" Style="margin-left: auto; margin-right: auto;" />
+				</div>
+			</Template>
+		</RadzenGridColumn>
+	</Columns>
+</RadzenGrid>
+
+
+
+
+@code {
+
+}

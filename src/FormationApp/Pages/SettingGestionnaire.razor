@@ -1,0 +1,48 @@
+﻿@using FormationApp.Composants
+
+@page "/gestionnaireSetting"
+@attribute [Authorize(Roles = "Administrateur, Gestionnaire")]
+
+<h1>Paramètres Gestionnaire</h1>
+
+<MatTabGroup>
+	<MatTab>
+		<LabelContent>
+			Salles <MatIcon Icon="@MatIconNames.Meeting_room"></MatIcon>
+		</LabelContent>
+		<ChildContent>
+			<GestionSalle />
+		</ChildContent>
+	</MatTab>
+
+	<MatTab>
+		<LabelContent>
+			Formations <MatIcon Icon="@MatIconNames.School"></MatIcon>
+		</LabelContent>
+		<ChildContent>
+			<GestionFormation />
+		</ChildContent>
+	</MatTab>
+
+	<MatTab>
+		<LabelContent>
+			Formateurs <MatIcon Icon="@MatIconNames.School"></MatIcon>
+		</LabelContent>
+		<ChildContent>
+			<GestionFormateur />
+		</ChildContent>
+	</MatTab>
+
+	<MatTab>
+		<LabelContent>
+			Sessions <MatIcon Icon="@MatIconNames.Schedule"></MatIcon>
+		</LabelContent>
+		<ChildContent>
+			<GestionSession />
+		</ChildContent>
+	</MatTab>
+</MatTabGroup>
+
+@code {
+
+}

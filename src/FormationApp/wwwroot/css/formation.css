@@ -1,0 +1,17 @@
+﻿
+.padding-top-10 {
+	padding-top: 10px;
+}
+
+.hidden{
+	visibility:hidden;
+}
+
+.margin5px {
+	margin: 5px 5px 5px 5px
+}
+
+.center-content {
+	width: 50%;
+	margin: 0 auto;
+}

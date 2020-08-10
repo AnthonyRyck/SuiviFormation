@@ -1,0 +1,112 @@
+﻿@using AccessData.Models
+
+<br />
+<br />
+<h2>Gestion des salles</h2>
+
+@*Pour Ajouter une salle*@
+<div>
+	<MatButton OnClick="@OpenDialogNewSalle" Raised="true">Ajouter une nouvelle salle</MatButton>
+
+	<MatDialog @bind-IsOpen="@DialogIsOpenNewSalle">
+		<MatDialogTitle>Ajout d'une salle</MatDialogTitle>
+		
+		<MatDialogContent>
+			<div>
+				<MatTextField @bind-Value="@NomSalleNew" Label="Nom de la salle" />
+				<MatTextField @bind-Value="@NbrePlaceNew" Label="Nombre de place" />
+			</div>
+
+			<div class="padding-top-10">
+				<MatTextField @bind-Value="@DescriptionNew" Label="Description" TextArea="true" FullWidth="true" />
+			</div>
+		</MatDialogContent>
+
+		<MatDialogActions>
+			<MatButton OnClick="@OkClickNewSalle">Ajouter</MatButton>
+			<MatButton OnClick="@(e => { DialogIsOpenNewSalle = false; })">Annuler</MatButton>
+		</MatDialogActions>
+	</MatDialog>
+
+</div>
+
+<br />
+<br />
+
+
+@*Pour voir la liste des salles*@
+<div>
+	<RadzenGrid @ref="SallesViewGrid"
+				AllowFiltering="true"
+				FilterCaseSensitivity="FilterCaseSensitivity.Default"
+				AllowPaging="true"
+				PageSize="20"
+				AllowSorting="true"
+				Data="@AllSalles"
+				TItem="Salle"
+				EmptyText="Aucune salle de connue"
+				RowUpdate="@OnUpdateRow"
+				ColumnWidth="200px">
+		<Columns>
+			<RadzenGridColumn TItem="Salle" Property="NomSalle" Title="Nom">
+				<EditTemplate Context="currentSalle">
+					<RadzenTextBox @bind-Value="currentSalle.NomSalle" Style="width:100%; display: block" Name="Nom" />
+				</EditTemplate>
+			</RadzenGridColumn>
+
+			<RadzenGridColumn TItem="Salle" Property="NombreDePlace" Title="Nombre place">
+				<EditTemplate Context="currentSalle">
+					<RadzenNumeric @bind-Value="currentSalle.NombreDePlace" Style="width:100%" />
+				</EditTemplate>
+			</RadzenGridColumn>
+
+			<RadzenGridColumn TItem="Salle" Property="Description" Title="Description" Filterable="false" Sortable="false">
+				<EditTemplate Context="currentSalle">
+					<RadzenTextBox @bind-Value="currentSalle.Description" Style="width:100%; display: block" Name="Description" />
+				</EditTemplate>
+			</RadzenGridColumn>
+
+			@*Colonne pour la modification*@
+			<RadzenGridColumn TItem="Salle" Bubble="false" Filterable="false" Sortable="false" TextAlign="TextAlign.Center" Width="100px">
+				<Template Context="currentSalle">
+					<RadzenButton Icon="edit" Size="ButtonSize.Small" Click="@(args => EditRow(currentSalle))">
+					</RadzenButton>
+				</Template>
+
+				<EditTemplate Context="currentSalle">
+					<RadzenButton Icon="save" Size="ButtonSize.Small"
+								  Click="@((args) => SaveRow(currentSalle))" />
+
+					<RadzenButton Icon="cancel" Size="ButtonSize.Small"
+								  ButtonStyle="ButtonStyle.Secondary"
+								  Click="@((args) => CancelEdit(currentSalle))" />
+				</EditTemplate>
+			</RadzenGridColumn>
+
+			@*Colonne pour la Suppression*@
+			<RadzenGridColumn TItem="Salle" Context="currentSalle" Bubble="false" Filterable="false" Sortable="false" TextAlign="TextAlign.Center" Width="70px">
+				<Template Context="currentSalle">
+					<RadzenButton ButtonStyle="ButtonStyle.Danger"
+								  Icon="close"
+								  Size="ButtonSize.Small"
+								  Click="@(args => DeleteRow(currentSalle))">
+					</RadzenButton>
+				</Template>
+				<EditTemplate Context="currentSalle">
+					<RadzenButton ButtonStyle="ButtonStyle.Danger"
+								  Icon="close"
+								  Size="ButtonSize.Small"
+								  Click="@(args => DeleteRow(currentSalle))">
+					</RadzenButton>
+				</EditTemplate>
+			</RadzenGridColumn>
+
+		</Columns>
+	</RadzenGrid>
+
+</div>
+
+
+@code {
+
+}

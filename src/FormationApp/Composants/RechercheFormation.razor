@@ -1,0 +1,44 @@
+﻿@using AccessData.Models 
+
+
+<h2>Recherche de formation(s)</h2>
+
+<div>
+	<MatTextField Label="Formation" @bind-Value="NomFormation" />
+	<i>Double click sur un résultat pour sélectionner</i>
+</div>
+
+<br />
+
+<div class="mat-elevation-z5">
+	<RadzenGrid FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+				AllowFiltering="true"
+				AllowPaging="true"
+				PageSize="5"
+				AllowSorting="true"
+				Data="@AllFormations"
+				TItem="CatalogueFormations"
+				EmptyText="Aucune formation trouvé"
+				RowDoubleClick="@(args => OnFormationDbClickedEvent(args))">
+
+		<Columns>
+			<RadzenGridColumn TItem="CatalogueFormations" Property="Titre" Title="Titre" Filterable="true" Sortable="false" />
+			<RadzenGridColumn TItem="CatalogueFormations" Property="Description" Title="Description" Filterable="true" Sortable="false" />
+
+			<RadzenGridColumn TItem="CatalogueFormations" Property="EstInterne" Title="Est interne" Filterable="true" Sortable="false">
+				<Template Context="currentFormation">
+					<div>
+						<MatCheckbox Disabled="true" @bind-Value="currentFormation.EstInterne" Style="margin-left: auto; margin-right: auto;" />
+					</div>
+				</Template>
+			</RadzenGridColumn>
+
+		</Columns>
+	</RadzenGrid>
+
+</div>
+
+
+@code {
+
+}
