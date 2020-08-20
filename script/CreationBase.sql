@@ -1,5 +1,4 @@
-﻿USE azureformationdb;
-/* USE testscript; */
+USE formationdb;
 
 /******************************
 * Création des tables ASP.Net *

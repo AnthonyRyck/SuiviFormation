@@ -37,10 +37,8 @@ namespace FormationApp
 		// For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
 		public void ConfigureServices(IServiceCollection services)
 		{
-			//services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
 			services.AddDbContext<ApplicationDbContext>(options => options.UseMySql(Configuration.GetConnectionString("MySqlConnection")));
 
-			//services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
 			services.AddDefaultIdentity<IdentityUser>()
 				.AddRoles<IdentityRole>()
 				.AddEntityFrameworkStores<ApplicationDbContext>();
@@ -48,7 +46,9 @@ namespace FormationApp
 			services.AddRazorPages();
 			services.AddServerSideBlazor();
 			services.AddScoped<AuthenticationStateProvider, RevalidatingIdentityAuthenticationStateProvider<IdentityUser>>();
-			
+
+			services.AddServerSideBlazor().AddCircuitOptions(options => { options.DetailedErrors = true; });
+
 			// Service SQL de AccessData.
 			services.AddSingleton(new SqlContext(Configuration.GetConnectionString("MySqlConnection")));
 			
@@ -67,6 +67,9 @@ namespace FormationApp
 
 			services.AddScoped<DialogService>();
 			services.AddScoped<NotificationService>();
+
+			services.AddHttpContextAccessor();
+			services.AddScoped<CurrentUserService>();
 		}
 
 		// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

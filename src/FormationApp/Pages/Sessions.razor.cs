@@ -1,9 +1,9 @@
 ﻿using AccessData;
 using AccessData.Models;
+using FormationApp.Data;
 using MatBlazor;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
-using Microsoft.AspNetCore.Identity;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,7 +22,7 @@ namespace FormationApp.Pages
 		protected IMatToaster Toaster { get; set; }
 
 		[Inject]
-		protected SignInManager<IdentityUser> SignInManager { get; set; }
+		public CurrentUserService UserService { get; set; }
 
 		/// <summary>
 		/// Liste de toutes les sessions.
@@ -65,10 +65,9 @@ namespace FormationApp.Pages
 		{
 			try
 			{
-				string userID = SignInManager.UserManager.GetUserId(SignInManager.Context.User);
-				await SqlService.InsertInscriptionAsync(idSession, userID);
+				await SqlService.InsertInscriptionAsync(idSession, UserService.UserId);
 
-				AllSessions.FirstOrDefault(x => x.IdSession == idSession).UsersInscrits.Add(userID);
+				AllSessions.FirstOrDefault(x => x.IdSession == idSession).UsersInscrits.Add(UserService.UserId);
 
 				Toaster.Add("Inscription effectuée.", MatToastType.Success);
 				StateHasChanged();
@@ -89,10 +88,9 @@ namespace FormationApp.Pages
 		{
 			try
 			{
-				string userID = SignInManager.UserManager.GetUserId(SignInManager.Context.User);
-				await SqlService.DeleteInscriptionAsync(idSession, userID);
+				await SqlService.DeleteInscriptionAsync(idSession, UserService.UserId);
 
-				AllSessions.FirstOrDefault(x => x.IdSession == idSession).UsersInscrits.Remove(userID);
+				AllSessions.FirstOrDefault(x => x.IdSession == idSession).UsersInscrits.Remove(UserService.UserId);
 
 				Toaster.Add("Désinscription effectuée.", MatToastType.Success);
 				StateHasChanged();

@@ -50,7 +50,7 @@
 			<Template Context="data">
 				<AuthorizeView>
 					<Authorized>
-							@if (data.UsersInscrits.Contains(SignInManager.UserManager.GetUserId(SignInManager.Context.User)))
+							@if (data.UsersInscrits.Contains(UserService.UserId))
 							{
 								<MatIconButton Icon="remove_circle" @onclick="(args => DesinscriptionOnClick(args, data.IdSession))" Style="color:red" />
 							}

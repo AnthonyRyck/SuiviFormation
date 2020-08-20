@@ -317,36 +317,38 @@ namespace AccessData
 		{
             CatalogueFormations formation = new CatalogueFormations();
 
-            try
+            var commandText = @"SELECT IdFormation, Titre, DescriptionFormation, DateDeFin, NomDeFichier, EstInterne FROM catalogueformation"
+                                       + $" WHERE IdFormation={idFormation};";
+
+            Func<MySqlCommand, CatalogueFormations> funcCmd = (cmd) =>
             {
+                CatalogueFormations formation = new CatalogueFormations();
 
-                using (var conn = new MySqlConnection(ConnectionString))
+                using (var reader = cmd.ExecuteReader())
                 {
-                    conn.Open();
-                    var commandText = @"SELECT IdFormation, Titre, DescriptionFormation, DateDeFin, NomDeFichier, EstInterne FROM catalogueformation"
-                                        + $" WHERE IdFormation={idFormation};";
-                    MySqlCommand cmd = new MySqlCommand(commandText, conn);
-
-                    using (var reader = cmd.ExecuteReader())
+                    while (reader.Read())
                     {
-                        while (await reader.ReadAsync())
+                        object tempDate = reader.GetValue(3);
+                        DateTime? tempDateFin = ConvertFromDBVal<DateTime?>(tempDate);
+
+                        formation = new CatalogueFormations()
                         {
-
-                            object tempDate = reader.GetValue(3);
-                            DateTime? tempDateFin = ConvertFromDBVal<DateTime?>(tempDate);
-
-                            formation = new CatalogueFormations()
-                            {
-                                IdFormation = reader.GetInt32(0),
-                                Titre = reader.GetString(1),
-                                Description = reader.GetString(2),
-                                DateDeFin = tempDateFin,
-                                NomDuFichier = reader.GetString(4),
-                                EstInterne = reader.GetBoolean(5)
-                            };
-                        }
+                            IdFormation = reader.GetInt32(0),
+                            Titre = reader.GetString(1),
+                            Description = reader.GetString(2),
+                            DateDeFin = tempDateFin,
+                            NomDuFichier = reader.GetString(4),
+                            EstInterne = reader.GetBoolean(5)
+                        };
                     }
                 }
+
+                return formation;
+            };
+
+            try
+            {
+                formation = await GetCoreAsync(commandText, funcCmd);
             }
             catch (Exception ex)
             {
@@ -363,33 +365,37 @@ namespace AccessData
         /// <returns></returns>
         public async Task<IEnumerable<CatalogueFormations>> GetFormationAsync(string nomFormation)
         {
+            var commandText = @"SELECT IdFormation, Titre, DescriptionFormation, EstInterne FROM catalogueformation"
+                            + $" WHERE Titre LIKE '%{nomFormation}%';";
+
+            Func<MySqlCommand, List<CatalogueFormations>> funcCmd = (cmd) =>
+            {
+                List<CatalogueFormations> formations = new List<CatalogueFormations>();
+
+                using (var reader = cmd.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        var formation = new CatalogueFormations()
+                        {
+                            IdFormation = reader.GetInt32(0),
+                            Titre = reader.GetString(1),
+                            Description = reader.GetString(2),
+                            EstInterne = reader.GetBoolean(3)
+                        };
+
+                        formations.Add(formation);
+                    }
+                }
+
+                return formations;
+            };
+
             List<CatalogueFormations> formations = new List<CatalogueFormations>();
 
             try
             {
-                using (var conn = new MySqlConnection(ConnectionString))
-                {
-                    conn.Open();
-                    var commandText = @"SELECT IdFormation, Titre, DescriptionFormation, EstInterne FROM catalogueformation"
-                                        + $" WHERE Titre LIKE '%{nomFormation}%';";
-                    MySqlCommand cmd = new MySqlCommand(commandText, conn);
-
-                    using (var reader = cmd.ExecuteReader())
-                    {
-                        while (await reader.ReadAsync())
-                        {
-                            var formation = new CatalogueFormations()
-                            {
-                                IdFormation = reader.GetInt32(0),
-                                Titre = reader.GetString(1),
-                                Description = reader.GetString(2),
-                                EstInterne = reader.GetBoolean(3)
-                            };
-
-                            formations.Add(formation);
-                        }
-                    }
-                }
+                formations = await GetCoreAsync(commandText, funcCmd);
             }
             catch (Exception ex)
             {
@@ -408,13 +414,7 @@ namespace AccessData
 		{
             string commandDelete = $"DELETE FROM catalogueformation WHERE IdFormation={currentFormation.IdFormation}";
 
-            using (var conn = new MySqlConnection(ConnectionString))
-            {
-                conn.Open();
-                MySqlCommand cmd = new MySqlCommand(commandDelete, conn);
-
-                await cmd.ExecuteNonQueryAsync();
-            }
+            await ExecuteCoreAsync(commandDelete);
         }
 
         /// <summary>
@@ -1271,7 +1271,51 @@ namespace AccessData
             });
         }
 
-       
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="commandSql"></param>
+        /// <param name="func"></param>
+        /// <returns></returns>
+        private async Task<T> GetCoreAsync<T>(string commandSql, Func<MySqlCommand, T> func)
+            where T : new()
+        {
+            return await Task.Run(() =>
+            {
+                T result = new T();
+
+                try
+                {
+                    using (var conn = new MySqlConnection(ConnectionString))
+                    {
+                        MySqlCommand cmd = new MySqlCommand(commandSql, conn);
+                        conn.Open();
+                        result = func.Invoke(cmd);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw;
+                }
+
+                return result;
+            });
+        }
+
+
+        private async Task ExecuteCoreAsync(string commandSql)
+		{
+            using (var conn = new MySqlConnection(ConnectionString))
+            {
+                MySqlCommand cmd = new MySqlCommand(commandSql, conn);
+
+                conn.Open();
+                await cmd.ExecuteNonQueryAsync();
+            }
+        }
+
+
 
         #endregion
     }
