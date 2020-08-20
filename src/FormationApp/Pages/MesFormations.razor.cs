@@ -1,5 +1,6 @@
 ﻿using AccessData;
 using AccessData.Models;
+using FormationApp.Data;
 using MatBlazor;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
@@ -19,7 +20,7 @@ namespace FormationApp.Pages
 		public SqlContext SqlService { get; set; }
 
 		[Inject]
-		protected SignInManager<IdentityUser> SignInManager { get; set; }
+		public CurrentUserService UserService{ get; set; }
 
 		[Inject]
 		protected IMatToaster Toaster { get; set; }
@@ -33,8 +34,6 @@ namespace FormationApp.Pages
 		/// Liste des sessions que l'utilisateur s'est inscrit et qui sont terminés.
 		/// </summary>
 		public List<SessionInscritUserView> SessionInscritUserViews { get; set; }
-
-		public string UserId { get; private set; }
 
 		#endregion
 
@@ -56,7 +55,7 @@ namespace FormationApp.Pages
 		internal async void OkClickNewNote()
 		{
 			// Sauvegarde en BDD
-			await SqlService.SaveNotationFormation(IdSessionNotation, UserId, NotePourFormation, CommentairePourFormation);
+			await SqlService.SaveNotationFormation(IdSessionNotation, UserService.UserId, NotePourFormation, CommentairePourFormation);
 
 			var tempSession = SessionInscritUserViews.First(x => x.IdSession == IdSessionNotation);
 			tempSession.Note = NotePourFormation;
@@ -73,7 +72,7 @@ namespace FormationApp.Pages
 		/// <summary>
 		/// Annule l'ajout
 		/// </summary>
-		internal async void AnnulerClickNewNote()
+		internal void AnnulerClickNewNote()
 		{
 			// Remise à zéro, dans le cas d'une nouvelle notation
 			NotePourFormation = 0;
@@ -99,10 +98,8 @@ namespace FormationApp.Pages
 
 		protected async override Task OnInitializedAsync()
 		{
-			UserId = SignInManager.UserManager.GetUserId(SignInManager.Context.User);
-
-			AllSessions = await SqlService.GetInscriptionSessionUserAsync(UserId);
-			SessionInscritUserViews = await SqlService.GetInscriptionSessionUserFinishAsync(UserId);
+			AllSessions = await SqlService.GetInscriptionSessionUserAsync(UserService.UserId);
+			SessionInscritUserViews = await SqlService.GetInscriptionSessionUserFinishAsync(UserService.UserId);
 		}
 
 		#endregion
@@ -118,7 +115,7 @@ namespace FormationApp.Pages
 		{
 			try
 			{
-				await SqlService.DeleteInscriptionAsync(idSession, UserId);
+				await SqlService.DeleteInscriptionAsync(idSession, UserService.UserId);
 
 				AllSessions.RemoveAll(x => x.IdSession == idSession);
 
