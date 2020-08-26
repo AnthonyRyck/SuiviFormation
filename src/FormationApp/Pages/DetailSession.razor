@@ -1,0 +1,50 @@
+﻿@page "/detailsession"
+
+@attribute [Authorize(Roles = "Administrateur, Gestionnaire")]
+
+<h3>Détail de la session</h3>
+
+@*Affichage des informations sur le session de formation*@
+<div class="row border">
+	<div class="col-4">
+		<div><u>Formation</u> : @UserService.SessionView.TitreFormation</div>
+		<div><u>Date</u> : @UserService.SessionView.DateDebutSession.ToString("d")</div>
+		<div><u>Durée</u> : @UserService.SessionView.NombreDeJour jour(s)</div>
+	</div>
+	
+	<div class="col-4">
+		<div><u>Formateur</u> : @UserService.SessionView.Nom @UserService.SessionView.Prenom</div>
+		<div><u>Salle</u> : @UserService.SessionView.NomDeLaSalle</div>
+	</div>
+
+	<div class="col-4">
+		<div>Ajouter le fichier d'émargement</div>
+
+		@if (string.IsNullOrEmpty(FileNameEmergement))
+		{
+			<div>
+				<MatFileUpload OnChange="@FileEmargement"
+							   Label="Déposer le fichier ou Parcourir"
+							   Style="height:30px"></MatFileUpload>
+			</div>
+		}
+		else
+		{
+	<div>
+		<MatButton Icon="attachment" 
+					Label="Télécharger"
+					@onclick="@(e => DownloadOnClick(e))" />
+	</div>
+		}
+			<div>Nom du fichier : @FileNameEmergement</div>
+	</div>
+</div>
+
+@*Affichage du tableau du personnel inscrit à cette session*@
+<div>
+	
+</div>
+
+@code {
+
+}

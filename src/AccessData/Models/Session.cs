@@ -18,5 +18,7 @@ namespace AccessData.Models
 
 		public byte[] ScanEmargement { get; set; }
 
+		public string? NomFichierEmargement { get; set; }
+
 	}
 }

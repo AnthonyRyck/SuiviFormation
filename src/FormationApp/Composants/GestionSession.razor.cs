@@ -1,5 +1,6 @@
 ﻿using AccessData;
 using AccessData.Models;
+using FormationApp.Data;
 using MatBlazor;
 using Microsoft.AspNetCore.Components;
 using System;
@@ -18,6 +19,12 @@ namespace FormationApp.Composants
 
 		[Inject]
 		protected IMatToaster Toaster { get; set; }
+
+		[Inject]
+		protected NavigationManager NavManager { get; set; }
+
+		[Inject]
+		protected CurrentUserService UserService { get; set; }
 
 		/// <summary>
 		/// Liste de toutes les sessions.
@@ -219,6 +226,15 @@ namespace FormationApp.Composants
 			await LoadAllSessions();
 			StateHasChanged();
 		}
+
+
+		internal async Task OpenSessionSetting(SessionView sessionSelected)
+		{
+			UserService.SessionView = sessionSelected;
+			NavManager.NavigateTo($"detailsession");
+		}
+
+
 
 		#endregion
 

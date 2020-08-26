@@ -67,8 +67,6 @@ namespace AccessData
             return listSession;
         }
 
-
-
 		/// <summary>
 		/// Récupère toutes les sessions qui sont encore ouvertes
 		/// </summary>
@@ -208,6 +206,72 @@ namespace AccessData
 			{
                 throw;
 			}
+        }
+
+        /// <summary>
+        /// Ajoute le fichier d'emargement pour la session.
+        /// </summary>
+        /// <param name="idSession"></param>
+        /// <param name="file"></param>
+        /// <returns></returns>
+        public async Task AddEmargementFile(int idSession, byte[] file, string fileName)
+		{
+            string cmdUpdate = @"UPDATE sessionformation SET emargement=@fichier, filename=@name"
+                                + $" WHERE IdSession=@idSession";
+
+            using (var conn = new MySqlConnection(ConnectionString))
+            {
+                using (var cmd = new MySqlCommand(cmdUpdate, conn))
+                {
+                    cmd.Parameters.AddWithValue("@idSession", idSession);
+                    cmd.Parameters.AddWithValue("@fichier", file);
+                    cmd.Parameters.AddWithValue("@name", fileName);
+
+                    conn.Open();
+                    int result = await cmd.ExecuteNonQueryAsync();
+                    conn.Close();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Récupère le nom du fichier d'émargement.
+        /// Si null, c'est qu'il n'y a pas de fichier.
+        /// </summary>
+        /// <param name="idSession"></param>
+        /// <returns></returns>
+        public async Task<Session> GetFileNameEmargementAsync(int idSession)
+        {
+            string commandText = $"SELECT IdSession, FileName FROM sessionformation WHERE IdSession={idSession}";
+
+            Func<MySqlCommand, Session> funcCmd = (cmd) =>
+            {
+                Session session = new Session();
+                
+                using (var reader = cmd.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        session.IdFormation = reader.GetInt32(0);
+                        session.NomFichierEmargement = ConvertFromDBVal<string?>(reader.GetValue(1));
+                    }
+                }
+
+                return session;
+            };
+
+            Session session = new Session();
+
+            try
+			{
+                session = await GetCoreAsync(commandText, funcCmd);
+            }
+			catch (Exception ex)
+			{
+
+			}
+
+            return session;
         }
 
         #endregion
@@ -511,33 +575,22 @@ namespace AccessData
         /// <returns></returns>
         public async Task<byte[]> GetFormationFileAsync(int id)
         {
-            byte[] file = null;
-
-            try
-            {
-                using (var conn = new MySqlConnection(ConnectionString))
-                {
-                    conn.Open();
-                    var commandText = @"SELECT FichierContenu FROM catalogueformation"
+            var commandText = @"SELECT FichierContenu FROM catalogueformation"
                                         + $" WHERE IdFormation={id};";
-                    MySqlCommand cmd = new MySqlCommand(commandText, conn);
 
-                    using (var reader = cmd.ExecuteReader())
-                    {
-                        while (await reader.ReadAsync())
-                        {
-                            file = (byte[])reader[0];
-                          
-                        }
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                var exs = ex.Message;
-            }
+            return await GetBytesCore(commandText);
+        }
 
-            return file;
+        /// <summary>
+        /// Récupère le fichier d'émergement pour une session donnée.
+        /// </summary>
+        /// <param name="idSession"></param>
+        /// <returns></returns>
+        public async Task<byte[]> GetEmargementFileAsync(int idSession)
+        {
+            var commandText = @"SELECT Emargement FROM sessionformation"
+                                        + $" WHERE IdSession={idSession};";
+            return await GetBytesCore(commandText);
         }
 
         #endregion
@@ -1303,7 +1356,6 @@ namespace AccessData
             });
         }
 
-
         private async Task ExecuteCoreAsync(string commandSql)
 		{
             using (var conn = new MySqlConnection(ConnectionString))
@@ -1315,8 +1367,41 @@ namespace AccessData
             }
         }
 
+        /// <summary>
+        /// Permet la récupération d'un BLOB uniquement !
+        /// </summary>
+        /// <param name="commandText"></param>
+        /// <returns></returns>
+        private async Task<byte[]> GetBytesCore(string commandText)
+        {
+            byte[] file = null;
 
+            try
+            {
+                using (var conn = new MySqlConnection(ConnectionString))
+                {
+                    conn.Open();
+                    MySqlCommand cmd = new MySqlCommand(commandText, conn);
+
+                    using (var reader = cmd.ExecuteReader())
+                    {
+                        while (await reader.ReadAsync())
+                        {
+                            file = (byte[])reader[0];
+
+                        }
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+
+            return file;
+        }
 
         #endregion
     }
+
 }

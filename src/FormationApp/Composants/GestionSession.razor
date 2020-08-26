@@ -5,7 +5,8 @@
 
 <br />
 
-@*Affichage des sessions en cours*@
+<div>Sessions en cours</div>
+
 <RadzenGrid AllowFiltering="true"
 			FilterCaseSensitivity="FilterCaseSensitivity.Default"
 			AllowPaging="true"
@@ -16,6 +17,12 @@
 			EmptyText="Il n'y a aucune session"
 			ColumnWidth="150px">
 	<Columns>
+		<RadzenGridColumn TItem="SessionView" Title="Détails" Filterable="false" Sortable="false" Width="50px">
+			<Template Context="data">
+				<MatIconButton Icon="settings" OnClick="@(args => OpenSessionSetting(data))"></MatIconButton>
+			</Template>
+		</RadzenGridColumn>
+
 		<RadzenGridColumn TItem="SessionView" Property="TitreFormation" Title="Formation" Filterable="true" Sortable="false" />
 		<RadzenGridColumn TItem="SessionView" Property="DateDebutSession" Title="Date" Filterable="true" Sortable="false" Width="80px">
 			<Template Context="data">
