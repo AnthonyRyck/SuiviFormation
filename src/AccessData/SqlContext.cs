@@ -266,9 +266,9 @@ namespace AccessData
 			{
                 session = await GetCoreAsync(commandText, funcCmd);
             }
-			catch (Exception ex)
+			catch (Exception)
 			{
-
+                throw;
 			}
 
             return session;
@@ -1234,6 +1234,59 @@ namespace AccessData
             }
 
             return listSession;
+        }
+
+        /// <summary>
+        /// Récupère la liste des utilisateurs inscrits.
+        /// </summary>
+        /// <param name="idSession"></param>
+        /// <returns></returns>
+        public async Task<List<PersonnelInscritView>> GetPersonnelsInscritSession(int idSession)
+        {
+            List<PersonnelInscritView> personnelInscrit = new List<PersonnelInscritView>();
+
+            var commandText = "SELECT pers.IdPersonnel, pers.Nom, pers.Prenom, pers.Service, inscription.IsSessionValidate, inscription.Note, inscription.Commentaire"
+                            + " FROM personnel pers"
+                            + " INNER JOIN inscriptionformation inscription ON pers.IdPersonnel = inscription.IdPersonnel"
+                            + $" WHERE inscription.IdSession = {idSession};";
+
+            Func<MySqlCommand, List<PersonnelInscritView>> funcCmd = (cmd) =>
+            {
+                List<PersonnelInscritView> personnelInscrits = new List<PersonnelInscritView>();
+
+                using (var reader = cmd.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        PersonnelInscritView personnel = new PersonnelInscritView()
+                        {
+                            IdPersonnel = reader.GetString(0),
+                            Nom = reader.GetString(1),
+                            Prenom = reader.GetString(2),
+                            Service = reader.GetString(3),
+                            IsSessionValidate = reader.GetBoolean(4),
+                            Note = ConvertFromDBVal<int?>(reader.GetValue(5)),
+                            Commentaire = ConvertFromDBVal<string?>(reader.GetValue(6))
+                        };
+
+                        personnelInscrits.Add(personnel);
+                    }
+                }
+
+                return personnelInscrits;
+            };
+
+            try
+            {
+                personnelInscrit = await GetCoreAsync(commandText, funcCmd);
+            }
+            catch (Exception ex)
+            {
+                var exs = ex.Message;
+            }
+
+            return personnelInscrit;
+
         }
 
         /// <summary>

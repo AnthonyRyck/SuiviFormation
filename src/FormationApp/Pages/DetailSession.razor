@@ -1,5 +1,7 @@
 ﻿@page "/detailsession"
 
+@using AccessData.Models
+@using FormationApp.Composants
 @attribute [Authorize(Roles = "Administrateur, Gestionnaire")]
 
 <h3>Détail de la session</h3>
@@ -40,9 +42,47 @@
 	</div>
 </div>
 
+<br />
+<br />
+
 @*Affichage du tableau du personnel inscrit à cette session*@
 <div>
-	
+	<RadzenGrid AllowFiltering="true"
+				FilterCaseSensitivity="FilterCaseSensitivity.Default"
+				AllowPaging="true"
+				PageSize="10"
+				AllowSorting="true"
+				Data="@PersonnelsInscrit"
+				TItem="PersonnelInscritView"
+				EmptyText="Aucun personnel inscrit"
+				ColumnWidth="150px">
+		<Columns>
+			<RadzenGridColumn TItem="PersonnelInscritView" Property="Nom" Title="Nom" Filterable="true" Sortable="true" />
+			<RadzenGridColumn TItem="PersonnelInscritView" Property="Prenom" Title="Prénom" Filterable="true" Sortable="true" />
+			<RadzenGridColumn TItem="PersonnelInscritView" Property="Service" Title="Service" Filterable="true" Sortable="true" />
+			<RadzenGridColumn TItem="PersonnelInscritView" Property="Note" Title="Note" Filterable="false" Sortable="false">
+				<Template Context="personnel">
+					@if(!personnel.Note.HasValue)
+					{
+						<div><i>Aucune note</i></div>
+					}
+					else
+					{
+						<Rating Stars="personnel.Note.Value" MaxStars="5"></Rating>
+					}
+				</Template>
+			</RadzenGridColumn>
+
+			<RadzenGridColumn TItem="PersonnelInscritView" Property="Commentaire" Title="Commentaire" Filterable="false" Sortable="false">
+				<Template Context="personnel">
+				@if(string.IsNullOrEmpty(personnel.Commentaire))
+				{
+					<div><i>Aucun commentaire</i></div>
+				}
+				</Template>
+			</RadzenGridColumn>
+		</Columns>
+	</RadzenGrid>
 </div>
 
 @code {

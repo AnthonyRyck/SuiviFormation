@@ -31,7 +31,15 @@ namespace FormationApp.Pages
 
 		public Session InfoSession { get; set; }
 
+		/// <summary>
+		/// Nom du fichier d'émargement, null si aucun.
+		/// </summary>
 		public string FileNameEmergement { get; set; }
+
+		/// <summary>
+		/// Liste du personnel suivant la formation
+		/// </summary>
+		public List<PersonnelInscritView> PersonnelsInscrit { get; set; }
 
 		#endregion
 
@@ -41,6 +49,7 @@ namespace FormationApp.Pages
 		{
 			// Chargement pour savoir s'il y a un fichier d'émargement.
 			InfoSession = await SqlService.GetFileNameEmargementAsync(UserService.SessionView.IdSession);
+			PersonnelsInscrit = await SqlService.GetPersonnelsInscritSession(UserService.SessionView.IdSession);
 
 			if (!string.IsNullOrEmpty(InfoSession.NomFichierEmargement))
 				FileNameEmergement = InfoSession.NomFichierEmargement;
