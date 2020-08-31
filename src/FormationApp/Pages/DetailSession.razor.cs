@@ -5,6 +5,7 @@ using FormationApp.Data;
 using MatBlazor;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
+using Radzen.Blazor;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -40,6 +41,10 @@ namespace FormationApp.Pages
 		/// Liste du personnel suivant la formation
 		/// </summary>
 		public List<PersonnelInscritView> PersonnelsInscrit { get; set; }
+
+		public RadzenGrid<PersonnelInscritView> PersonnelViewGrid { get; set; }
+
+		//public PersonnelInscritView CurrentLine { get; set; }
 
 		#endregion
 
@@ -108,6 +113,53 @@ namespace FormationApp.Pages
 				Toaster.Add("Erreur sur la récupération du fichier d'émargement.", MatToastType.Danger);
 			}
 		}
+
+		#endregion
+
+		#region Event sur DataGrid
+
+		/// <summary>
+		/// Lors du click sur le bouton Edit
+		/// </summary>
+		/// <param name="currentPersonnel"></param>
+		internal void EditRow(PersonnelInscritView currentPersonnel)
+		{
+			//CurrentLine = currentPersonnel;
+			PersonnelViewGrid.EditRow(currentPersonnel);
+		}
+
+		internal void SaveRow(PersonnelInscritView currentPersonnel)
+		{
+			SqlService.UpdateValidationUser(currentPersonnel.IsSessionValidate, UserService.SessionView.IdSession, currentPersonnel.IdPersonnel);
+			PersonnelViewGrid.UpdateRow(currentPersonnel);
+		}
+
+		/// <summary>
+		/// Sauvegarde en BDD des modifications
+		/// </summary>
+		/// <param name="currentFormation"></param>
+		internal async void OnUpdateRow(PersonnelInscritView currentPersonnel)
+		{
+			StateHasChanged();
+		}
+
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="currentFormation"></param>
+		internal async void CancelEdit(PersonnelInscritView currentPersonnel)
+		{
+			PersonnelViewGrid.CancelEditRow(currentPersonnel);
+
+			// récupération de la valeur en BDD
+			//PersonnelInscritView backup = await SqlService.GetFormationAsync(currentFormation.IdFormation);
+
+			//AllFormations.Remove(currentFormation);
+			//AllFormations.Add(backup);
+		}
+
+		
+
 
 		#endregion
 	}

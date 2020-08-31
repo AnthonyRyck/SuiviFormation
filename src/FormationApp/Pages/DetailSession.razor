@@ -55,14 +55,15 @@
 				Data="@PersonnelsInscrit"
 				TItem="PersonnelInscritView"
 				EmptyText="Aucun personnel inscrit"
-				ColumnWidth="150px">
+				ColumnWidth="150px"
+				@ref="PersonnelViewGrid">
 		<Columns>
 			<RadzenGridColumn TItem="PersonnelInscritView" Property="Nom" Title="Nom" Filterable="true" Sortable="true" />
 			<RadzenGridColumn TItem="PersonnelInscritView" Property="Prenom" Title="Prénom" Filterable="true" Sortable="true" />
 			<RadzenGridColumn TItem="PersonnelInscritView" Property="Service" Title="Service" Filterable="true" Sortable="true" />
 			<RadzenGridColumn TItem="PersonnelInscritView" Property="Note" Title="Note" Filterable="false" Sortable="false">
 				<Template Context="personnel">
-					@if(!personnel.Note.HasValue)
+					@if (!personnel.Note.HasValue)
 					{
 						<div><i>Aucune note</i></div>
 					}
@@ -75,11 +76,42 @@
 
 			<RadzenGridColumn TItem="PersonnelInscritView" Property="Commentaire" Title="Commentaire" Filterable="false" Sortable="false">
 				<Template Context="personnel">
-				@if(string.IsNullOrEmpty(personnel.Commentaire))
-				{
-					<div><i>Aucun commentaire</i></div>
-				}
+					@if (string.IsNullOrEmpty(personnel.Commentaire))
+					{
+						<div><i>Aucun commentaire</i></div>
+					}
 				</Template>
+			</RadzenGridColumn>
+
+			<RadzenGridColumn TItem="PersonnelInscritView" Property="IsSessionValidate" Title="Validé ?" Filterable="false" Sortable="false">
+				<Template Context="personnel">
+					<RadzenCheckBox @bind-Value="personnel.IsSessionValidate" Disabled="true" />
+				</Template>
+
+				<EditTemplate Context="personnel">
+					<RadzenCheckBox @bind-Value="personnel.IsSessionValidate" />
+				</EditTemplate>
+			</RadzenGridColumn>
+
+
+			@*Colonne pour la modification*@
+			<RadzenGridColumn TItem="PersonnelInscritView" Bubble="false"
+								Filterable="false" Sortable="false" 
+								TextAlign="TextAlign.Center" Width="100px">
+				<Template Context="currentPersonnel">
+					<RadzenButton Icon="edit"
+								  Size="ButtonSize.Small"
+								  Click="@(args => EditRow(currentPersonnel))" />
+				</Template>
+
+				<EditTemplate Context="currentPersonnel">
+					<RadzenButton Icon="save" Size="ButtonSize.Small"
+								  Click="@((args) => SaveRow(currentPersonnel))" />
+
+					<RadzenButton Icon="cancel" Size="ButtonSize.Small"
+								  ButtonStyle="ButtonStyle.Secondary"
+								  Click="@((args) => CancelEdit(currentPersonnel))" />
+				</EditTemplate>
 			</RadzenGridColumn>
 		</Columns>
 	</RadzenGrid>

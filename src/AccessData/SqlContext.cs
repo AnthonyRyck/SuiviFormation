@@ -1328,20 +1328,40 @@ namespace AccessData
             }
         }
 
-        #endregion
+        /// <summary>
+        /// Met à jour pour un utilisateur, si la session est validé ou non.
+        /// </summary>
+        /// <param name="isValidate"></param>
+        /// <param name="idSession"></param>
+        /// <param name="idUser"></param>
+        /// <returns></returns>
+        public void UpdateValidationUser(bool isValidate, int idSession, string idUser)
+		{
+				try
+				{
+                    using (var conn = new MySqlConnection(ConnectionString))
+                    {
+                        string commandUpdateSession = @"UPDATE inscriptionformation"
+                                                            + $" SET IsSessionValidate=@valueValidate"
+                                                            + $" WHERE IdSession = {idSession}  AND IdPersonnel = '{idUser}';";
 
-        public static T ConvertFromDBVal<T>(object obj)
-        {
-            if (obj == null || obj == DBNull.Value)
-            {
-                return default(T);
-            }
-            else
-            {
-                return (T)obj;
-            }
+                        using (var cmd = new MySqlCommand(commandUpdateSession, conn))
+                        {
+                            cmd.Parameters.AddWithValue("@valueValidate", isValidate);
+
+                            conn.Open();
+                            int result = cmd.ExecuteNonQuery();
+                            conn.Close();
+                        }
+                    }
+                }
+                catch (Exception)
+				{
+					throw;
+				}       
         }
 
+        #endregion
 
         #region Private Methods
 
@@ -1454,7 +1474,25 @@ namespace AccessData
             return file;
         }
 
-        #endregion
-    }
+        /// <summary>
+        /// Permet de gérer les retours de valeur null de la BDD
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="obj"></param>
+        /// <returns></returns>
+        private static T ConvertFromDBVal<T>(object obj)
+        {
+            if (obj == null || obj == DBNull.Value)
+            {
+                return default(T);
+            }
+            else
+            {
+                return (T)obj;
+            }
+        }
 
+        #endregion
+
+    }
 }
