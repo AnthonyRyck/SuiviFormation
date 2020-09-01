@@ -27,6 +27,20 @@
 				<br />
 
 				<div>
+					@*<MatNumericUpDownField Label="Durée"
+										   @bind-Value=@formationModel.Duree
+										   Step="0.01d"
+										   DecimalPlaces=2>
+					</MatNumericUpDownField>*@
+					<label>Durée : </label>
+					<RadzenNumeric TValue="double"
+								   Step="0.1"
+								   Min="0"
+								   Placeholder="Durée"
+								   @bind-Value="@formationModel.Duree" />
+				</div>
+
+				<div>
 					<MatFileUpload OnChange="@UploadFiles"
 								   title="Ajouter le contenu de formation"
 								   Label="Contenu de la formation" />
@@ -38,6 +52,7 @@
 						@formationModel.FileName
 					}
 				</div>
+
 
 				<div>
 					<MatCheckbox Label="Est interne ?" @bind-Value="formationModel.EstInterne" />
@@ -83,11 +98,24 @@
 				</EditTemplate>
 			</RadzenGridColumn>
 
+			<RadzenGridColumn TItem="CatalogueFormations" Property="Duree" Title="Durée (en jour)" Filterable="false" Sortable="false">
+				<Template Context="currentFormation">
+					<div>@currentFormation.Duree.ToString()</div>
+				</Template>
+
+				<EditTemplate Context="currentFormation">
+					<RadzenNumeric TValue="double"
+									Step="0.1"
+									Min="0"
+									@bind-Value="currentFormation.Duree" />
+				</EditTemplate>
+			</RadzenGridColumn>
+
 			<RadzenGridColumn TItem="CatalogueFormations" Property="EstInterne" Title="Formation interne" Filterable="true" Sortable="false">
 				<Template Context="currentFormation">
-					<RadzenCheckBox @bind-Value="currentFormation.EstInterne" Disabled="true"  />
+					<RadzenCheckBox @bind-Value="currentFormation.EstInterne" Disabled="true" />
 				</Template>
-				
+
 				<EditTemplate Context="currentFormation">
 					<RadzenCheckBox @bind-Value="currentFormation.EstInterne" />
 				</EditTemplate>

@@ -34,5 +34,7 @@ namespace AccessData.Models
 
 		public bool EstInterne { get; set; }
 
+		public double Duree { get; set; }
+
 	}
 }

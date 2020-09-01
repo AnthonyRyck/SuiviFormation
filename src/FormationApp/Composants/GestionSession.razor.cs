@@ -61,11 +61,6 @@ namespace FormationApp.Composants
 		public DateTime DateFormation { get; set; }
 
 		/// <summary>
-		/// Nombre de jour de formation
-		/// </summary>
-		public int NombreJour { get; set; }
-
-		/// <summary>
 		/// Nombre de place disponible
 		/// </summary>
 		public int PlaceDispo { get; set; }
@@ -197,17 +192,10 @@ namespace FormationApp.Composants
 				return;
 			}
 
-			if(NombreJour <= 0)
-			{
-				// Message d'erreur.
-				Toaster.Add("Il faut un nombre de jour supérieur à zéro.", MatToastType.Warning);
-				return;
-			}
-
 			try
 			{
 				SqlService.AddSession(FormationSelected.IdFormation, FormateurSelected.IdPersonnel,
-											SalleSelected.IdSalle, DateFormation, NombreJour, PlaceDispo);
+											SalleSelected.IdSalle, DateFormation, PlaceDispo);
 			}
 			catch (Exception)
 			{

@@ -123,6 +123,7 @@ DateDeFin DATE,
 FichierContenu LONGBLOB,
 NomDeFichier VARCHAR(45),
 EstInterne BIT(1) NOT NULL,
+Duree Double(5,2) NOT NULL,
 PRIMARY KEY(IdFormation));
 
 CREATE TABLE Formateur
@@ -139,7 +140,6 @@ IdFormateur VARCHAR(255) NOT NULL,
 IdFormation int NOT NULL,
 IdSalle int NOT NULL,
 DateSession DATE NOT NULL,
-NombreDeJour INT NOT NULL,
 PlaceDispo INT NOT NULL,
 Emargement LONGBLOB NULL,
 FileName VARCHAR(45) NULL,

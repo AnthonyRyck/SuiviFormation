@@ -256,6 +256,8 @@ namespace FormationApp.Composants
 
 		public bool EstInterne { get; set; }
 
+		public double Duree { get; set; }
+
 		public CatalogueFormations ToFormation()
 		{
 			return new CatalogueFormations()
@@ -265,7 +267,8 @@ namespace FormationApp.Composants
 				DateDeFin = null,
 				NomDuFichier = this.FileName,
 				ContenuFormationN = this.Contenu,
-				EstInterne = this.EstInterne
+				EstInterne = this.EstInterne,
+				Duree = this.Duree
 			};
 		}
 

@@ -15,7 +15,7 @@ namespace AccessData.Models
 
 		public string TitreFormation { get; set; }
 
-		public int NombreJourFormation { get; set; }
+		public double NombreJourFormation { get; set; }
 
 		public DateTime DateDeLaFormation { get; set; }
 

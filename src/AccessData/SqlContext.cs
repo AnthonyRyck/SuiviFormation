@@ -33,7 +33,7 @@ namespace AccessData
                 using (var conn = new MySqlConnection(ConnectionString))
                 {
                     conn.Open();
-                    var commandText = @"SELECT pers.IdPersonnel, pers.Nom, pers.Prenom, pers.IsExterne, catalogue.Titre, sesion.IdSession, sesion.NombreDeJour, sesion.DateSession, sal.IdSalle, sal.NomSalle, sesion.PlaceDispo"
+                    var commandText = @"SELECT pers.IdPersonnel, pers.Nom, pers.Prenom, pers.IsExterne, catalogue.Titre, sesion.IdSession, catalogue.Duree, sesion.DateSession, sal.IdSalle, sal.NomSalle, sesion.PlaceDispo"
                                         + " FROM sessionformation sesion"
                                         + " INNER JOIN personnel pers ON pers.IdPersonnel = sesion.IdFormateur"
                                         + " INNER JOIN catalogueformation catalogue ON catalogue.IdFormation = sesion.IdFormation"
@@ -53,7 +53,7 @@ namespace AccessData
                                 EstExterne = reader.GetBoolean(3),
                                 TitreFormation = await reader.GetFieldValueAsync<string>(4),
                                 IdSession = await reader.GetFieldValueAsync<int>(5),
-                                NombreDeJour = await reader.GetFieldValueAsync<int>(6),
+                                NombreDeJour = await reader.GetFieldValueAsync<double>(6),
                                 DateDebutSession = await reader.GetFieldValueAsync<DateTime>(7),
                                 IdSalle = await reader.GetFieldValueAsync<int>(8),
                                 NomDeLaSalle = await reader.GetFieldValueAsync<string>(9),
@@ -85,7 +85,7 @@ namespace AccessData
                 using (var conn = new MySqlConnection(ConnectionString))
                 {
                     conn.Open();
-                    var commandText = @"SELECT pers.IdPersonnel, pers.Nom, pers.Prenom, pers.IsExterne, catalogue.Titre, sesion.IdSession, sesion.NombreDeJour, sesion.DateSession, sal.IdSalle, sal.NomSalle, sesion.PlaceDispo"
+                    var commandText = @"SELECT pers.IdPersonnel, pers.Nom, pers.Prenom, pers.IsExterne, catalogue.Titre, sesion.IdSession, catalogue.Duree, sesion.DateSession, sal.IdSalle, sal.NomSalle, sesion.PlaceDispo"
                                         + " FROM sessionformation sesion"
                                         + " INNER JOIN personnel pers ON pers.IdPersonnel = sesion.IdFormateur"
                                         + " INNER JOIN catalogueformation catalogue ON catalogue.IdFormation = sesion.IdFormation"
@@ -105,7 +105,7 @@ namespace AccessData
                                 EstExterne = reader.GetBoolean(3),
                                 TitreFormation = await reader.GetFieldValueAsync<string>(4),
                                 IdSession = await reader.GetFieldValueAsync<int>(5),
-                                NombreDeJour = await reader.GetFieldValueAsync<int>(6),
+                                NombreDeJour = await reader.GetFieldValueAsync<double>(6),
                                 DateDebutSession = await reader.GetFieldValueAsync<DateTime>(7),
                                 IdSalle = await reader.GetFieldValueAsync<int>(8),
                                 NomDeLaSalle = await reader.GetFieldValueAsync<string>(9),
@@ -137,7 +137,7 @@ namespace AccessData
                 using (var conn = new MySqlConnection(ConnectionString))
                 {
                     conn.Open();
-                    var commandText = @"SELECT catalogue.Titre, sesion.NombreDeJour, sesion.DateSession"
+                    var commandText = @"SELECT catalogue.Titre, catalogue.Duree, sesion.DateSession"
                                     + " FROM sessionformation sesion"
                                     + " INNER JOIN catalogueformation catalogue ON catalogue.IdFormation = sesion.IdFormation"
                                     + " WHERE sesion.DateSession > NOW();";
@@ -147,7 +147,7 @@ namespace AccessData
                     {
                         while (await reader.ReadAsync())
                         {
-                            int nbreJour = await reader.GetFieldValueAsync<int>(1);
+                            double nbreJour = await reader.GetFieldValueAsync<double>(1);
                             DateTime dateStart = await reader.GetFieldValueAsync<DateTime>(2);
                             DateTime dateEnd = dateStart.AddDays(nbreJour);
                             
@@ -179,17 +179,16 @@ namespace AccessData
         /// <param name="idFormateur"></param>
         /// <param name="idSalle"></param>
         /// <param name="dateFormation"></param>
-        /// <param name="nombreJour"></param>
         /// <param name="nbrePlace"></param>
         /// <returns></returns>
-        public void AddSession(int idFormation, string idFormateur, int idSalle, DateTime dateFormation, int nombreJour, int nbrePlace)
+        public void AddSession(int idFormation, string idFormateur, int idSalle, DateTime dateFormation, int nbrePlace)
         {
 			try
 			{
                 using (var conn = new MySqlConnection(ConnectionString))
                 {
-                    string command = "INSERT INTO sessionformation (IdFormateur, IdFormation, IdSalle, DateSession, NombreDeJour, PlaceDispo, IsArchive)"
-                                + " VALUES (@idFormateur, @idFormation, @idSalle, @dateSession, @nombreJour, @placeDispo, @archive);";
+                    string command = "INSERT INTO sessionformation (IdFormateur, IdFormation, IdSalle, DateSession, PlaceDispo, IsArchive)"
+                                + " VALUES (@idFormateur, @idFormation, @idSalle, @dateSession, @placeDispo, @archive);";
 
 
                     using (var cmd = new MySqlCommand(command, conn))
@@ -198,7 +197,6 @@ namespace AccessData
                         cmd.Parameters.AddWithValue("@idFormation", idFormation);
                         cmd.Parameters.AddWithValue("@idSalle", idSalle);
                         cmd.Parameters.AddWithValue("@dateSession", dateFormation);
-                        cmd.Parameters.AddWithValue("@nombreJour", nombreJour);
                         cmd.Parameters.AddWithValue("@placeDispo", nbrePlace);
                         cmd.Parameters.AddWithValue("@archive", false);
 
@@ -313,7 +311,7 @@ namespace AccessData
         /// <returns></returns>
         public async Task<List<CatalogueFormations>> GetAllFormationsAsync()
         {
-            var commandText = @"SELECT IdFormation, Titre, DescriptionFormation, DateDeFin, NomDeFichier, EstInterne FROM catalogueformation;";
+            var commandText = @"SELECT IdFormation, Titre, DescriptionFormation, DateDeFin, NomDeFichier, EstInterne, Duree FROM catalogueformation;";
 
             Func<MySqlCommand, List<CatalogueFormations>> funcCmd = (cmd) =>
             {
@@ -333,7 +331,8 @@ namespace AccessData
                             Description = reader.GetString(2),
                             DateDeFin = tempDateFin,
                             NomDuFichier = reader.GetString(4),
-                            EstInterne = reader.GetBoolean(5)
+                            EstInterne = reader.GetBoolean(5),
+                            Duree = reader.GetDouble(6)
                         });
                     }
                 }
@@ -362,7 +361,7 @@ namespace AccessData
         /// <returns></returns>
         public async Task<List<CatalogueFormations>> GetAllFormationsEncoreValideAsync()
         {
-            var commandText = @"SELECT IdFormation, Titre, DescriptionFormation, NomDeFichier, EstInterne FROM catalogueformation"
+            var commandText = @"SELECT IdFormation, Titre, DescriptionFormation, NomDeFichier, EstInterne, Duree FROM catalogueformation"
                             + " WHERE DateDeFin IS NULL"
                             + " OR DateDeFin > curdate();";
 
@@ -380,7 +379,8 @@ namespace AccessData
                             Titre = reader.GetString(1),
                             Description = reader.GetString(2),
                             NomDuFichier = reader.GetString(3),
-                            EstInterne = reader.GetBoolean(4)
+                            EstInterne = reader.GetBoolean(4),
+                            Duree = reader.GetDouble(5)
                         });
                     }
                 }
@@ -410,7 +410,7 @@ namespace AccessData
 		{
             CatalogueFormations formation = new CatalogueFormations();
 
-            var commandText = @"SELECT IdFormation, Titre, DescriptionFormation, DateDeFin, NomDeFichier, EstInterne FROM catalogueformation"
+            var commandText = @"SELECT IdFormation, Titre, DescriptionFormation, DateDeFin, NomDeFichier, EstInterne, Duree FROM catalogueformation"
                                        + $" WHERE IdFormation={idFormation};";
 
             Func<MySqlCommand, CatalogueFormations> funcCmd = (cmd) =>
@@ -431,7 +431,8 @@ namespace AccessData
                             Description = reader.GetString(2),
                             DateDeFin = tempDateFin,
                             NomDuFichier = reader.GetString(4),
-                            EstInterne = reader.GetBoolean(5)
+                            EstInterne = reader.GetBoolean(5),
+                            Duree = reader.GetDouble(6)
                         };
                     }
                 }
@@ -458,7 +459,7 @@ namespace AccessData
         /// <returns></returns>
         public async Task<IEnumerable<CatalogueFormations>> GetFormationAsync(string nomFormation)
         {
-            var commandText = @"SELECT IdFormation, Titre, DescriptionFormation, EstInterne FROM catalogueformation"
+            var commandText = @"SELECT IdFormation, Titre, DescriptionFormation, EstInterne, Duree FROM catalogueformation"
                             + $" WHERE Titre LIKE '%{nomFormation}%';";
 
             Func<MySqlCommand, List<CatalogueFormations>> funcCmd = (cmd) =>
@@ -474,7 +475,8 @@ namespace AccessData
                             IdFormation = reader.GetInt32(0),
                             Titre = reader.GetString(1),
                             Description = reader.GetString(2),
-                            EstInterne = reader.GetBoolean(3)
+                            EstInterne = reader.GetBoolean(3),
+                            Duree = reader.GetDouble(4)
                         };
 
                         formations.Add(formation);
@@ -519,8 +521,8 @@ namespace AccessData
 		{
             using (var conn = new MySqlConnection(ConnectionString))
             {
-                using (var cmd = new MySqlCommand("INSERT INTO catalogueformation (Titre, DescriptionFormation, DateDeFin, FichierContenu, NomDeFichier, EstInterne)"
-                                                + " VALUES (@Titre, @Description, NULL, @ContenuFormationN, @NomDuFichier, @EstInterne);"
+                using (var cmd = new MySqlCommand("INSERT INTO catalogueformation (Titre, DescriptionFormation, DateDeFin, FichierContenu, NomDeFichier, EstInterne, Duree)"
+                                                + " VALUES (@Titre, @Description, NULL, @ContenuFormationN, @NomDuFichier, @EstInterne, @Duree);"
                 , conn))
                 {
                     cmd.Parameters.AddWithValue("@Titre", nouvelleFormation.Titre);
@@ -528,6 +530,7 @@ namespace AccessData
                     cmd.Parameters.AddWithValue("@ContenuFormationN", nouvelleFormation.ContenuFormationN);
                     cmd.Parameters.AddWithValue("@NomDuFichier", nouvelleFormation.NomDuFichier);
                     cmd.Parameters.AddWithValue("@EstInterne", nouvelleFormation.EstInterne);
+                    cmd.Parameters.AddWithValue("@Duree", nouvelleFormation.Duree);
 
                     conn.Open();
                     int result = cmd.ExecuteNonQuery();
@@ -547,7 +550,7 @@ namespace AccessData
 					dateFin = null;
 
 
-				var commandUpdateFormation = @$"UPDATE catalogueformation SET Titre=@Titre, DescriptionFormation=@Description, DateDeFin=@dateFin, FichierContenu=@ContenuFormationN, NomDeFichier=@NomDuFichier, EstInterne=@EstInterne"
+				var commandUpdateFormation = @$"UPDATE catalogueformation SET Titre=@Titre, DescriptionFormation=@Description, DateDeFin=@dateFin, FichierContenu=@ContenuFormationN, NomDeFichier=@NomDuFichier, EstInterne=@EstInterne, Duree=@Duree"
                                          + $" WHERE IdFormation=@IdFormation;";
 
                 using (var cmd = new MySqlCommand(commandUpdateFormation, conn))
@@ -559,6 +562,7 @@ namespace AccessData
                     cmd.Parameters.AddWithValue("@IdFormation", currentFormation.IdFormation);
                     cmd.Parameters.AddWithValue("@dateFin", dateFin);
                     cmd.Parameters.AddWithValue("@EstInterne", currentFormation.EstInterne);
+                    cmd.Parameters.AddWithValue("@Duree", currentFormation.Duree);
 
                     conn.Open();
                     int result = cmd.ExecuteNonQuery();
@@ -578,7 +582,7 @@ namespace AccessData
                     dateFin = null;
 
 
-                var commandUpdateFormation = @$"UPDATE catalogueformation SET Titre=@Titre, DescriptionFormation=@Description, DateDeFin=@dateFin, NomDeFichier=@NomDuFichier, EstInterne=@EstInterne"
+                var commandUpdateFormation = @$"UPDATE catalogueformation SET Titre=@Titre, DescriptionFormation=@Description, DateDeFin=@dateFin, NomDeFichier=@NomDuFichier, EstInterne=@EstInterne, Duree=@Duree"
                                          + $" WHERE IdFormation=@IdFormation;";
 
                 using (var cmd = new MySqlCommand(commandUpdateFormation, conn))
@@ -589,6 +593,7 @@ namespace AccessData
                     cmd.Parameters.AddWithValue("@IdFormation", currentFormation.IdFormation);
                     cmd.Parameters.AddWithValue("@dateFin", dateFin);
                     cmd.Parameters.AddWithValue("@EstInterne", currentFormation.EstInterne);
+                    cmd.Parameters.AddWithValue("@Duree", currentFormation.Duree);
 
                     conn.Open();
                     int result = cmd.ExecuteNonQuery();
@@ -1168,7 +1173,7 @@ namespace AccessData
                 using (var conn = new MySqlConnection(ConnectionString))
                 {
                     conn.Open();
-                    var commandText = @"SELECT pers.IdPersonnel, pers.Nom, pers.Prenom, pers.IsExterne, catalogue.Titre, sesion.IdSession, sesion.NombreDeJour, sesion.DateSession, sal.IdSalle, sal.NomSalle, sesion.PlaceDispo"
+                    var commandText = @"SELECT pers.IdPersonnel, pers.Nom, pers.Prenom, pers.IsExterne, catalogue.Titre, sesion.IdSession, catalogue.Duree, sesion.DateSession, sal.IdSalle, sal.NomSalle, sesion.PlaceDispo"
                                         + " FROM sessionformation sesion"
                                         + " INNER JOIN personnel pers ON pers.IdPersonnel = sesion.IdFormateur"
                                         + " INNER JOIN catalogueformation catalogue ON catalogue.IdFormation = sesion.IdFormation"
@@ -1190,7 +1195,7 @@ namespace AccessData
                                 EstExterne = reader.GetBoolean(3),
                                 TitreFormation = await reader.GetFieldValueAsync<string>(4),
                                 IdSession = await reader.GetFieldValueAsync<int>(5),
-                                NombreDeJour = await reader.GetFieldValueAsync<int>(6),
+                                NombreDeJour = await reader.GetFieldValueAsync<double>(6),
                                 DateDebutSession = await reader.GetFieldValueAsync<DateTime>(7),
                                 IdSalle = await reader.GetFieldValueAsync<int>(8),
                                 NomDeLaSalle = await reader.GetFieldValueAsync<string>(9),
@@ -1224,7 +1229,7 @@ namespace AccessData
                 {
                     conn.Open();
                     var commandText = "SELECT inscrit.IdSession, formateur.Nom, formateur.Prenom, formateur.IsExterne,"
-                                            + " catalogue.Titre, sesion.NombreDeJour, sesion.DateSession, inscrit.IsSessionValidate," 
+                                            + " catalogue.Titre, catalogue.Duree, sesion.DateSession, inscrit.IsSessionValidate,"
                                             + " inscrit.Note, inscrit.Commentaire"
                                     + " FROM inscriptionformation inscrit"
                                     + " INNER JOIN sessionformation sesion ON inscrit.IdSession = sesion.IdSession"
@@ -1246,7 +1251,7 @@ namespace AccessData
                                 PrenomFormateur = await reader.GetFieldValueAsync<string>(2),
                                 IsExterne = reader.GetBoolean(3),
                                 TitreFormation = await reader.GetFieldValueAsync<string>(4),
-                                NombreJourFormation = await reader.GetFieldValueAsync<int>(5),
+                                NombreJourFormation = await reader.GetFieldValueAsync<double>(5),
                                 DateDeLaFormation = await reader.GetFieldValueAsync<DateTime>(6),
                                 IsFormationValide = reader.GetBoolean(7),
                                 Note = ConvertFromDBVal<int?>(reader.GetValue(8)),

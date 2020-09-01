@@ -18,13 +18,13 @@ namespace AccessData.Models
 		/// </summary>
 		public int NombreDePlaceDispo { get; set; }
 
-		public int NombreDeJour { get; set; }
-
 		#region Lié au catalogue de formation
 
 		public int IdFormation { get; set; }
 
 		public string TitreFormation { get; set; }
+
+		public double NombreDeJour { get; set; }
 
 		#endregion
 
