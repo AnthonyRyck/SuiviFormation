@@ -20,6 +20,10 @@ namespace AccessData
 
         #region Session
 
+        /// <summary>
+        /// Récupère toutes les sessions qui ne sont pas encore archivées.
+        /// </summary>
+        /// <returns></returns>
         public async Task<List<SessionView>> GetAllSessionAsync()
         {
             List<SessionView> listSession = new List<SessionView>();
@@ -33,7 +37,8 @@ namespace AccessData
                                         + " FROM sessionformation sesion"
                                         + " INNER JOIN personnel pers ON pers.IdPersonnel = sesion.IdFormateur"
                                         + " INNER JOIN catalogueformation catalogue ON catalogue.IdFormation = sesion.IdFormation"
-                                        + " INNER JOIN salle sal ON sal.IdSalle = sesion.IdSalle";
+                                        + " INNER JOIN salle sal ON sal.IdSalle = sesion.IdSalle"
+                                        + " WHERE sesion.IsArchive = 0";
                     MySqlCommand cmd = new MySqlCommand(commandText, conn);
 
                     using (var reader = cmd.ExecuteReader())
@@ -119,7 +124,7 @@ namespace AccessData
             return listSession;
         }
 
-        /// <summary>
+		/// <summary>
 		/// Récupère toutes les sessions qui sont encore ouvertes
 		/// </summary>
 		/// <returns></returns>
@@ -183,8 +188,8 @@ namespace AccessData
 			{
                 using (var conn = new MySqlConnection(ConnectionString))
                 {
-                    string command = "INSERT INTO sessionformation (IdFormateur, IdFormation, IdSalle, DateSession, NombreDeJour, PlaceDispo)"
-                                + " VALUES (@idFormateur, @idFormation, @idSalle, @dateSession, @nombreJour, @placeDispo);";
+                    string command = "INSERT INTO sessionformation (IdFormateur, IdFormation, IdSalle, DateSession, NombreDeJour, PlaceDispo, IsArchive)"
+                                + " VALUES (@idFormateur, @idFormation, @idSalle, @dateSession, @nombreJour, @placeDispo, @archive);";
 
 
                     using (var cmd = new MySqlCommand(command, conn))
@@ -195,6 +200,7 @@ namespace AccessData
                         cmd.Parameters.AddWithValue("@dateSession", dateFormation);
                         cmd.Parameters.AddWithValue("@nombreJour", nombreJour);
                         cmd.Parameters.AddWithValue("@placeDispo", nbrePlace);
+                        cmd.Parameters.AddWithValue("@archive", false);
 
                         conn.Open();
                         int result = cmd.ExecuteNonQuery();
@@ -272,6 +278,29 @@ namespace AccessData
 			}
 
             return session;
+        }
+
+        /// <summary>
+        /// Permet d'archiver la session.
+        /// </summary>
+        /// <param name="idSession"></param>
+        /// <returns></returns>
+        public async Task ArchiverSession(int idSession)
+        {
+            string cmdUpdate = @"UPDATE sessionformation SET IsArchive=@archive"
+                                + $" WHERE IdSession={idSession}";
+
+            using (var conn = new MySqlConnection(ConnectionString))
+            {
+                using (var cmd = new MySqlCommand(cmdUpdate, conn))
+                {
+                    cmd.Parameters.AddWithValue("@archive", true);
+
+                    conn.Open();
+                    int result = await cmd.ExecuteNonQueryAsync();
+                    conn.Close();
+                }
+            }
         }
 
         #endregion

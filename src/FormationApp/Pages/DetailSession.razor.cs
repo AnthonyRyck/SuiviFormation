@@ -44,7 +44,10 @@ namespace FormationApp.Pages
 
 		public RadzenGrid<PersonnelInscritView> PersonnelViewGrid { get; set; }
 
-		//public PersonnelInscritView CurrentLine { get; set; }
+		/// <summary>
+		/// Indicateur si la session est archiver
+		/// </summary>
+		public bool IsArchiver { get; set; }
 
 		#endregion
 
@@ -158,8 +161,27 @@ namespace FormationApp.Pages
 			//AllFormations.Add(backup);
 		}
 
-		
 
+
+
+		#endregion
+
+		#region Event sur Button
+
+		public async void ClickArchiver(MouseEventArgs args)
+		{
+			try
+			{
+				await SqlService.ArchiverSession(UserService.SessionView.IdSession);
+				IsArchiver = true;
+			}
+			catch (Exception)
+			{
+				Toaster.Add("Erreur sur l'archivage de la session.", MatToastType.Danger);
+			}
+
+			StateHasChanged();
+		}
 
 		#endregion
 	}

@@ -20,5 +20,6 @@ namespace AccessData.Models
 
 		public string? NomFichierEmargement { get; set; }
 
+		public bool IsArchive { get; set; }
 	}
 }

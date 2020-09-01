@@ -12,6 +12,7 @@
 		<div><u>Formation</u> : @UserService.SessionView.TitreFormation</div>
 		<div><u>Date</u> : @UserService.SessionView.DateDebutSession.ToString("d")</div>
 		<div><u>Durée</u> : @UserService.SessionView.NombreDeJour jour(s)</div>
+		<div><u>Place dispo</u> : @UserService.SessionView.NombreDePlaceDispo</div>
 	</div>
 	
 	<div class="col-4">
@@ -43,7 +44,25 @@
 </div>
 
 <br />
-<br />
+<div>
+	<RadzenButton Click="@((args) => ClickArchiver(args))"
+				  Text="Archiver"
+				  ButtonStyle="ButtonStyle.Danger"
+				  Disabled="@IsArchiver" />
+	<div>
+		@if (IsArchiver)
+		{
+			<i>Session archivée.</i>
+		}
+		else
+		{
+			<b>Attention : </b><i>Plus aucune modification ne sera possible.</i>
+		}
+	</div>
+</div>
+
+
+<hr style="width:80%;text-align:center;color:black">
 
 @*Affichage du tableau du personnel inscrit à cette session*@
 <div>
