@@ -1397,6 +1397,153 @@ namespace AccessData
 
         #endregion
 
+        #region Competences
+
+        /// <summary>
+        /// Ajoute une nouvelle compétence
+        /// </summary>
+        /// <param name="nouvelleCompetence"></param>
+        /// <returns></returns>
+        public async Task<int> InsertCompetence(Competence nouvelleCompetence)
+        {
+            // Pour insérer
+            await Task.Run(() => 
+            {
+                using (var conn = new MySqlConnection(ConnectionString))
+                {
+                    string commandInsert = "INSERT INTO competences(Titre, DescriptionCompetence) "
+                                                    + "VALUES(@titre, @descriptionCompetence);";
+
+                    using (var cmd = new MySqlCommand(commandInsert, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@titre", nouvelleCompetence.Titre);
+                        cmd.Parameters.AddWithValue("@descriptionCompetence", nouvelleCompetence.Description);
+
+                        conn.Open();
+                        cmd.ExecuteNonQuery();
+                    }
+                }
+            });
+
+            // Pour récupérer l'ID de la ligne.
+            string idCmd = "SELECT LAST_INSERT_ID();";
+            return await GetIntCore(idCmd);
+        }
+
+        /// <summary>
+        /// Ajout les formations pour une compétence
+        /// </summary>
+        /// <param name="idCompetence"></param>
+        /// <param name="formations"></param>
+        /// <returns></returns>
+        public async Task InsertCompetenceFormation(int idCompetence, List<CatalogueFormations> formations)
+        {
+            // Pour insérer
+            await Task.Run(() =>
+            {
+                try
+                {
+                    string commandInsert = "INSERT INTO competenceformation(IdCompetence, IdFormation) VALUES ";
+
+                    int maxLine = formations.Count();
+                    for (int i = 0; i < maxLine; i++)
+                    {
+                        commandInsert += $"({idCompetence}, {formations[i].IdFormation})";
+
+                        if (i < (maxLine - 1))
+                            commandInsert += ", ";
+                    }
+
+                    commandInsert += ";";
+
+
+                    using (var conn = new MySqlConnection(ConnectionString))
+                    {
+                        conn.Open();
+                        MySqlCommand cmd = new MySqlCommand(commandInsert, conn);
+                        cmd.ExecuteNonQuery();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw;
+                }
+            });
+        }
+
+        /// <summary>
+        /// Récupère toutes les compétences, avec les formations liés.
+        /// </summary>
+        /// <returns></returns>
+        public async Task<List<CompetenceView>> GetAllCompetence()
+		{
+            var commandText = @"SELECT comp.IdCompetence, comp.Titre, comp.DescriptionCompetence, formation.IdFormation, formation.Titre "
+                                + "FROM competences comp "
+                                + "INNER JOIN competenceformation compform ON compform.IdCompetence = comp.IdCompetence "
+                                + "INNER JOIN catalogueformation formation ON formation.IdFormation = compform.IdFormation";
+
+            Func<MySqlCommand, List<CompetenceView>> funcCmd = (cmd) =>
+            {
+                List<CompetenceView> competences = new List<CompetenceView>();
+
+                using (var reader = cmd.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        Competence competence = new Competence()
+                        {
+                            IdCompetence = reader.GetInt32(0),
+                            Titre = reader.GetString(1),
+                            Description = reader.GetString(2)
+                        };
+
+                        FormationView formationView = new FormationView()
+                        {
+                            IdFormation = reader.GetInt32(3),
+                            TitreFormation = reader.GetString(4)
+                        };
+
+                        // Si la liste contient la compétence, ajouter la formation
+                        var tempCompetence = competences.FirstOrDefault(x => x.Competence.IdCompetence == competence.IdCompetence);
+
+                        if (tempCompetence != null)
+						{
+                            tempCompetence.FormationViews.Add(formationView);
+						}
+						else
+						{
+                            var tempFormations = new List<FormationView>();
+                            tempFormations.Add(formationView);
+
+                            competences.Add(new CompetenceView()
+                            {
+                                Competence = competence,
+                                FormationViews = tempFormations
+                            });
+                        }
+                    }
+                }
+
+                return competences;
+            };
+
+            List<CompetenceView> competences = new List<CompetenceView>();
+
+            try
+            {
+                competences = await GetCoreAsync(commandText, funcCmd);
+            }
+            catch (Exception ex)
+            {
+                var exs = ex.Message;
+                throw;
+            }
+
+            return competences;
+        }
+
+        #endregion
+
         #region Private Methods
 
         /// <summary>
@@ -1507,6 +1654,44 @@ namespace AccessData
 
             return file;
         }
+
+        /// <summary>
+        /// Permet la récupération d'un ID type int uniquement !
+        /// </summary>
+        /// <param name="commandText"></param>
+        /// <returns></returns>
+        private async Task<int> GetIntCore(string commandText)
+        {
+            int id = 0;
+
+            try
+            {
+                using (var conn = new MySqlConnection(ConnectionString))
+                {
+                    conn.Open();
+                    MySqlCommand cmd = new MySqlCommand(commandText, conn);
+
+                    UInt64 idTemp = 0;
+
+                    using (var reader = cmd.ExecuteReader())
+                    {
+                        while (await reader.ReadAsync())
+                        {
+                            idTemp = (UInt64)reader[0];
+                        }
+                    }
+
+                    id = Convert.ToInt32(idTemp);
+                }
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+
+            return id;
+        }
+
 
         /// <summary>
         /// Permet de gérer les retours de valeur null de la BDD

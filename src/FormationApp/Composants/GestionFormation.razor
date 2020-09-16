@@ -1,4 +1,5 @@
 ﻿@using AccessData.Models
+@attribute [Authorize(Roles = "Administrateur, Gestionnaire")]
 
 <br />
 <br />
@@ -28,10 +29,10 @@
 
 				<div>
 					@*<MatNumericUpDownField Label="Durée"
-										   @bind-Value=@formationModel.Duree
-										   Step="0.01d"
-										   DecimalPlaces=2>
-					</MatNumericUpDownField>*@
+											   @bind-Value=@formationModel.Duree
+											   Step="0.01d"
+											   DecimalPlaces=2>
+						</MatNumericUpDownField>*@
 					<label>Durée : </label>
 					<RadzenNumeric TValue="double"
 								   Step="0.1"
@@ -105,9 +106,9 @@
 
 				<EditTemplate Context="currentFormation">
 					<RadzenNumeric TValue="double"
-									Step="0.1"
-									Min="0"
-									@bind-Value="currentFormation.Duree" />
+								   Step="0.1"
+								   Min="0"
+								   @bind-Value="currentFormation.Duree" />
 				</EditTemplate>
 			</RadzenGridColumn>
 
@@ -171,21 +172,21 @@
 			@* NOTE: En commentaire, car techniquement il ne faut pas supprimer une formation.*@
 			@*Colonne pour la Suppression*@
 			@*<RadzenGridColumn TItem="CatalogueFormations" Context="currentFormation" Bubble="false" Filterable="false" Sortable="false" TextAlign="TextAlign.Center" Width="70px">
-			<Template Context="currentFormation">
-				<RadzenButton ButtonStyle="ButtonStyle.Danger"
-							  Icon="close"
-							  Size="ButtonSize.Small"
-							  Click="@(args => DeleteRow(currentFormation))">
-				</RadzenButton>
-			</Template>
-			<EditTemplate Context="currentFormation">
-				<RadzenButton ButtonStyle="ButtonStyle.Danger"
-							  Icon="close"
-							  Size="ButtonSize.Small"
-							  Click="@(args => DeleteRow(currentFormation))">
-				</RadzenButton>
-			</EditTemplate>
-		</RadzenGridColumn>*@
+					<Template Context="currentFormation">
+						<RadzenButton ButtonStyle="ButtonStyle.Danger"
+									  Icon="close"
+									  Size="ButtonSize.Small"
+									  Click="@(args => DeleteRow(currentFormation))">
+						</RadzenButton>
+					</Template>
+					<EditTemplate Context="currentFormation">
+						<RadzenButton ButtonStyle="ButtonStyle.Danger"
+									  Icon="close"
+									  Size="ButtonSize.Small"
+									  Click="@(args => DeleteRow(currentFormation))">
+						</RadzenButton>
+					</EditTemplate>
+				</RadzenGridColumn>*@
 
 		</Columns>
 	</RadzenGrid>

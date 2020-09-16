@@ -1,0 +1,114 @@
+﻿@using AccessData.Models;
+
+@attribute [Authorize(Roles = "Administrateur, Gestionnaire")]
+
+
+<div>
+	@if (IsAddCompetence)
+	{
+		<h2>Ajout d'une compétence</h2>
+
+		<div>
+			<EditForm Model="@competenceModel" OnValidSubmit="HandleValidSubmit">
+				<DataAnnotationsValidator />
+				<div asp-validation-summary="All" class="text-danger"></div>
+
+				<div class="row">
+					<div class="col-2">
+						<div class="padding-top-10">
+							<ValidationMessage For="@(() => competenceModel.Titre)" />
+							<MatTextField @bind-Value="competenceModel.Titre"
+										  Label="Titre de la compétence"
+										  Outlined="true" />
+						</div>
+
+						<div class="padding-top-10">
+							<ValidationMessage For="@(() => competenceModel.Description)" />
+							<MatTextField @bind-Value="competenceModel.Description"
+										  Label="Description"
+										  TextArea="true"
+										  FullWidth="false" />
+						</div>
+					</div>
+
+					<div>
+						<div>Formation(s) comprise dans cette compétence</div>
+						@if (competenceModel.ListFormations.Count == 0)
+						{
+							<div class="red-color">Aucune formation de sélectionné !</div>
+						}
+						else
+						{
+							@foreach (var item in competenceModel.ListFormations)
+							{
+								<div>@item.Titre</div>
+							}
+						}
+					</div>
+				</div>
+
+				<MatButton Type="submit">Ajouter</MatButton>
+				<MatButton OnClick="@AnnulationNewCompetence" Type="reset">Annuler</MatButton>
+			</EditForm>
+
+			<hr class="margin5px"/>
+
+			@*Liste des formations*@
+			<div>
+				<RechercheFormation GetFormation="GetFormationAction" />
+			</div>
+
+		</div>
+	}
+	else
+	{
+		<h2>Gestion des compétences</h2>
+		<div>
+			<MatButton OnClick="@CreateNewCompetence" Raised="true">Ajouter une compétence</MatButton>
+		</div>
+		<br />
+
+		<div>
+			<RadzenGrid AllowFiltering="true"
+						FilterCaseSensitivity="FilterCaseSensitivity.Default"
+						AllowPaging="true"
+						PageSize="10"
+						AllowSorting="true"
+						Data="@CompetencesCollection"
+						TItem="CompetenceView"
+						EmptyText="Il n'y a aucune compétence"
+						ColumnWidth="150px">
+
+				<Template Context="formations">
+					<RadzenCard Style="margin-bottom:20px">
+						<b>Liste des formations</b>
+					</RadzenCard>
+
+					<RadzenGrid AllowFiltering="false" AllowPaging="false" AllowSorting="false" Data="@formations.FormationViews" TItem="FormationView">
+						<Columns>
+							<RadzenGridColumn TItem="FormationView" Property="TitreFormation" Title="Titre" />
+						</Columns>
+					</RadzenGrid>
+				</Template>
+
+				<Columns>
+					<RadzenGridColumn TItem="CompetenceView" Title="Détails" Filterable="false" Sortable="false" Width="50px">
+						<Template Context="data">
+							<MatIconButton Icon="settings" OnClick="@(args => OpenCompetenceSetting(data))"></MatIconButton>
+						</Template>
+					</RadzenGridColumn>
+
+					<RadzenGridColumn TItem="CompetenceView" Property="Competence.Titre" Title="Titre" Filterable="true" Sortable="true">
+					</RadzenGridColumn>
+
+					<RadzenGridColumn TItem="CompetenceView" Property="Competence.Description" Title="Description" Filterable="false" Sortable="false" />
+				</Columns>
+			</RadzenGrid>
+
+		</div>
+	}
+</div>
+
+@code {
+
+}

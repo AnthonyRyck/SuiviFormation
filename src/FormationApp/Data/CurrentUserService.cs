@@ -34,6 +34,11 @@ namespace FormationApp.Data
 		/// </summary>
 		public SessionView SessionView { get; set; }
 
+		/// <summary>
+		/// Utilisé pour les détails d'une compétence.
+		/// </summary>
+		public CompetenceView CompetenceView { get; set; }
+
 
 		private AuthenticationStateProvider AuthenticationStateProvider;
 
