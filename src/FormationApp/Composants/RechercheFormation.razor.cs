@@ -20,7 +20,7 @@ namespace FormationApp.Composants
 		/// Pour pouvoir récupérer la formation qui est sélectionné
 		/// </summary>
 		[Parameter]
-		public Action<CatalogueFormations> GetFormation { get; set; }
+		public EventCallback<CatalogueFormations> OnSelectFormationClick { get; set; }
 
 		/// <summary>
 		/// Résultat de la recherche sur le nom de la formation.
@@ -46,22 +46,6 @@ namespace FormationApp.Composants
 		#region Constructeur
 
 
-
-		#endregion
-
-		#region Events
-
-		/// <summary>
-		/// Event levé lors de la sélection d'une formation
-		/// </summary>
-		/// <param name="formationSelected"></param>
-		public void OnFormationDbClickedEvent(CatalogueFormations formationSelected)
-		{
-			if (formationSelected != null)
-			{
-				GetFormation(formationSelected);
-			}
-		}
 
 		#endregion
 

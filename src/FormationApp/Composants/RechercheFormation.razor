@@ -19,7 +19,7 @@
 				Data="@AllFormations"
 				TItem="CatalogueFormations"
 				EmptyText="Aucune formation trouvé"
-				RowDoubleClick="@(args => OnFormationDbClickedEvent(args))">
+				RowDoubleClick="@OnSelectFormationClick">
 
 		<Columns>
 			<RadzenGridColumn TItem="CatalogueFormations" Property="Titre" Title="Titre" Filterable="true" Sortable="false" />
