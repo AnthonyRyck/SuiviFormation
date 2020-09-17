@@ -154,13 +154,42 @@ namespace FormationApp.Pages
 				
 				Toaster.Add("Sauvegarde OK.", MatToastType.Success);
 			}
-			catch (Exception ex)
+			catch (Exception)
 			{
 				TempFormationViews = UserService.CompetenceView.FormationViews.ToList();
 				Toaster.Add("Erreur sur la sauvegarde.", MatToastType.Danger);
 			}
 
 			CanDisplayFormationSearch = false;
+		}
+
+		/// <summary>
+		/// Supprime une ligne
+		/// </summary>
+		/// <param name="currentFormation"></param>
+		internal async void DeleteRow(FormationView currentFormation)
+		{
+			try
+			{
+				if (TempFormationViews.Count == 1)
+				{
+					Toaster.Add("Il doit avoir au moins 1 compétence.", MatToastType.Danger);
+				}
+				else
+				{
+					await SqlService.DeleteCompetenceFormation(UserService.CompetenceView.Competence.IdCompetence, currentFormation.IdFormation);
+					TempFormationViews.Remove(currentFormation);
+					NouvelleFormations.RemoveAll(x => x.IdFormation == currentFormation.IdFormation);
+					UserService.CompetenceView.FormationViews.Remove(currentFormation);
+				}
+			}
+			catch (Exception ex)
+			{
+				TempFormationViews = UserService.CompetenceView.FormationViews.ToList();
+				Toaster.Add("Erreur sur la sauvegarde.", MatToastType.Danger);
+			}
+						
+			//SallesViewGrid.Reload();
 		}
 
 		/// <summary>

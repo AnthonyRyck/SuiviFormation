@@ -63,6 +63,17 @@
 				<Columns>
 					<RadzenGridColumn TItem="FormationView" Property="TitreFormation" Title="Titre" Filterable="true" Sortable="true">
 					</RadzenGridColumn>
+
+					@*Colonne pour la Suppression*@
+					<RadzenGridColumn TItem="FormationView" Context="formation" Bubble="false" Filterable="false" Sortable="false" TextAlign="TextAlign.Center" Width="70px">
+						<Template Context="formation">
+							<RadzenButton ButtonStyle="ButtonStyle.Danger"
+										  Icon="close"
+										  Size="ButtonSize.Small"
+										  Click="@(args => DeleteRow(formation))">
+							</RadzenButton>
+						</Template>
+					</RadzenGridColumn>
 				</Columns>
 			</RadzenGrid>
 

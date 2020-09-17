@@ -1443,25 +1443,28 @@ namespace AccessData
             {
                 try
                 {
-                    string commandInsert = "INSERT INTO competenceformation(IdCompetence, IdFormation) VALUES ";
+                    if(formations.Count > 0)
+					{
+                        string commandInsert = "INSERT INTO competenceformation(IdCompetence, IdFormation) VALUES ";
 
-                    int maxLine = formations.Count();
-                    for (int i = 0; i < maxLine; i++)
-                    {
-                        commandInsert += $"({idCompetence}, {formations[i].IdFormation})";
+                        int maxLine = formations.Count();
+                        for (int i = 0; i < maxLine; i++)
+                        {
+                            commandInsert += $"({idCompetence}, {formations[i].IdFormation})";
 
-                        if (i < (maxLine - 1))
-                            commandInsert += ", ";
-                    }
+                            if (i < (maxLine - 1))
+                                commandInsert += ", ";
+                        }
 
-                    commandInsert += ";";
+                        commandInsert += ";";
 
 
-                    using (var conn = new MySqlConnection(ConnectionString))
-                    {
-                        conn.Open();
-                        MySqlCommand cmd = new MySqlCommand(commandInsert, conn);
-                        cmd.ExecuteNonQuery();
+                        using (var conn = new MySqlConnection(ConnectionString))
+                        {
+                            conn.Open();
+                            MySqlCommand cmd = new MySqlCommand(commandInsert, conn);
+                            cmd.ExecuteNonQuery();
+                        }
                     }
                 }
                 catch (Exception ex)
@@ -1567,6 +1570,20 @@ namespace AccessData
                     }
                 }
             });
+        }
+
+        /// <summary>
+        /// Supprime une formation pour cette compétence.
+        /// </summary>
+        /// <param name="idCompetence"></param>
+        /// <param name="idFormation"></param>
+        /// <returns></returns>
+        public async Task DeleteCompetenceFormation(int idCompetence, int idFormation)
+        {
+            string commandDelete = $"DELETE FROM competenceformation"
+                                   + $" WHERE IdCompetence={idCompetence} AND IdFormation='{idFormation}';";
+
+            await ExecuteCoreAsync(commandDelete);
         }
 
         #endregion
