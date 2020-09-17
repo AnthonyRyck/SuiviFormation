@@ -1,8 +1,102 @@
-﻿@page "/detailcompetence"
+﻿@using AccessData.Models
+@using FormationApp.Composants
+
+@page "/detailcompetence"
 
 @attribute [Authorize(Roles = "Administrateur, Gestionnaire")]
 
-<h3>DetailCompetence</h3>
+<h3>Détail de la compétence <b>@UserService.CompetenceView.Competence.Titre</b></h3>
+
+<div>
+	<RadzenCard Style="min-width:400px;">
+		<h3>Information sur la compétence</h3>
+		<div class="row">
+			<Radzen.Blazor.RadzenLabel Text="Titre compétence :"
+									   Style="margin-top: 10px;" />
+			<RadzenTextBox @bind-Value="@TitreCompetence"
+						   MaxLength="50"
+						   Disabled="@IsDisabled"
+						   Style="margin-left: 10px" />
+		</div>
+
+		<div class="row margin-top-10px">
+			<Radzen.Blazor.RadzenLabel Text="Description :"
+									   Style="margin-top: 10px;" />
+
+			<MatTextField @bind-Value="@DescriptionCompetence" 
+						Style="margin-left:10px;" 
+						Disabled="@IsDisabled"
+						FullWidth="true"
+						TextArea="true" />
+
+		</div>
+
+		<div class="row margin-top-10px">
+			@if (IsDisabled)
+			{
+				<RadzenButton Click="@UpdateTitreOnClick" Icon="update" Style="margin-left: 5px; width: 40px; background-color:gray" />
+			}
+			else
+			{
+				<RadzenButton Click="@ValidateTitreOnClick" Icon="done" Style="margin-left: 5px; width: 40px; background-color:green;" />
+				<RadzenButton Click="@CancelTitreOnClick" Icon="highlight_off" Style="margin-left: 5px; width: 40px; background-color:orangered" />
+			}
+		</div>
+	</RadzenCard>
+</div>
+
+<div class="padding-top-10">
+	<h4>Liste des formations</h4>
+	
+	<div class="row">
+		<div class="col-4">
+			<RadzenGrid AllowFiltering="true"
+						FilterCaseSensitivity="FilterCaseSensitivity.Default"
+						AllowPaging="true"
+						PageSize="10"
+						AllowSorting="true"
+						Data="@TempFormationViews"
+						TItem="FormationView"
+						EmptyText="Il n'y a aucune formation"
+						Style="width:350px;">
+
+				<Columns>
+					<RadzenGridColumn TItem="FormationView" Property="TitreFormation" Title="Titre" Filterable="true" Sortable="true">
+					</RadzenGridColumn>
+				</Columns>
+			</RadzenGrid>
+
+			@if (CanDisplayFormationSearch)
+			{
+				<div class="row margin-top-10px">
+					<RadzenButton Text="Valider" 
+									Icon="done" 
+									Style="width: 150px; background-color:green;"
+									Click="@ValidateFormationsOnClick" />
+					<RadzenButton Text="Annuler" 
+									Icon="highlight_off" 
+									Style="margin-left: 20px; width: 150px; background-color:orangered;"
+									Click="@CancelFormationOnClick" />
+				</div>
+			}
+		</div>
+
+		<div class="col-8">
+			@if(CanDisplayFormationSearch)
+			{
+				<RechercheFormation OnSelectFormationClick="GetFormation" />
+			}
+		</div>
+	</div>
+
+	<div class="margin-top-10px">
+		@if (!CanDisplayFormationSearch)
+		{
+			<MatButton OnClick="@AddFormationOnClick" Raised="true">Ajouter une formation</MatButton>
+		}
+	</div>
+
+</div>
 
 @code {
 

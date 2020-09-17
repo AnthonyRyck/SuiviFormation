@@ -1542,6 +1542,33 @@ namespace AccessData
             return competences;
         }
 
+        /// <summary>
+        /// Met à jour les valeurs du titre et de la description pour une compétence.
+        /// </summary>
+        /// <param name="titreCompetence"></param>
+        /// <param name="descriptionCompetence"></param>
+        /// <returns></returns>
+        public async Task UpdateCompetenceTitreDescription(int idCompetence, string titreCompetence, string descriptionCompetence)
+        {
+            await Task.Run(() =>
+            {
+                using (var conn = new MySqlConnection(ConnectionString))
+                {
+                    var commandUpdateCompetence = @$"UPDATE competences SET Titre=@titre, DescriptionCompetence=@description"
+                                          + $" WHERE IdCompetence={idCompetence};";
+
+                    using (var cmd = new MySqlCommand(commandUpdateCompetence, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@titre", titreCompetence);
+                        cmd.Parameters.AddWithValue("@description", descriptionCompetence);
+
+                        conn.Open();
+                        cmd.ExecuteNonQuery();
+                    }
+                }
+            });
+        }
+
         #endregion
 
         #region Private Methods
@@ -1610,6 +1637,11 @@ namespace AccessData
             });
         }
 
+        /// <summary>
+        /// Execute une commande qui n'attend pas de retour.
+        /// </summary>
+        /// <param name="commandSql"></param>
+        /// <returns></returns>
         private async Task ExecuteCoreAsync(string commandSql)
 		{
             using (var conn = new MySqlConnection(ConnectionString))

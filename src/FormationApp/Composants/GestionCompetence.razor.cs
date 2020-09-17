@@ -178,10 +178,7 @@ namespace FormationApp.Composants
 
 		internal List<FormationView> ToFormationView()
 		{
-			//List<FormationView> result = new List<FormationView>(ListFormations.Count);
 			return ListFormations.Select(x => new FormationView() { IdFormation = x.IdFormation, TitreFormation = x.Titre }).ToList();
-
-			//return result;
 		}
 	}
 }

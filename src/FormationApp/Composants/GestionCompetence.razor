@@ -84,7 +84,12 @@
 						<b>Liste des formations</b>
 					</RadzenCard>
 
-					<RadzenGrid AllowFiltering="false" AllowPaging="false" AllowSorting="false" Data="@formations.FormationViews" TItem="FormationView">
+					<RadzenGrid AllowFiltering="false" 
+								AllowPaging="false" 
+								AllowSorting="false" 
+								Data="@formations.FormationViews" 
+								TItem="FormationView"
+								Style="width:350px;">
 						<Columns>
 							<RadzenGridColumn TItem="FormationView" Property="TitreFormation" Title="Titre" />
 						</Columns>
