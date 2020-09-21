@@ -36,6 +36,8 @@ namespace FormationApp.Composants
 
 		public bool AjoutFormation { get; set; }
 
+		public bool AddFormationTrigger { get; set; }
+
 		#endregion
 
 		#region Constructeur
@@ -43,6 +45,8 @@ namespace FormationApp.Composants
 		public GestionFormateur()
 		{
 			ListFormationsNouveauFormateur = new List<CatalogueFormations>();
+			AddFormationTrigger = false;
+			PersonnelSelectedNouveauFormateur = new Personnel();
 		}
 
 		#endregion
@@ -63,6 +67,8 @@ namespace FormationApp.Composants
 		/// </summary>
 		internal void AddFormateur()
 		{
+			AddFormationTrigger = true;
+
 			if (AjoutFormation)
 				AjoutFormation = false;
 
@@ -111,8 +117,9 @@ namespace FormationApp.Composants
 		/// </summary>
 		internal void OnClickAnnuler()
 		{
-			PersonnelSelectedNouveauFormateur = null;
+			PersonnelSelectedNouveauFormateur = new Personnel();
 			ListFormationsNouveauFormateur = new List<CatalogueFormations>();
+			AddFormationTrigger = false;
 		}
 
 		/// <summary>

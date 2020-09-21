@@ -3,6 +3,10 @@
 	padding-top: 10px;
 }
 
+.padding-5 {
+	padding: 5px;
+}
+
 .hidden{
 	visibility:hidden;
 }
@@ -22,4 +26,11 @@
 
 .red-color {
 	color: red;
+}
+
+
+.center {
+	margin: auto;
+	width: 100%;
+	padding: 10px;
 }
