@@ -1,187 +1,191 @@
 ﻿@using AccessData.Models
 
-
-<h2>Gestion des sessions</h2>
-
-<br />
-
-<div>
-	<div>Sessions en cours</div>
-
-	<RadzenGrid AllowFiltering="true"
-				FilterCaseSensitivity="FilterCaseSensitivity.Default"
-				AllowPaging="true"
-				PageSize="10"
-				AllowSorting="true"
-				Data="@AllSessions"
-				TItem="SessionView"
-				EmptyText="Il n'y a aucune session"
-				ColumnWidth="150px">
-		<Columns>
-			<RadzenGridColumn TItem="SessionView" Title="Détails" Filterable="false" Sortable="false" Width="50px">
-				<Template Context="data">
-					<MatIconButton Icon="settings" OnClick="@(args => OpenSessionSetting(data))"></MatIconButton>
-				</Template>
-			</RadzenGridColumn>
-
-			<RadzenGridColumn TItem="SessionView" Property="TitreFormation" Title="Formation" Filterable="true" Sortable="false" />
-			<RadzenGridColumn TItem="SessionView" Property="DateDebutSession" Title="Date" Filterable="true" Sortable="false" Width="80px">
-				<Template Context="data">
-					@String.Format("{0:d}", data.DateDebutSession)
-				</Template>
-			</RadzenGridColumn>
-			<RadzenGridColumn TItem="SessionView" Property="NombreDeJour" Title="Jour" Filterable="false" Sortable="false" Width="50px" />
-			<RadzenGridColumn TItem="SessionView" Property="NombreDePlaceDispo" Title="Place dispo" Filterable="false" Sortable="false" Width="80px" />
-			<RadzenGridColumn TItem="SessionView" Property="NomDeLaSalle" Title="Salle" Filterable="false" Sortable="false" Width="80px" />
-
-			<RadzenGridColumn TItem="SessionView" Property="Nom" Title="Formateur" Filterable="false" Sortable="false">
-				<Template Context="data">
-					<div>
-						@data.Nom
-					</div>
-					<div>
-						@data.Prenom
-					</div>
-				</Template>
-			</RadzenGridColumn>
-
-			<RadzenGridColumn TItem="SessionView" Property="EstExterne" Title="Externe MinDef" Filterable="true" Sortable="false" Width="80px">
-				<Template Context="data">
-					<div>
-						<MatCheckbox Disabled="true" @bind-Value="data.EstExterne" Style="margin-left: auto; margin-right: auto;" />
-					</div>
-				</Template>
-			</RadzenGridColumn>
-		</Columns>
-	</RadzenGrid>
+@if (!AddSession)
+{
+	<h2>Gestion des sessions</h2>
 
 	<br />
+	<MatButton Raised="true" TrailingIcon="add_circle" OnClick="@AddFormation">Ajouter une session</MatButton>
 	<br />
 
-	@*Ajout d'une Session*@
-	<h2>Ajout d'une nouvelle session</h2>
+	<div>
+		<div>Sessions en cours</div>
 
-	<br />
+		<RadzenGrid AllowFiltering="true"
+					FilterCaseSensitivity="FilterCaseSensitivity.Default"
+					AllowPaging="true"
+					PageSize="10"
+					AllowSorting="true"
+					Data="@AllSessions"
+					TItem="SessionView"
+					EmptyText="Il n'y a aucune session"
+					ColumnWidth="150px">
+			<Columns>
+				<RadzenGridColumn TItem="SessionView" Title="Détails" Filterable="false" Sortable="false" Width="50px">
+					<Template Context="data">
+						<MatIconButton Icon="settings" OnClick="@(args => OpenSessionSetting(data))"></MatIconButton>
+					</Template>
+				</RadzenGridColumn>
 
-	<div class="row">
+				<RadzenGridColumn TItem="SessionView" Property="TitreFormation" Title="Formation" Filterable="true" Sortable="false" />
+				<RadzenGridColumn TItem="SessionView" Property="DateDebutSession" Title="Date" Filterable="true" Sortable="false" Width="80px">
+					<Template Context="data">
+						@String.Format("{0:d}", data.DateDebutSession)
+					</Template>
+				</RadzenGridColumn>
+				<RadzenGridColumn TItem="SessionView" Property="NombreDeJour" Title="Jour" Filterable="false" Sortable="false" Width="50px" />
+				<RadzenGridColumn TItem="SessionView" Property="NombreDePlaceDispo" Title="Place dispo" Filterable="false" Sortable="false" Width="80px" />
+				<RadzenGridColumn TItem="SessionView" Property="NomDeLaSalle" Title="Salle" Filterable="false" Sortable="false" Width="80px" />
 
-		@*colonne pour faire le résultat*@
-		<div class="col-3">
-			<div>
-				<span>
-					<MatButton Outlined="true" TrailingIcon="add_circle" OnClick="@AddFormation">Choisir une formation</MatButton>
-					@if (FormationSelected != null)
-					{
-						<MatIcon Icon="check" />
-					}
-				</span>
-			</div>
+				<RadzenGridColumn TItem="SessionView" Property="Nom" Title="Formateur" Filterable="false" Sortable="false">
+					<Template Context="data">
+						<div>
+							@data.Nom
+						</div>
+						<div>
+							@data.Prenom
+						</div>
+					</Template>
+				</RadzenGridColumn>
 
-			@if (FormationSelected != null)
-			{
-				//Affichage de la formation sélectionnée
-				<h4>Formation sélectionnée</h4>
-				<label>@FormationSelected.Titre</label>
+				<RadzenGridColumn TItem="SessionView" Property="EstExterne" Title="Externe MinDef" Filterable="true" Sortable="false" Width="80px">
+					<Template Context="data">
+						<div>
+							<MatCheckbox Disabled="true" @bind-Value="data.EstExterne" Style="margin-left: auto; margin-right: auto;" />
+						</div>
+					</Template>
+				</RadzenGridColumn>
+			</Columns>
+		</RadzenGrid>
+	</div>
+		}
+		else
+		{
+		@*Ajout d'une Session*@
+		<h2>Ajout d'une nouvelle session</h2>
 
-				<div class="margin5px">
-					<h4>Date de début : </h4>
-					<RadzenDatePicker @bind-Value="DateFormation" />
+		<br />
+
+		<div class="row">
+
+			@*colonne pour faire le résultat*@
+			<div class="col-3">
+				<div>
+					<span>
+
+						@if (FormationSelected != null)
+						{
+							<MatIcon Icon="check" />
+						}
+					</span>
 				</div>
 
-				<div class="margin5px">
-					<h6>Nombre de place : </h6>
-					<MatTextField @bind-Value="@PlaceDispo" />
-				</div>
+				@if (FormationSelected != null)
+				{
+					//Affichage de la formation sélectionnée
+					<h4>Formation sélectionnée</h4>
+					<label>@FormationSelected.Titre</label>
 
-				//Affichage du formateur sélectionné
-				<div class="mat-elevation-z5">
 					<div class="margin5px">
-						<span>
-							<MatButton Outlined="true" TrailingIcon="add_circle" OnClick="@AddFormateur">Choisir un formateur</MatButton>
+						<h4>Date de début : </h4>
+						<RadzenDatePicker @bind-Value="DateFormation" />
+					</div>
+
+					<div class="margin5px">
+						<h6>Nombre de place : </h6>
+						<MatTextField @bind-Value="@PlaceDispo" />
+					</div>
+
+					//Affichage du formateur sélectionné
+					<div class="mat-elevation-z5">
+						<div class="margin5px">
+							<span>
+								<MatButton Outlined="true" TrailingIcon="add_circle" OnClick="@AddFormateur">Choisir un formateur</MatButton>
+								@if (FormateurSelected != null)
+								{
+									<MatIcon Icon="check" />
+								}
+							</span>
+
+							<h5>Formateur : </h5>
+
 							@if (FormateurSelected != null)
 							{
-								<MatIcon Icon="check" />
+								<div>
+									<label>Nom : @FormateurSelected.Nom</label>
+								</div>
 							}
-						</span>
+							else
+							{
+								<label>Aucun formateur sélectionné</label>
+							}
 
-						<h5>Formateur : </h5>
-
-						@if (FormateurSelected != null)
-						{
-							<div>
-								<label>Nom : @FormateurSelected.Nom</label>
-							</div>
-						}
-						else
-						{
-							<label>Aucun formateur sélectionné</label>
-						}
-
+						</div>
 					</div>
-				</div>
 
-				//Affichage de la salle sélectionnée
-				<div class="mat-elevation-z5">
-					<div class="margin5px">
-						<span>
-							<MatButton Outlined="true" TrailingIcon="add_circle" OnClick="@AddSalle">Choisir une salle</MatButton>
+					//Affichage de la salle sélectionnée
+					<div class="mat-elevation-z5">
+						<div class="margin5px">
+							<span>
+								<MatButton Outlined="true" TrailingIcon="add_circle" OnClick="@AddSalle">Choisir une salle</MatButton>
+								@if (SalleSelected != null)
+								{
+									<MatIcon Icon="check" />
+								}
+							</span>
+
+							<h5>Salle : </h5>
 							@if (SalleSelected != null)
 							{
-								<MatIcon Icon="check" />
+								<div>
+									<label>Nom : @SalleSelected.NomSalle</label>
+								</div>
+								<div>
+									<label>@SalleSelected.NombreDePlace places</label>
+								</div>
 							}
-						</span>
-
-						<h5>Salle : </h5>
-						@if (SalleSelected != null)
-						{
-							<div>
-								<label>Nom : @SalleSelected.NomSalle</label>
-							</div>
-							<div>
-								<label>@SalleSelected.NombreDePlace places</label>
-							</div>
-						}
-						else
-						{
-							<label>Aucune salle sélectionnée</label>
-						}
+							else
+							{
+								<label>Aucune salle sélectionnée</label>
+							}
+						</div>
 					</div>
-				</div>
 
-				<div>
-					<MatButton Outlined="true" @onclick="OnClickValider">Valider</MatButton>
-				</div>
-			}
+					@*<div>
+						<MatButton Outlined="true" @onclick="OnClickValider">Valider</MatButton>
+					</div>*@
+
+					<span class="center">
+						<MatButton Outlined="true" @onclick="OnClickValider" Class="margin5px">Valider</MatButton>
+						<MatButton Outlined="true" @onclick="OnClickAnnuler" Class="margin5px">Annuler</MatButton>
+					</span>
+				}
+			</div>
+
+			@*colonne pour faire la recherche*@
+			<div class="col-9">
+
+				@if (AjoutFormation)
+				{
+					<RechercheFormation OnSelectFormationClick="GetFormationAction" />
+				}
+
+				@if (AjoutFormateur)
+				{
+					<RechercheFormateur GetFormateur="GetFormateurAction"
+										IdFormation="@FormationSelected.IdFormation"
+										TitreFormation="@FormationSelected.Titre" />
+				}
+
+				@if (AjoutSalle)
+				{
+					<RechercheSalle GetSalle="GetSalleAction" />
+				}
+
+			</div>
+
 		</div>
-
-		@*colonne pour faire la recherche*@
-		<div class="col-9">
-
-			@if (AjoutFormation)
-			{
-				<RechercheFormation OnSelectFormationClick="GetFormationAction" />
-			}
-
-			@if (AjoutFormateur)
-			{
-				<RechercheFormateur GetFormateur="GetFormateurAction"
-									IdFormation="@FormationSelected.IdFormation"
-									TitreFormation="@FormationSelected.Titre" />
-			}
-
-			@if (AjoutSalle)
-			{
-				<RechercheSalle GetSalle="GetSalleAction" />
-			}
-
-		</div>
-
-	</div>
-
-</div>
-
-
-
+}
 
 @code {
 

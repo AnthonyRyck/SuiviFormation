@@ -75,13 +75,18 @@ namespace FormationApp.Composants
 		/// </summary>
 		public FormateurView FormateurSelected { get; set; }
 
+		public bool AddSession { get; set; }
+
 		#endregion
 
 		#endregion
 
 		#region Constructeur
 
-
+		public GestionSession()
+		{
+			AddSession = false;
+		}
 
 		#endregion
 
@@ -101,6 +106,8 @@ namespace FormationApp.Composants
 		/// </summary>
 		internal void AddFormation()
 		{
+			AddSession = true;
+
 			AjoutFormateur = false;
 			AjoutSalle = false;
 			AjoutFormation = true;
@@ -213,6 +220,24 @@ namespace FormationApp.Composants
 
 			await LoadAllSessions();
 			StateHasChanged();
+		}
+
+
+
+		/// <summary>
+		/// 
+		/// </summary>
+		internal void OnClickAnnuler()
+		{
+			AddSession = false;
+
+			AjoutFormateur = false;
+			AjoutSalle = false;
+			AjoutFormation = false;
+
+			FormationSelected = null;
+			FormateurSelected = null;
+			SalleSelected = null;
 		}
 
 
