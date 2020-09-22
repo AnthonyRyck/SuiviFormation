@@ -159,10 +159,6 @@ PRIMARY KEY (IdSession, IdPersonnel),
 FOREIGN KEY(IdSession) REFERENCES SessionFormation(IdSession),
 FOREIGN KEY(IdPersonnel) REFERENCES Personnel(IdPersonnel));
 
-
-/******************************
-* Pour la suite en prévision  *
-*******************************/ 
 CREATE TABLE Competences
 (IdCompetence int NOT NULL AUTO_INCREMENT,
 Titre VARCHAR(50) NOT NULL,
@@ -175,3 +171,25 @@ IdFormation int NOT NULL,
 PRIMARY KEY (IdCompetence, IdFormation),
 FOREIGN KEY(IdCompetence) REFERENCES Competences(IdCompetence),
 FOREIGN KEY(IdFormation) REFERENCES CatalogueFormation(IdFormation));
+
+CREATE TABLE Same
+(IdSame int NOT NULL AUTO_INCREMENT,
+Nom VARCHAR(50) NOT NULL,
+DescriptionSame LONGTEXT NOT NULL,
+PRIMARY KEY(IdSame));
+
+INSERT INTO same (Nom, DescriptionSame)
+VALUES ('Sensibilisation', 'Sensibilisé pour cette compétence'),
+('Application', 'La personne applique cette compétence'),
+('Maitrise', 'Maitrise cette compétence'),
+('Expert', 'Maitrise et peut aussi former sur cette compétence');
+
+CREATE TABLE SuiviSame
+(IdPersonnel VARCHAR(255) NOT NULL,
+IdCompetence int NOT NULL,
+IdSame int NOT NULL,
+DateObtention DATE,
+PRIMARY KEY (IdPersonnel, IdCompetence, IdSame),
+FOREIGN KEY(IdPersonnel) REFERENCES Personnel(IdPersonnel),
+FOREIGN KEY(IdCompetence) REFERENCES Competences(IdCompetence),
+FOREIGN KEY(IdPersonnel) REFERENCES Personnel(IdPersonnel));
