@@ -47,6 +47,19 @@
 
 </div>
 
+@*Affichage des formations sous formes de card*@
+@*<div class="formation-flex">
+@foreach (var formation in AllFormations)
+{
+	<div class="card-formation grow" @onclick="@(e =>  ClickOnFormation(formation.IdFormation))">
+		<h2 class="card-header-formation">@formation.Titre</h2>
+		<div class="card-formation-description">@formation.Description</div>
+
+	</div>
+	
+}
+</div>*@
+
 
 @code {
  

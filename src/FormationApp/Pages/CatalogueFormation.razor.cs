@@ -24,13 +24,19 @@ namespace FormationApp.Pages
 		[Inject] 
 		IBlazorDownloadFileService BlazorDownloadFileService { get; set; }
 
+		[Inject]
+		NavigationManager Navigation { get; set; }
+
 		public List<CatalogueFormations> AllFormations { get; set; }
 
 		#endregion
 
 		#region Constructeur
 
-
+		public CatalogueFormation()
+		{
+			AllFormations = new List<CatalogueFormations>();
+		}
 
 		#endregion
 
@@ -69,6 +75,12 @@ namespace FormationApp.Pages
 		{
 			byte[] fileTemp = await SqlService.GetFormationFileAsync(id);
 			await BlazorDownloadFileService.DownloadFile(fileName, fileTemp, "application/octet-stream");
+		}
+
+
+		public void ClickOnFormation(int idFormation)
+		{
+			Navigation.NavigateTo($"detailFormation/{idFormation}");
 		}
 
 		#endregion

@@ -34,3 +34,44 @@
 	width: 100%;
 	padding: 10px;
 }
+
+.card-formation {
+	box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
+	transition: 0.3s;
+	border-radius: 5px;
+	border-color:black;
+	border: 2px;
+	width: 250px;
+	height: 250px;
+	margin:15px;
+}
+
+.card-formation:hover {
+	box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
+}
+
+.card-header-formation {
+	background-color: darkgray;
+	text-align: center;
+	border-bottom-width: 1px;
+	border-bottom-color: dimgray;
+	border-top-left-radius: 5px;
+	border-top-right-radius: 5px;
+}
+
+.card-formation-description {
+	padding: 5px;
+}
+
+.formation-flex {
+	display: flex;
+	flex-wrap: wrap;
+}
+
+.grow {
+	transition: all .2s ease-in-out;
+}
+
+.grow:hover {
+	transform: scale(1.1);
+}
