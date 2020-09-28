@@ -1,0 +1,34 @@
+﻿@using AccessData.Models
+
+
+<div class="dialog-container">
+	<div class="dialog">
+		<div class="padding-5">
+			<h2 class="title-detail">@Formation.Titre</h2>
+			<div class="description-detail">@Formation.Description</div>
+			<div><u>Durée</u> : @Formation.Duree jour(s)</div>
+
+			<span>
+				<u>Contenu de la formation</u> : 
+					<MatButton Icon="attachment" Label="Télécharger" Id="@Formation.NomDuFichier"
+							   @onclick="@OnClickToDownload" />
+			</span>
+
+			<div>
+				<MatButton @onclick="@OnClickToClose">Fermer</MatButton>
+			</div>
+		</div>
+	</div>
+</div>
+
+@code {
+	[Parameter]
+	public CatalogueFormations Formation { get; set; }
+
+	[Parameter]
+	public EventCallback<MouseEventArgs> OnClickToDownload { get; set; }
+
+	[Parameter]
+	public EventCallback<MouseEventArgs> OnClickToClose { get; set; }
+}
+

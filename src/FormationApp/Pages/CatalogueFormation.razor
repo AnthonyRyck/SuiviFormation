@@ -1,66 +1,31 @@
 ﻿@page "/catalogueFormation"
+@using FormationApp.Composants
 
-@using AccessData.Models
 
 <h1>Catalogue des formations</h1>
 
 <br />
 
-<div>
-	<RadzenGrid AllowFiltering="true"
-				FilterCaseSensitivity="FilterCaseSensitivity.Default"
-				AllowPaging="true"
-				PageSize="20"
-				AllowSorting="true"
-				Data="@AllFormations"
-				TItem="CatalogueFormations"
-				EmptyText="Il y a aucune formation"
-				ColumnWidth="200px">
-		<Columns>
-			<RadzenGridColumn TItem="CatalogueFormations" Property="Titre" Title="Titre" />
-
-			<RadzenGridColumn TItem="CatalogueFormations" Property="Description" Title="Description" Filterable="false" Sortable="false" />
-
-			<RadzenGridColumn TItem="CatalogueFormations" Property="EstInterne" Title="Formation interne" Filterable="true" Sortable="false" Width="70px">
-				<Template Context="currentFormation">
-					<div>
-						<MatCheckbox Disabled="true" @bind-Value="currentFormation.EstInterne" Style="margin-left: auto; margin-right: auto;" />
-					</div>
-				</Template>
-			</RadzenGridColumn>
-
-			<RadzenGridColumn TItem="CatalogueFormations" Property="Duree" Title="Durée" Filterable="true" Sortable="false" Width="40px" />
-
-			<RadzenGridColumn TItem="CatalogueFormations" Title="Contenu Formation" Filterable="false" Sortable="false">
-				<Template Context="currentFormation">
-					<div>
-						@currentFormation.NomDuFichier
-						<MatButton Icon="attachment" Label="Télécharger" Id="@currentFormation.NomDuFichier"
-								   @onclick="@(e => DownloadOnClick(e, currentFormation.IdFormation, currentFormation.NomDuFichier))" />
-					</div>
-
-				</Template>
-			</RadzenGridColumn>
-
-		</Columns>
-	</RadzenGrid>
-
-</div>
+@if (DisplayDetail)
+{
+	<DetailFormation Formation="@SelectedFormation"
+					OnClickToDownload="@(e => DownloadOnClick(e, SelectedFormation.IdFormation, SelectedFormation.NomDuFichier))"
+					OnClickToClose="@(e => CloseDetail(e))"/>
+}
 
 @*Affichage des formations sous formes de card*@
-@*<div class="formation-flex">
-@foreach (var formation in AllFormations)
-{
-	<div class="card-formation grow" @onclick="@(e =>  ClickOnFormation(formation.IdFormation))">
-		<h2 class="card-header-formation">@formation.Titre</h2>
-		<div class="card-formation-description">@formation.Description</div>
+<div class="formation-flex">
+	@foreach (var formation in AllFormations)
+	{
+		<div class="card-formation grow" @onclick="@(e =>  ClickOnFormation(formation))">
+			<h2 class="card-header-formation">@formation.Titre</h2>
+			<div class="card-formation-description">@formation.Description</div>
+		</div>
 
-	</div>
-	
-}
-</div>*@
+	}
+</div>
 
 
 @code {
- 
+
 }

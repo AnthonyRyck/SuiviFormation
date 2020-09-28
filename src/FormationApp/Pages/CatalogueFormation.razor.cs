@@ -1,14 +1,9 @@
 ﻿using AccessData;
 using AccessData.Models;
 using BlazorDownloadFile;
-using MatBlazor;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
-using Microsoft.AspNetCore.Mvc;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace FormationApp.Pages
@@ -23,9 +18,6 @@ namespace FormationApp.Pages
 
 		[Inject] 
 		IBlazorDownloadFileService BlazorDownloadFileService { get; set; }
-
-		[Inject]
-		NavigationManager Navigation { get; set; }
 
 		public List<CatalogueFormations> AllFormations { get; set; }
 
@@ -78,10 +70,25 @@ namespace FormationApp.Pages
 		}
 
 
-		public void ClickOnFormation(int idFormation)
+		public void ClickOnFormation(CatalogueFormations formation)
 		{
-			Navigation.NavigateTo($"detailFormation/{idFormation}");
+			SelectedFormation = formation;
+			DisplayDetail = true;
 		}
+
+		/// <summary>
+		/// Event sur un click pour DL un fichier.
+		/// </summary>
+		/// <param name="e"></param>
+		/// <param name="id">ID de la formation.</param>
+		public async void CloseDetail(MouseEventArgs e)
+		{
+			DisplayDetail = false;
+		}
+
+
+		public CatalogueFormations SelectedFormation { get; set; }
+		public bool DisplayDetail { get; set; }
 
 		#endregion
 
