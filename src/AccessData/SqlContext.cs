@@ -5,6 +5,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using AccessData.Models;
+using AccessData.Views;
 using MySql.Data.MySqlClient;
 
 namespace AccessData
@@ -1478,6 +1479,73 @@ namespace AccessData
         /// Récupère toutes les compétences, avec les formations liés.
         /// </summary>
         /// <returns></returns>
+        public async Task<CompetenceDetailView> GetCompetenceView(int idCompetence)
+        {
+            var commandText = @"SELECT comp.IdCompetence, comp.Titre, comp.DescriptionCompetence, formation.IdFormation, formation.Titre, formation.DescriptionFormation, formation.EstInterne, formation.Duree, formation.NomDeFichier "
+                                + "FROM competences comp "
+                                + "INNER JOIN competenceformation compform ON compform.IdCompetence = comp.IdCompetence "
+                                + "INNER JOIN catalogueformation formation ON formation.IdFormation = compform.IdFormation "
+                                + $"WHERE comp.IdCompetence={idCompetence}";
+
+            Func<MySqlCommand, CompetenceDetailView> funcCmd = (cmd) =>
+            {
+                CompetenceDetailView competenceView = new CompetenceDetailView();
+
+                using (var reader = cmd.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        if(competenceView.Competence == null)
+						{
+                            Competence competence = new Competence()
+                            {
+                                IdCompetence = reader.GetInt32(0),
+                                Titre = reader.GetString(1),
+                                Description = reader.GetString(2)
+                            };
+
+                            competenceView.Competence = competence;
+
+                            competenceView.Formations = new List<CatalogueFormations>();
+                        }
+
+                        CatalogueFormations formation = new CatalogueFormations()
+                        {
+                            IdFormation = reader.GetInt32(3),
+                            Titre  = reader.GetString(4),
+                            Description = reader.GetString(5),
+                            EstInterne = reader.GetBoolean(6),
+                            Duree = reader.GetDouble(7),
+                            NomDuFichier = reader.GetString(8)
+                        };
+
+                        competenceView.Formations.Add(formation);
+                    }
+                }
+
+                return competenceView;
+            };
+
+            CompetenceDetailView competenceView = new CompetenceDetailView();
+
+            try
+            {
+                competenceView = await GetCoreAsync(commandText, funcCmd);
+            }
+            catch (Exception ex)
+            {
+                var exs = ex.Message;
+                throw;
+            }
+
+            return competenceView;
+        }
+
+
+        /// <summary>
+        /// Récupère toutes les compétences, avec les formations liés.
+        /// </summary>
+        /// <returns></returns>
         public async Task<List<CompetenceView>> GetAllCompetence()
 		{
             var commandText = @"SELECT comp.IdCompetence, comp.Titre, comp.DescriptionCompetence, formation.IdFormation, formation.Titre "
@@ -1531,6 +1599,52 @@ namespace AccessData
             };
 
             List<CompetenceView> competences = new List<CompetenceView>();
+
+            try
+            {
+                competences = await GetCoreAsync(commandText, funcCmd);
+            }
+            catch (Exception ex)
+            {
+                var exs = ex.Message;
+                throw;
+            }
+
+            return competences;
+        }
+
+        /// <summary>
+        /// Récupère toutes les compétences
+        /// </summary>
+        /// <returns></returns>
+        public async Task<List<Competence>> GetAllCompetences()
+        {
+            var commandText = @"SELECT comp.IdCompetence, comp.Titre, comp.DescriptionCompetence "
+                                + "FROM competences comp;";
+
+            Func<MySqlCommand, List<Competence>> funcCmd = (cmd) =>
+            {
+                List<Competence> competences = new List<Competence>();
+
+                using (var reader = cmd.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        Competence competence = new Competence()
+                        {
+                            IdCompetence = reader.GetInt32(0),
+                            Titre = reader.GetString(1),
+                            Description = reader.GetString(2)
+                        };
+
+                        competences.Add(competence);
+                    }
+                }
+
+                return competences;
+            };
+
+            List<Competence> competences = new List<Competence>();
 
             try
             {

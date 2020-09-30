@@ -1,58 +1,57 @@
 ﻿using AccessData;
 using AccessData.Models;
+using AccessData.Views;
 using BlazorDownloadFile;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace FormationApp.Pages
 {
-	public partial class CatalogueFormation : ComponentBase
+	public partial class CompetencePage
 	{
-
 		#region Properties
+
+		[Parameter]
+		public int IdCompetence { get; set; }
 
 		[Inject]
 		public SqlContext SqlService { get; set; }
-				
 
-		[Inject] 
+		[Inject]
 		IBlazorDownloadFileService BlazorDownloadFileService { get; set; }
 
-		public List<CatalogueFormations> AllFormations { get; set; }
 
-		#endregion
+		public CompetenceDetailView CompetenceView { get; set; }
 
-		#region Constructeur
+		public bool DisplayDetail { get; set; }
 
+		public CatalogueFormations SelectedFormation { get; set; }
 
 		#endregion
 
 		#region Héritage
 
-		protected override async Task OnInitializedAsync()
+		protected async override Task OnInitializedAsync()
 		{
-			await LoadAllFormations();
+			await LoadCompetence();
 		}
 
 		#endregion
 
-		#region Internal methods
+		#region Private methods
 
 		/// <summary>
-		/// Charge toutes les salles
+		/// Charge les informations sur la compétence.
 		/// </summary>
 		/// <returns></returns>
-		internal async Task LoadAllFormations()
+		private async Task LoadCompetence()
 		{
-			AllFormations = await SqlService.GetAllFormationsEncoreValideAsync();
-			StateHasChanged();
+			CompetenceView = await SqlService.GetCompetenceView(IdCompetence);
 		}
-
-		#endregion
-
-		#region Events
 
 
 		/// <summary>
@@ -83,17 +82,6 @@ namespace FormationApp.Pages
 			DisplayDetail = false;
 		}
 
-
-		public CatalogueFormations SelectedFormation { get; set; }
-		public bool DisplayDetail { get; set; }
-
 		#endregion
-
-		#region Private methods
-
-
-		#endregion
-
 	}
-
 }

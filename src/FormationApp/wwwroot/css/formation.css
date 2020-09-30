@@ -15,6 +15,10 @@
 	margin: 5px 5px 5px 5px
 }
 
+.margin10px {
+	margin: 10px 10px 10px 10px
+}
+
 .margin-top-10px {
 	margin-top: 10px
 }
@@ -34,7 +38,10 @@
 	width: 100%;
 	padding: 10px;
 }
+/**********************/
 
+
+/* Pour le card d'une formation et compétence */
 .card-formation {
 	box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
 	transition: 0.3s;
@@ -44,6 +51,7 @@
 	width: 250px;
 	height: 250px;
 	margin:15px;
+	background-color: white;
 }
 
 .card-formation:hover {
@@ -75,7 +83,10 @@
 .grow:hover {
 	transform: scale(1.1);
 }
+/**********************/
 
+
+/* Pour le composant Détail formation */
 .dialog-container {
 	position: absolute;
 	top: 0;
@@ -122,8 +133,6 @@
 	}
 }
 
-
-
 .title-detail {
 	background-color:lightcyan;
 	padding:5px;
@@ -132,3 +141,41 @@
 .description-detail {
 	padding: 5px;
 }
+/**********************/
+
+
+/* Pour faire le Loading */
+.spinner {
+	border: 16px solid silver;
+	border-top: 16px solid #337AB7;
+	border-radius: 50%;
+	width: 80px;
+	height: 80px;
+	animation: spin 700ms linear infinite;
+	top: 40%;
+	left: 55%;
+	position: absolute;
+}
+
+@keyframes spin {
+	0% {
+		transform: rotate(0deg)
+	}
+
+	100% {
+		transform: rotate(360deg)
+	}
+}
+
+/**********************/
+
+
+/* Détail sur la compétence */
+.cadre {
+	border: 2px solid black;
+	border-radius: 20px;
+	box-shadow: 8px 10px 12px #aaa;
+}
+
+
+/**********************/

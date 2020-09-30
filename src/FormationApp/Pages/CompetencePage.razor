@@ -1,0 +1,51 @@
+﻿@page "/competence/{IdCompetence:int}"
+@using FormationApp.Composants
+
+@if (CompetenceView == null)
+{
+	<div class="spinner"></div>
+}
+else
+{
+
+	@if (DisplayDetail)
+	{
+		<DetailFormation Formation="@SelectedFormation"
+						 OnClickToDownload="@(e => DownloadOnClick(e, SelectedFormation.IdFormation, SelectedFormation.NomDuFichier))"
+						 OnClickToClose="@(e => CloseDetail(e))" />
+	}
+
+	<div class="title-detail cadre">
+		<h2><b>@CompetenceView.Competence.Titre</b></h2>
+
+		@*information sur la compétence*@
+		<div class="padding-5">
+			<div>
+				<u>Description</u> :
+			</div>
+			<div>
+				@CompetenceView.Competence.Description
+			</div>
+		</div>
+	</div>
+
+	@*Liste des formations*@
+	<div class="title-detail cadre margin10px">
+		<h2>Liste des formations</h2>
+
+		<div class="formation-flex">
+			@foreach (var formation in CompetenceView.Formations)
+			{
+				<div class="card-formation grow" @onclick="@(e =>  ClickOnFormation(formation))">
+					<h2 class="card-header-formation">@formation.Titre</h2>
+					<div class="card-formation-description">@formation.Description</div>
+				</div>
+			}
+		</div>
+	</div>
+}
+
+
+@code {
+
+}

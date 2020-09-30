@@ -1,0 +1,27 @@
+﻿@page "/CatalogueCompetence"
+
+
+<h1>Catalogue des compétences</h1>
+
+<br />
+
+@if(AllCompetences == null)
+{
+	<div class="spinner" />
+}
+else
+{
+<div class="formation-flex">
+	@foreach (var competence in AllCompetences)
+	{
+		<div class="card-formation grow" @onclick="@(e =>  ClickOnCompetence(competence))">
+			<h2 class="card-header-formation">@competence.Titre</h2>
+			<div class="card-formation-description">@competence.Description</div>
+		</div>
+	}
+</div>
+}
+
+@code {
+
+}
