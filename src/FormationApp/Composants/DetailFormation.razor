@@ -7,13 +7,22 @@
 			<h2 class="title-detail">@Formation.Titre</h2>
 			<div class="description-detail">@Formation.Description</div>
 			<div><u>Durée</u> : @Formation.Duree jour(s)</div>
-
-			<span>
-				<u>Contenu de la formation</u> : 
-					<MatButton Icon="attachment" Label="Télécharger" Id="@Formation.NomDuFichier"
-							   @onclick="@OnClickToDownload" />
+			<span><u>Formation interne</u> ? : @if (@Formation.EstInterne)
+			{
+				<span>oui</span>
+			}
+			else {
+				<span>non</span>
+			} 
 			</span>
 
+			<div>
+				<span>
+					<u>Contenu de la formation</u> :
+					<MatButton Icon="attachment" Label="Télécharger" Id="@Formation.NomDuFichier"
+							   @onclick="@OnClickToDownload" />
+				</span>
+			</div>
 			<div>
 				<MatButton @onclick="@OnClickToClose">Fermer</MatButton>
 			</div>
