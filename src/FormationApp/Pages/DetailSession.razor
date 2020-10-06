@@ -25,11 +25,14 @@
 
 		@if (string.IsNullOrEmpty(FileNameEmergement))
 		{
-			<div>
-				<MatFileUpload OnChange="@FileEmargement"
-							   Label="Déposer le fichier ou Parcourir"
-							   Style="height:30px"></MatFileUpload>
-			</div>
+	<div>
+		<MatFileUpload OnChange="@UploadFiles"
+						title="Ajouter emargement"
+					   Label="Fichier émargement" />
+
+		@*<RadzenUpload Url="upload/single" Style="margin-bottom: 20px;"
+					  Progress="@((args) => OnProgress(args, "Single file upload"))" />*@
+	</div>
 		}
 		else
 		{

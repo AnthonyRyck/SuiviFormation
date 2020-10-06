@@ -5,12 +5,17 @@ using FormationApp.Data;
 using MatBlazor;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
+using Microsoft.EntityFrameworkCore.Internal;
 using Radzen.Blazor;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Radzen;
 
 namespace FormationApp.Pages
 {
@@ -72,10 +77,10 @@ namespace FormationApp.Pages
 		/// </summary>
 		/// <param name="files"></param>
 		/// <returns></returns>
-		public async Task FileEmargement(IMatFileUploadEntry[] files)
-        {
-            try
-            {
+		public async void UploadFiles(IMatFileUploadEntry[] files)
+		{
+			try
+			{
 				if (files.Count() >= 1)
 				{
 					IMatFileUploadEntry fileMat = files.FirstOrDefault();
@@ -90,15 +95,16 @@ namespace FormationApp.Pages
 					}
 				}
 			}
-            catch (Exception e)
-            {
+			catch (Exception e)
+			{
+				FileNameEmergement = string.Empty;
 				Toaster.Add("Erreur sur la sauvegarde du fichier d'émargement.", MatToastType.Danger);
 			}
-            finally
-            {
-                StateHasChanged();
-            }
-        }
+			finally
+			{
+				StateHasChanged();
+			}
+		}
 
 		/// <summary>
 		/// Event sur un click pour DL un fichier.
@@ -172,8 +178,63 @@ namespace FormationApp.Pages
 		{
 			try
 			{
-				await SqlService.ArchiverSession(UserService.SessionView.IdSession);
 				IsArchiver = true;
+
+				// 01 - Trouver les compétences ou se trouve la formation.
+				List<int> idsCompetence = await SqlService.GetCompetencesIdByFormation(UserService.SessionView.IdFormation);
+
+				// 02 - Récupère les ID formations, pour chaque compétence. 
+				//Dictionary <int,List<int>> - idCompetence, List idFormation
+
+				Dictionary<int, List<int>> competencesValuePairsFormations = new Dictionary<int, List<int>>();
+				
+				foreach (var idCompetence in idsCompetence)
+				{
+					List<int> idsFormations = await SqlService.GetFormationsByCompetence(idCompetence);
+					competencesValuePairsFormations.Add(idCompetence, idsFormations);
+				}
+
+				// 03 - Récupère la liste des ID User qui sont validé sur cette session/formation.
+				List<string> idsUsers = await SqlService.GetUsersValidateOnThisSession(UserService.SessionView.IdSession);
+
+				//*** Boucle Pour chaque personnel de la session-validé
+				// 04 - Récupérer la liste de ID formation validé dans les autres sessions.
+				foreach (var user in idsUsers)
+				{
+					List<int> idFormationValide = await SqlService.GetFormationsValideByUser(user);
+
+					// 05 - Comparaison entre 02 et 04.
+					//		Valider les compétences qui besoin.
+					
+
+					foreach (var item in competencesValuePairsFormations)
+					{
+						List<FormationIsValidate> formationsIsValidate = item.Value.Select(x => new FormationIsValidate(x)).ToList();
+
+						// Pour chaque formation
+						foreach (var formation in formationsIsValidate)
+						{
+							// Si l'utilisateur a validé cette formation.
+							if(idFormationValide.Contains(formation.IdFormation))
+							{
+								formation.IsValidate = true;
+							}
+						}
+
+						// Si ne contient pas 1 seul FALSE, valider la compétence.
+						if(!formationsIsValidate.Any(x => x.IsValidate == false))
+						{
+							// Vérifier que l'utilisateur n'a pas déjà validé cette compétence.
+							if (!await SqlService.IsCompetenceValidate(user, item.Key))
+							{
+								await SqlService.AddCompetenceToUser(user, item.Key, 1, DateTime.Now);
+							}
+						}
+					}
+				}
+
+				// Archivage de la session
+				await SqlService.ArchiverSession(UserService.SessionView.IdSession);
 			}
 			catch (Exception)
 			{
@@ -184,5 +245,19 @@ namespace FormationApp.Pages
 		}
 
 		#endregion
+	}
+
+
+	internal class FormationIsValidate
+	{
+		public int IdFormation { get; set; }
+
+		public bool IsValidate { get; set; }
+
+		public FormationIsValidate(int id)
+		{
+			IdFormation = id;
+			IsValidate = false;
+		}
 	}
 }

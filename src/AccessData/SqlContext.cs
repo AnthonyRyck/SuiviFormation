@@ -34,7 +34,7 @@ namespace AccessData
                 using (var conn = new MySqlConnection(ConnectionString))
                 {
                     conn.Open();
-                    var commandText = @"SELECT pers.IdPersonnel, pers.Nom, pers.Prenom, pers.IsExterne, catalogue.Titre, sesion.IdSession, catalogue.Duree, sesion.DateSession, sal.IdSalle, sal.NomSalle, sesion.PlaceDispo"
+                    var commandText = @"SELECT pers.IdPersonnel, pers.Nom, pers.Prenom, pers.IsExterne, catalogue.IdFormation, catalogue.Titre, sesion.IdSession, catalogue.Duree, sesion.DateSession, sal.IdSalle, sal.NomSalle, sesion.PlaceDispo"
                                         + " FROM sessionformation sesion"
                                         + " INNER JOIN personnel pers ON pers.IdPersonnel = sesion.IdFormateur"
                                         + " INNER JOIN catalogueformation catalogue ON catalogue.IdFormation = sesion.IdFormation"
@@ -52,13 +52,14 @@ namespace AccessData
                                 Nom = await reader.GetFieldValueAsync<string>(1),
                                 Prenom = await reader.GetFieldValueAsync<string>(2),
                                 EstExterne = reader.GetBoolean(3),
-                                TitreFormation = await reader.GetFieldValueAsync<string>(4),
-                                IdSession = await reader.GetFieldValueAsync<int>(5),
-                                NombreDeJour = await reader.GetFieldValueAsync<double>(6),
-                                DateDebutSession = await reader.GetFieldValueAsync<DateTime>(7),
-                                IdSalle = await reader.GetFieldValueAsync<int>(8),
-                                NomDeLaSalle = await reader.GetFieldValueAsync<string>(9),
-                                NombreDePlaceDispo = await reader.GetFieldValueAsync<int>(10)
+                                IdFormation = await reader.GetFieldValueAsync<int>(4),
+                                TitreFormation = await reader.GetFieldValueAsync<string>(5),
+                                IdSession = await reader.GetFieldValueAsync<int>(6),
+                                NombreDeJour = await reader.GetFieldValueAsync<double>(7),
+                                DateDebutSession = await reader.GetFieldValueAsync<DateTime>(8),
+                                IdSalle = await reader.GetFieldValueAsync<int>(9),
+                                NomDeLaSalle = await reader.GetFieldValueAsync<string>(10),
+                                NombreDePlaceDispo = await reader.GetFieldValueAsync<int>(11)
                             }) ;
                         }
                     }
@@ -124,7 +125,7 @@ namespace AccessData
 
             return listSession;
         }
-
+        
 		/// <summary>
 		/// Récupère toutes les sessions qui sont encore ouvertes
 		/// </summary>
@@ -173,16 +174,16 @@ namespace AccessData
             return listSession;
         }
 
-        /// <summary>
-        /// Ajout une session en base de donné.
-        /// </summary>
-        /// <param name="idFormation"></param>
-        /// <param name="idFormateur"></param>
-        /// <param name="idSalle"></param>
-        /// <param name="dateFormation"></param>
-        /// <param name="nbrePlace"></param>
-        /// <returns></returns>
-        public void AddSession(int idFormation, string idFormateur, int idSalle, DateTime dateFormation, int nbrePlace)
+		/// <summary>
+		/// Ajout une session en base de donné.
+		/// </summary>
+		/// <param name="idFormation"></param>
+		/// <param name="idFormateur"></param>
+		/// <param name="idSalle"></param>
+		/// <param name="dateFormation"></param>
+		/// <param name="nbrePlace"></param>
+		/// <returns></returns>
+		public void AddSession(int idFormation, string idFormateur, int idSalle, DateTime dateFormation, int nbrePlace)
         {
 			try
 			{
@@ -1700,6 +1701,230 @@ namespace AccessData
             await ExecuteCoreAsync(commandDelete);
         }
 
+        /// <summary>
+        /// Retourne la liste des ID de compétence pour cette formation.
+        /// </summary>
+        /// <param name="idFormation"></param>
+        /// <returns></returns>
+        public async Task<List<int>> GetCompetencesIdByFormation(int idFormation)
+        {
+            var commandText = @"SELECT comp.IdCompetence "
+                            + "FROM competenceformation comp "
+                            + $"WHERE comp.IdFormation = {idFormation};";
+
+            Func<MySqlCommand, List<int>> funcCmd = (cmd) =>
+            {
+                List<int> competences = new List<int>();
+
+                using (var reader = cmd.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        int idCompetence = reader.GetInt32(0);
+                        competences.Add(idCompetence);
+                    }
+                }
+
+                return competences;
+            };
+
+            List<int> competences = new List<int>();
+
+            try
+            {
+                competences = await GetCoreAsync(commandText, funcCmd);
+            }
+            catch (Exception ex)
+            {
+                var exs = ex.Message;
+                throw;
+            }
+
+            return competences;
+        }
+
+        /// <summary>
+        /// Retourne la liste des IDs formations pour une compétence
+        /// </summary>
+        /// <param name="idCompetence"></param>
+        /// <returns></returns>
+        public async Task<List<int>> GetFormationsByCompetence(int idCompetence)
+        {
+            var commandText = @"SELECT comp.IdFormation "
+                            + "FROM competenceformation comp "
+                            + $"WHERE comp.IdCompetence = {idCompetence};";
+
+            Func<MySqlCommand, List<int>> funcCmd = (cmd) =>
+            {
+                List<int> idFormations = new List<int>();
+
+                using (var reader = cmd.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        int idFormation = reader.GetInt32(0);
+                        idFormations.Add(idFormation);
+                    }
+                }
+
+                return idFormations;
+            };
+
+            List<int> formations = new List<int>();
+
+            try
+            {
+                formations = await GetCoreAsync(commandText, funcCmd);
+            }
+            catch (Exception ex)
+            {
+                var exs = ex.Message;
+                throw;
+            }
+
+            return formations;
+        }
+
+        /// <summary>
+        /// Récupère la liste des utilisateurs de la session donnée, qui sont validés.
+        /// </summary>
+        /// <param name="idSession"></param>
+        /// <returns></returns>
+        public async Task<List<string>> GetUsersValidateOnThisSession(int idSession)
+        {
+            var commandText = @"SELECT pers.IdPersonnel "
+                                + "FROM inscriptionformation pers "
+                                + $"WHERE pers.IdSession = {idSession} "
+                                + "AND pers.IsSessionValidate = true;";
+
+            Func<MySqlCommand, List<string>> funcCmd = (cmd) =>
+            {
+                List<string> users = new List<string>();
+
+                using (var reader = cmd.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        string idUser = reader.GetString(0);
+                        users.Add(idUser);
+                    }
+                }
+
+                return users;
+            };
+
+            List<string> usersId = new List<string>();
+
+            try
+            {
+                usersId = await GetCoreAsync(commandText, funcCmd);
+            }
+            catch (Exception ex)
+            {
+                var exs = ex.Message;
+                throw;
+            }
+
+            return usersId;
+        }
+
+        /// <summary>
+        /// Récupère les formations validés pour cet utilisateur.
+        /// </summary>
+        /// <param name="user"></param>
+        /// <returns></returns>
+        public async Task<List<int>> GetFormationsValideByUser(string user)
+        {
+            var commandText = @"SELECT sesion.IdFormation "
+                             + "FROM inscriptionformation inscrit "
+                             + "INNER JOIN sessionformation sesion "
+                             + "ON sesion.IdSession = inscrit.IdSession "
+                             + $"WHERE inscrit.IdPersonnel = '{user}' "
+                             + "AND inscrit.IsSessionValidate = true;";
+
+            Func<MySqlCommand, List<int>> funcCmd = (cmd) =>
+            {
+                List<int> allFormationsValidate = new List<int>();
+
+                using (var reader = cmd.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        int idFormation = reader.GetInt32(0);
+                        allFormationsValidate.Add(idFormation);
+                    }
+                }
+
+                return allFormationsValidate;
+            };
+
+            List<int> formations = new List<int>();
+
+            try
+            {
+                formations = await GetCoreAsync(commandText, funcCmd);
+            }
+            catch (Exception ex)
+            {
+                var exs = ex.Message;
+                throw;
+            }
+
+            return formations;
+        }
+
+        #endregion
+
+        #region SAME
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="user"></param>
+        /// <param name="key"></param>
+        /// <returns></returns>
+        public async Task<bool> IsCompetenceValidate(string user, int idCompetence)
+        {
+            var commandText = @"SELECT IdSame "
+                           + "FROM suivisame "
+                           + $"WHERE IdPersonnel = '{user}' "
+                           + $"AND IdCompetence = {idCompetence};";
+           
+            int id = await GetIntCore(commandText);
+            return (id > 0);
+        }
+
+        /// <summary>
+        /// Ajoute dans la table SuiviSAME, la compétence avec l'ID SAME pour un utilisateur.
+        /// </summary>
+        /// <param name="user"></param>
+        /// <param name="idCompetence"></param>
+        /// <param name="idSame"></param>
+        /// <param name="now"></param>
+        /// <returns></returns>
+        public async Task AddCompetenceToUser(string user, int idCompetence, int idSame, DateTime now)
+        {
+            await Task.Factory.StartNew(() => 
+            {
+                using (var conn = new MySqlConnection(ConnectionString))
+                {
+                    using (var cmd = new MySqlCommand("INSERT INTO suivisame (IdPersonnel, IdCompetence, IdSame, DateObtention)"
+                                                    + " VALUES (@user, @idCompetence, @same, @date);"
+                    , conn))
+                    {
+                        cmd.Parameters.AddWithValue("@user", user);
+                        cmd.Parameters.AddWithValue("@idCompetence", idCompetence);
+                        cmd.Parameters.AddWithValue("@same", idSame);
+                        cmd.Parameters.AddWithValue("@date", now);
+
+                        conn.Open();
+                        int result = cmd.ExecuteNonQuery();
+                        conn.Close();
+                    }
+                }
+            });
+        }
+
         #endregion
 
         #region Private Methods
@@ -1854,7 +2079,6 @@ namespace AccessData
 
             return id;
         }
-
 
         /// <summary>
         /// Permet de gérer les retours de valeur null de la BDD
