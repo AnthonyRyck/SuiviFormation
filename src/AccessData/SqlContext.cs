@@ -125,12 +125,65 @@ namespace AccessData
 
             return listSession;
         }
-        
-		/// <summary>
-		/// Récupère toutes les sessions qui sont encore ouvertes
-		/// </summary>
-		/// <returns></returns>
-		public async Task<List<DataSession>> GetAllOpenSessionWithDateAsync()
+
+        /// <summary>
+        /// Récupère les informations de la session.
+        /// </summary>
+        /// <param name="idSession"></param>
+        /// <returns></returns>
+        public async Task<SessionView> GetSessionAsync(int idSession)
+        {
+            SessionView sessionView = new SessionView();
+
+            try
+            {
+                using (var conn = new MySqlConnection(ConnectionString))
+                {
+                    conn.Open();
+                    var commandText = @"SELECT pers.IdPersonnel, pers.Nom, pers.Prenom, pers.IsExterne, catalogue.Titre, sesion.IdSession, catalogue.Duree, sesion.DateSession, sal.IdSalle, sal.NomSalle, sesion.PlaceDispo, sesion.IdFormation"
+                                        + " FROM sessionformation sesion"
+                                        + " INNER JOIN personnel pers ON pers.IdPersonnel = sesion.IdFormateur"
+                                        + " INNER JOIN catalogueformation catalogue ON catalogue.IdFormation = sesion.IdFormation"
+                                        + " INNER JOIN salle sal ON sal.IdSalle = sesion.IdSalle"
+                                        + $" WHERE sesion.IdSession = {idSession};";
+                    MySqlCommand cmd = new MySqlCommand(commandText, conn);
+
+                    using (var reader = cmd.ExecuteReader())
+                    {
+                        while (await reader.ReadAsync())
+                        {
+                            sessionView = new SessionView()
+                            {
+                                IdFormateur = await reader.GetFieldValueAsync<string>(0),
+                                Nom = await reader.GetFieldValueAsync<string>(1),
+                                Prenom = await reader.GetFieldValueAsync<string>(2),
+                                EstExterne = reader.GetBoolean(3),
+                                TitreFormation = await reader.GetFieldValueAsync<string>(4),
+                                IdSession = await reader.GetFieldValueAsync<int>(5),
+                                NombreDeJour = await reader.GetFieldValueAsync<double>(6),
+                                DateDebutSession = await reader.GetFieldValueAsync<DateTime>(7),
+                                IdSalle = await reader.GetFieldValueAsync<int>(8),
+                                NomDeLaSalle = await reader.GetFieldValueAsync<string>(9),
+                                NombreDePlaceDispo = await reader.GetFieldValueAsync<int>(10),
+                                IdFormation = await reader.GetFieldValueAsync<int>(11)
+                            };
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+
+            return sessionView;
+        }
+
+        /// <summary>
+        /// Récupère toutes les sessions qui sont encore ouvertes
+        /// </summary>
+        /// <returns></returns>
+        public async Task<List<DataSession>> GetAllOpenSessionWithDateAsync()
         {
             List<DataSession> listSession = new List<DataSession>();
 

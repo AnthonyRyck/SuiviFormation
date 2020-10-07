@@ -1,4 +1,4 @@
-﻿@page "/detailsession"
+﻿@page "/detailsession/{Id:int}"
 
 @using AccessData.Models
 @using FormationApp.Composants
@@ -9,15 +9,15 @@
 @*Affichage des informations sur le session de formation*@
 <div class="row border">
 	<div class="col-4">
-		<div><u>Formation</u> : @UserService.SessionView.TitreFormation</div>
-		<div><u>Date</u> : @UserService.SessionView.DateDebutSession.ToString("d")</div>
-		<div><u>Durée</u> : @UserService.SessionView.NombreDeJour jour(s)</div>
-		<div><u>Place dispo</u> : @UserService.SessionView.NombreDePlaceDispo</div>
+		<div><u>Formation</u> : @Session.TitreFormation</div>
+		<div><u>Date</u> : @Session.DateDebutSession.ToString("d")</div>
+		<div><u>Durée</u> : @Session.NombreDeJour jour(s)</div>
+		<div><u>Place dispo</u> : @Session.NombreDePlaceDispo</div>
 	</div>
-	
+
 	<div class="col-4">
-		<div><u>Formateur</u> : @UserService.SessionView.Nom @UserService.SessionView.Prenom</div>
-		<div><u>Salle</u> : @UserService.SessionView.NomDeLaSalle</div>
+		<div><u>Formateur</u> : @Session.Nom @Session.Prenom</div>
+		<div><u>Salle</u> : @Session.NomDeLaSalle</div>
 	</div>
 
 	<div class="col-4">
@@ -25,24 +25,24 @@
 
 		@if (string.IsNullOrEmpty(FileNameEmergement))
 		{
-	<div>
-		<MatFileUpload OnChange="@UploadFiles"
-						title="Ajouter emargement"
-					   Label="Fichier émargement" />
+			<div>
+				<MatFileUpload OnChange="@UploadFiles"
+							   title="Ajouter emargement"
+							   Label="Fichier émargement" />
 
-		@*<RadzenUpload Url="upload/single" Style="margin-bottom: 20px;"
-					  Progress="@((args) => OnProgress(args, "Single file upload"))" />*@
-	</div>
+				@*<RadzenUpload Url="upload/single" Style="margin-bottom: 20px;"
+					Progress="@((args) => OnProgress(args, "Single file upload"))" />*@
+			</div>
 		}
 		else
 		{
-	<div>
-		<MatButton Icon="attachment" 
-					Label="Télécharger"
-					@onclick="@(e => DownloadOnClick(e))" />
-	</div>
+			<div>
+				<MatButton Icon="attachment"
+						   Label="Télécharger"
+						   @onclick="@(e => DownloadOnClick(e))" />
+			</div>
 		}
-			<div>Nom du fichier : @FileNameEmergement</div>
+		<div>Nom du fichier : @FileNameEmergement</div>
 	</div>
 </div>
 
@@ -118,8 +118,8 @@
 
 			@*Colonne pour la modification*@
 			<RadzenGridColumn TItem="PersonnelInscritView" Bubble="false"
-								Filterable="false" Sortable="false" 
-								TextAlign="TextAlign.Center" Width="100px">
+							  Filterable="false" Sortable="false"
+							  TextAlign="TextAlign.Center" Width="100px">
 				<Template Context="currentPersonnel">
 					<RadzenButton Icon="edit"
 								  Size="ButtonSize.Small"

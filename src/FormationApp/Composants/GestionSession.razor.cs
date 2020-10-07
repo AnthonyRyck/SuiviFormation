@@ -241,10 +241,10 @@ namespace FormationApp.Composants
 		}
 
 
-		internal async Task OpenSessionSetting(SessionView sessionSelected)
+		internal void OpenSessionSetting(SessionView sessionSelected)
 		{
 			UserService.SessionView = sessionSelected;
-			NavManager.NavigateTo($"detailsession");
+			NavManager.NavigateTo($"detailsession/" + sessionSelected.IdSession);
 		}
 
 

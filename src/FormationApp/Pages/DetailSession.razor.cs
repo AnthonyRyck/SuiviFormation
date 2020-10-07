@@ -23,8 +23,8 @@ namespace FormationApp.Pages
 	{
 		#region Properties
 
-		[Inject]
-		protected CurrentUserService UserService { get; set; }
+		//[Inject]
+		//protected CurrentUserService UserService { get; set; }
 
 		[Inject]
 		IBlazorDownloadFileService BlazorDownloadFileService { get; set; }
@@ -36,6 +36,9 @@ namespace FormationApp.Pages
 		protected IMatToaster Toaster { get; set; }
 
 		public Session InfoSession { get; set; }
+
+		[Parameter]
+		public int Id { get; set; }
 
 		/// <summary>
 		/// Nom du fichier d'émargement, null si aucun.
@@ -54,6 +57,8 @@ namespace FormationApp.Pages
 		/// </summary>
 		public bool IsArchiver { get; set; }
 
+		public SessionView Session { get; set; }
+
 		#endregion
 
 		#region Protected Methods
@@ -61,8 +66,12 @@ namespace FormationApp.Pages
 		protected async override Task OnInitializedAsync()
 		{
 			// Chargement pour savoir s'il y a un fichier d'émargement.
-			InfoSession = await SqlService.GetFileNameEmargementAsync(UserService.SessionView.IdSession);
-			PersonnelsInscrit = await SqlService.GetPersonnelsInscritSession(UserService.SessionView.IdSession);
+			//InfoSession = await SqlService.GetFileNameEmargementAsync(UserService.SessionView.IdSession);
+			//PersonnelsInscrit = await SqlService.GetPersonnelsInscritSession(UserService.SessionView.IdSession);
+
+			Session = await SqlService.GetSessionAsync(Id);
+			InfoSession = await SqlService.GetFileNameEmargementAsync(Id);
+			PersonnelsInscrit = await SqlService.GetPersonnelsInscritSession(Id);
 
 			if (!string.IsNullOrEmpty(InfoSession.NomFichierEmargement))
 				FileNameEmergement = InfoSession.NomFichierEmargement;
@@ -91,7 +100,8 @@ namespace FormationApp.Pages
 						await fileMat.WriteToStreamAsync(stream);
 						stream.Seek(0, SeekOrigin.Begin);
 
-						await SqlService.AddEmargementFile(UserService.SessionView.IdSession, stream.ToArray(), FileNameEmergement);
+						//await SqlService.AddEmargementFile(UserService.SessionView.IdSession, stream.ToArray(), FileNameEmergement);
+						await SqlService.AddEmargementFile(Id, stream.ToArray(), FileNameEmergement);
 					}
 				}
 			}
@@ -114,7 +124,7 @@ namespace FormationApp.Pages
 		{
 			try
 			{
-				byte[] fileTemp = await SqlService.GetEmargementFileAsync(UserService.SessionView.IdSession);
+				byte[] fileTemp = await SqlService.GetEmargementFileAsync(Id);
 				await BlazorDownloadFileService.DownloadFile(FileNameEmergement, fileTemp, "application/octet-stream");
 			}
 			catch (Exception)
@@ -139,7 +149,9 @@ namespace FormationApp.Pages
 
 		internal void SaveRow(PersonnelInscritView currentPersonnel)
 		{
-			SqlService.UpdateValidationUser(currentPersonnel.IsSessionValidate, UserService.SessionView.IdSession, currentPersonnel.IdPersonnel);
+			//SqlService.UpdateValidationUser(currentPersonnel.IsSessionValidate, UserService.SessionView.IdSession, currentPersonnel.IdPersonnel);
+
+			SqlService.UpdateValidationUser(currentPersonnel.IsSessionValidate, Id, currentPersonnel.IdPersonnel);
 			PersonnelViewGrid.UpdateRow(currentPersonnel);
 		}
 
@@ -181,11 +193,10 @@ namespace FormationApp.Pages
 				IsArchiver = true;
 
 				// 01 - Trouver les compétences ou se trouve la formation.
-				List<int> idsCompetence = await SqlService.GetCompetencesIdByFormation(UserService.SessionView.IdFormation);
+				List<int> idsCompetence = await SqlService.GetCompetencesIdByFormation(Session.IdFormation);
 
 				// 02 - Récupère les ID formations, pour chaque compétence. 
 				//Dictionary <int,List<int>> - idCompetence, List idFormation
-
 				Dictionary<int, List<int>> competencesValuePairsFormations = new Dictionary<int, List<int>>();
 				
 				foreach (var idCompetence in idsCompetence)
@@ -195,7 +206,7 @@ namespace FormationApp.Pages
 				}
 
 				// 03 - Récupère la liste des ID User qui sont validé sur cette session/formation.
-				List<string> idsUsers = await SqlService.GetUsersValidateOnThisSession(UserService.SessionView.IdSession);
+				List<string> idsUsers = await SqlService.GetUsersValidateOnThisSession(Session.IdSession);
 
 				//*** Boucle Pour chaque personnel de la session-validé
 				// 04 - Récupérer la liste de ID formation validé dans les autres sessions.
@@ -234,7 +245,7 @@ namespace FormationApp.Pages
 				}
 
 				// Archivage de la session
-				await SqlService.ArchiverSession(UserService.SessionView.IdSession);
+				await SqlService.ArchiverSession(Id);
 			}
 			catch (Exception)
 			{

@@ -141,7 +141,7 @@ namespace FormationApp.Composants
 			await SqlService.DeleteFormation(currentFormation);
 			AllFormations.Remove(currentFormation);
 
-			FormationViewGrid.Reload();
+			await FormationViewGrid.Reload();
 		}
 
 		public CatalogueFormations CurrentLine { get; set; }
@@ -189,7 +189,7 @@ namespace FormationApp.Composants
 			await SqlService.InsertFormation(nouvelleFormation);
 
 			AllFormations.Add(nouvelleFormation);
-			FormationViewGrid.Reload();
+			await FormationViewGrid.Reload();
 
 			// Remise à zéro de l'objet.
 			formationModel = new FormationModel();
