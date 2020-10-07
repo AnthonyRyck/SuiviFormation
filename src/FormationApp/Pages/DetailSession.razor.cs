@@ -16,6 +16,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Radzen;
+using BlazorInputFile;
 
 namespace FormationApp.Pages
 {
@@ -86,23 +87,19 @@ namespace FormationApp.Pages
 		/// </summary>
 		/// <param name="files"></param>
 		/// <returns></returns>
-		public async void UploadFiles(IMatFileUploadEntry[] files)
+		public async void HandleFileSelected(IFileListEntry[] files)
 		{
 			try
 			{
 				if (files.Count() >= 1)
 				{
-					IMatFileUploadEntry fileMat = files.FirstOrDefault();
+					var fileMat = files.FirstOrDefault();
 					FileNameEmergement = Path.GetFileName(fileMat.Name);
+					
+					var stream = await fileMat.ReadAllAsync();
+					stream.Seek(0, SeekOrigin.Begin);
 
-					using (var stream = new MemoryStream())
-					{
-						await fileMat.WriteToStreamAsync(stream);
-						stream.Seek(0, SeekOrigin.Begin);
-
-						//await SqlService.AddEmargementFile(UserService.SessionView.IdSession, stream.ToArray(), FileNameEmergement);
-						await SqlService.AddEmargementFile(Id, stream.ToArray(), FileNameEmergement);
-					}
+					await SqlService.AddEmargementFile(Id, stream.ToArray(), FileNameEmergement);
 				}
 			}
 			catch (Exception e)
