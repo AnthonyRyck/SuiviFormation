@@ -219,6 +219,8 @@ namespace FormationApp.Composants
 			SalleSelected = null;
 
 			await LoadAllSessions();
+
+			AddSession = false;
 			StateHasChanged();
 		}
 

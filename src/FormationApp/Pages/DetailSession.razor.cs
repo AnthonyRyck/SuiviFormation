@@ -24,9 +24,6 @@ namespace FormationApp.Pages
 	{
 		#region Properties
 
-		//[Inject]
-		//protected CurrentUserService UserService { get; set; }
-
 		[Inject]
 		IBlazorDownloadFileService BlazorDownloadFileService { get; set; }
 
@@ -67,9 +64,6 @@ namespace FormationApp.Pages
 		protected async override Task OnInitializedAsync()
 		{
 			// Chargement pour savoir s'il y a un fichier d'émargement.
-			//InfoSession = await SqlService.GetFileNameEmargementAsync(UserService.SessionView.IdSession);
-			//PersonnelsInscrit = await SqlService.GetPersonnelsInscritSession(UserService.SessionView.IdSession);
-
 			Session = await SqlService.GetSessionAsync(Id);
 			InfoSession = await SqlService.GetFileNameEmargementAsync(Id);
 			PersonnelsInscrit = await SqlService.GetPersonnelsInscritSession(Id);
@@ -213,8 +207,6 @@ namespace FormationApp.Pages
 
 					// 05 - Comparaison entre 02 et 04.
 					//		Valider les compétences qui besoin.
-					
-
 					foreach (var item in competencesValuePairsFormations)
 					{
 						List<FormationIsValidate> formationsIsValidate = item.Value.Select(x => new FormationIsValidate(x)).ToList();
