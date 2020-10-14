@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using AccessData.Models;
 using AccessData.Views;
@@ -1924,6 +1922,83 @@ namespace AccessData
             }
 
             return formations;
+        }
+
+        /// <summary>
+        /// Récupère les compétences que l'utilisateur à validé.
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <returns></returns>
+        public async Task<List<CompetenceUserView>> GetCompetencesUser(string userId)
+        {
+            string commandText = @"SELECT competence.IdCompetence, competence.Titre, competence.DescriptionCompetence, suivi.IdSame, sam.Nom, suivi.DateObtention"
+                                + " FROM suivisame suivi"
+                                + " INNER JOIN same sam"
+                                + " ON suivi.IdSame = sam.IdSame"
+                                + " INNER JOIN competences competence"
+                                + " ON suivi.IdCompetence = competence.IdCompetence"
+                                + $" WHERE suivi.IdPersonnel = '{userId}';";
+
+            Func<MySqlCommand, List<CompetenceUserView>> funcCmd = (cmd) =>
+            {
+                List<CompetenceUserView> allCompetencesValidate = new List<CompetenceUserView>();
+
+                using (var reader = cmd.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        int idCompetence = reader.GetInt32(0);
+
+                        var tempCompetence = allCompetencesValidate.FirstOrDefault(x => x.IdCompetence == idCompetence);
+
+                        // Si contient une ligne avec cette compétence, mettre à jour les lignes SAME
+                        //if (allCompetencesValidate.Any(x => x.IdCompetence == idCompetence))
+                        if(tempCompetence != null)
+						{
+                            SameView sameView = new SameView();
+
+                            sameView.IdSame = reader.GetInt32(3);
+                            sameView.TitreSame = reader.GetString(4);
+                            sameView.DateObtention = reader.GetDateTime(5);
+
+                            tempCompetence.Same.Add(sameView);
+                        }
+						else
+						{
+                            CompetenceUserView competenceUserView = new CompetenceUserView();
+                            competenceUserView.Same = new List<SameView>();
+                            SameView sameView = new SameView();
+
+                            competenceUserView.IdCompetence = idCompetence;
+                            competenceUserView.Titre = reader.GetString(1);
+                            competenceUserView.Description = reader.GetString(2);
+                            
+                            sameView.IdSame = reader.GetInt32(3);
+                            sameView.TitreSame  = reader.GetString(4);
+                            sameView.DateObtention = reader.GetDateTime(5);
+
+                            competenceUserView.Same.Add(sameView);
+                            allCompetencesValidate.Add(competenceUserView);
+                        }
+                    }
+                }
+
+                return allCompetencesValidate;
+            };
+
+            List<CompetenceUserView> competenceUsers = new List<CompetenceUserView>();
+
+            try
+            {
+                competenceUsers = await GetCoreAsync(commandText, funcCmd);
+            }
+            catch (Exception ex)
+            {
+                var exs = ex.Message;
+                throw;
+            }
+
+            return competenceUsers;
         }
 
         #endregion

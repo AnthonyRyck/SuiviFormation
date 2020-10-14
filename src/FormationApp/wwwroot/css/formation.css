@@ -179,3 +179,22 @@
 
 
 /**********************/
+
+/* Ligne de séparation */
+.separation-line {
+	height: 1px;
+	border-width: 0;
+	color: black;
+	background-color: black;
+	width: 90%;
+}
+
+.separation-section {
+	height: 3px;
+	border-width: 0;
+	color: black;
+	background-color: black;
+	width: 90%;
+}
+
+/**********************/

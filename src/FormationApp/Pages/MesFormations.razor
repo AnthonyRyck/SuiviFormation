@@ -6,7 +6,7 @@
 
 <br />
 
-<h4>Formations ou vous êtes inscrit et qui n'ont pas encore commencés.</h4>
+<h4>Formations inscrits et pas encore commencées.</h4>
 
 @*Afficage des inscriptions en cours*@
 <RadzenGrid AllowFiltering="true"
@@ -58,11 +58,11 @@
 </RadzenGrid>
 
 <p>
-	<hr size=4 Width="80%" align="center" noshade>
+	<hr class="separation-line">
 </p>
 
 <p>
-	<h4>Formations que vous êtes inscrit et qui sont terminés.</h4>
+	<h4>Formations inscrits et terminées.</h4>
 </p>
 
 @*Affichage des Formations suivis et terminées.*@
@@ -118,7 +118,7 @@
 				{
 					<div>Formation pas encore validée.</div>
 				}
-				</Template>
+			</Template>
 			<EditTemplate Context="data">
 
 			</EditTemplate>
@@ -126,17 +126,17 @@
 		</RadzenGridColumn>
 
 		<RadzenGridColumn TItem="SessionInscritUserView" Property="Commentaire" Title="Commentaire" Filterable="false" Sortable="false" Width="100px">
-				<Template Context="data">
-					@if (string.IsNullOrEmpty(data.Commentaire))
-					{
+			<Template Context="data">
+				@if (string.IsNullOrEmpty(data.Commentaire))
+				{
 					<div>Aucun commentaire</div>
-					}
-					else
-					{
-						<div>@data.Commentaire</div>
-					}
-				</Template>
-			</RadzenGridColumn>
+				}
+				else
+				{
+					<div>@data.Commentaire</div>
+				}
+			</Template>
+		</RadzenGridColumn>
 
 	</Columns>
 </RadzenGrid>
@@ -170,6 +170,31 @@
 	</MatDialogActions>
 </MatDialog>
 
+<hr class="separation-section" />
+
+<h1>Mes Compétences</h1>
+
+@if (CompetencesUser == null)
+{
+	<div class="spinner" />
+}
+else
+{
+	<div class="formation-flex">
+		@foreach (var competence in CompetencesUser)
+		{
+			<div class="card-formation grow">
+				<h2 class="card-header-formation">@competence.Titre</h2>
+				<div class="card-formation-description">@competence.Description</div>
+				<div><u>Niveau SAME</u> : </div>
+				@foreach (var same in competence.Same)
+				{
+					<div>@same.TitreSame - @same.DateObtention.ToString("d")</div>
+				}
+			</div>
+		}
+	</div>
+}
 
 @code {
 

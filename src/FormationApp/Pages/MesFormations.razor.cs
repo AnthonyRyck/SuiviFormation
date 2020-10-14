@@ -4,7 +4,6 @@ using FormationApp.Data;
 using MatBlazor;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
-using Microsoft.AspNetCore.Identity;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -34,6 +33,11 @@ namespace FormationApp.Pages
 		/// Liste des sessions que l'utilisateur s'est inscrit et qui sont terminés.
 		/// </summary>
 		public List<SessionInscritUserView> SessionInscritUserViews { get; set; }
+
+		/// <summary>
+		/// Liste des compétences acquis par l'utilisateur
+		/// </summary>
+		public List<CompetenceUserView> CompetencesUser { get; set; }
 
 		#endregion
 
@@ -100,6 +104,7 @@ namespace FormationApp.Pages
 		{
 			AllSessions = await SqlService.GetInscriptionSessionUserAsync(UserService.UserId);
 			SessionInscritUserViews = await SqlService.GetInscriptionSessionUserFinishAsync(UserService.UserId);
+			CompetencesUser = await SqlService.GetCompetencesUser(UserService.UserId);
 		}
 
 		#endregion
