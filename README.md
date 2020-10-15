@@ -8,7 +8,7 @@ Au lancement de l'application, je crée l'utilisateur "root", avec le rôle admi
 * mdp : Azerty123!
 
 Je me base sur les autorisations sur les rôles :
-* **Rôle gestionnaire** : il permet de créer des salles, des formations dans le catalogue, de nouvelle session de formation.
+* **Rôle gestionnaire** : il permet de créer des salles, des formations dans le catalogue, des compétences, de nouvelle session de formation.
 * **Rôle administrateur** : il peut faire comme le rôle gestionnaire, en plus il peut changer les rôles des utilisateurs.
 
 ## Ajout d'une formation au catalogue ##
@@ -25,3 +25,10 @@ Pour créer une session de formation, il faut fournir :
 * une salle ou aura lieu cette formation
 * un formateur
 Ensuite se sont les agents qui viennent s'inscrire à la session. Il est possible d'éditer la session et d'inscrire un personnel à cette session.
+
+## Ajout de la classification SAME pour les compétences ##
+SAME est une classification sur 4 niveaux d'une compétence.
+* Sensibilitation : l'utilisateur a reçu toutes les formations d'une compétence, il est donc sensibilisé.
+* Application : l'utilisateur, après vérification, sait mettre en pratique cette compétence.
+* Maitrise : l'utilisateur devient un référent pour son service.
+* Expert : l'utilisateur peut former du personnel sur cette compétence.
