@@ -32,6 +32,8 @@ namespace FormationApp.Composants
 
 		protected FormationModel formationModel = new FormationModel();
 
+		public List<TypeFormation> AllTypeFormations { get; set; }
+
 		#endregion
 
 		#endregion
@@ -49,6 +51,7 @@ namespace FormationApp.Composants
 
 		public GestionFormation()
 		{
+			AllTypeFormations = new List<TypeFormation>();
 		}
 
 		#endregion
@@ -61,6 +64,7 @@ namespace FormationApp.Composants
 		/// <returns></returns>
 		internal async Task LoadAllFormations()
 		{
+			AllTypeFormations = await SqlService.GetAllTypeFormations();
 			AllFormations = await SqlService.GetAllFormationsAsync();
 			StateHasChanged();
 		}
@@ -185,6 +189,7 @@ namespace FormationApp.Composants
 		protected async void HandleValidSubmit()
 		{
 			CatalogueFormations nouvelleFormation = formationModel.ToFormation();
+			nouvelleFormation.TypeFormation = AllTypeFormations.FirstOrDefault(x => x.IdTypeFormation == nouvelleFormation.TypeFormationId).TitreTypeFormation;
 
 			await SqlService.InsertFormation(nouvelleFormation);
 
@@ -258,6 +263,9 @@ namespace FormationApp.Composants
 
 		public double Duree { get; set; }
 
+		[Required(ErrorMessage = "Il faut choisir un type de formation")]
+		public string IdTypeFormation { get; set; }
+
 		public CatalogueFormations ToFormation()
 		{
 			return new CatalogueFormations()
@@ -268,7 +276,8 @@ namespace FormationApp.Composants
 				NomDuFichier = this.FileName,
 				ContenuFormationN = this.Contenu,
 				EstInterne = this.EstInterne,
-				Duree = this.Duree
+				Duree = this.Duree,
+				TypeFormationId = Convert.ToInt32(IdTypeFormation)
 			};
 		}
 

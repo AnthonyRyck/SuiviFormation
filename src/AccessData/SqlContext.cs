@@ -72,6 +72,7 @@ namespace AccessData
             return listSession;
         }
 
+
 		/// <summary>
 		/// Récupère toutes les sessions qui sont encore ouvertes
 		/// </summary>
@@ -356,6 +357,52 @@ namespace AccessData
 
         #endregion
 
+        #region TypeDeFormation
+
+        /// <summary>
+        /// Récupère la liste des types de formation
+        /// </summary>
+        /// <returns></returns>
+        public async Task<List<TypeFormation>> GetAllTypeFormations()
+        {
+            var commandText = @"SELECT IdTypeFormation, TitreType"
+                                + " FROM typeformation;";                                
+
+            Func<MySqlCommand, List<TypeFormation>> funcCmd = (cmd) =>
+            {
+                List<TypeFormation> listTypes = new List<TypeFormation>();
+
+                using (var reader = cmd.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        listTypes.Add(new TypeFormation()
+                        {
+                            IdTypeFormation = reader.GetInt32(0),
+                            TitreTypeFormation = reader.GetString(1)
+                        });
+                    }
+                }
+
+                return listTypes;
+            };
+
+            List<TypeFormation> listTypesFormations = new List<TypeFormation>();
+
+            try
+            {
+                listTypesFormations = await GetCoreAsync(commandText, funcCmd);
+            }
+            catch (Exception ex)
+            {
+                var exs = ex.Message;
+            }
+
+            return listTypesFormations;
+        }
+
+        #endregion
+
         #region Formations
 
         /// <summary>
@@ -364,7 +411,9 @@ namespace AccessData
         /// <returns></returns>
         public async Task<List<CatalogueFormations>> GetAllFormationsAsync()
         {
-            var commandText = @"SELECT IdFormation, Titre, DescriptionFormation, DateDeFin, NomDeFichier, EstInterne, Duree FROM catalogueformation;";
+            var commandText = @"SELECT catalogue.IdFormation, catalogue.Titre, catalogue.DescriptionFormation, catalogue.DateDeFin, catalogue.NomDeFichier, catalogue.EstInterne, catalogue.Duree, typeform.TitreType, typeform.IdTypeFormation"
+                                + " FROM catalogueformation catalogue"
+                                + " INNER JOIN typeformation typeform ON typeform.IdTypeFormation = catalogue.IdTypeFormation;";
 
             Func<MySqlCommand, List<CatalogueFormations>> funcCmd = (cmd) =>
             {
@@ -385,7 +434,9 @@ namespace AccessData
                             DateDeFin = tempDateFin,
                             NomDuFichier = reader.GetString(4),
                             EstInterne = reader.GetBoolean(5),
-                            Duree = reader.GetDouble(6)
+                            Duree = reader.GetDouble(6),
+                            TypeFormation = reader.GetString(7),
+                            TypeFormationId = reader.GetInt32(8)
                         });
                     }
                 }
@@ -574,8 +625,8 @@ namespace AccessData
 		{
             using (var conn = new MySqlConnection(ConnectionString))
             {
-                using (var cmd = new MySqlCommand("INSERT INTO catalogueformation (Titre, DescriptionFormation, DateDeFin, FichierContenu, NomDeFichier, EstInterne, Duree)"
-                                                + " VALUES (@Titre, @Description, NULL, @ContenuFormationN, @NomDuFichier, @EstInterne, @Duree);"
+                using (var cmd = new MySqlCommand("INSERT INTO catalogueformation (Titre, DescriptionFormation, DateDeFin, FichierContenu, NomDeFichier, EstInterne, Duree, IdTypeFormation)"
+                                                + " VALUES (@Titre, @Description, NULL, @ContenuFormationN, @NomDuFichier, @EstInterne, @Duree, @IdTypeFormation);"
                 , conn))
                 {
                     cmd.Parameters.AddWithValue("@Titre", nouvelleFormation.Titre);
@@ -584,6 +635,7 @@ namespace AccessData
                     cmd.Parameters.AddWithValue("@NomDuFichier", nouvelleFormation.NomDuFichier);
                     cmd.Parameters.AddWithValue("@EstInterne", nouvelleFormation.EstInterne);
                     cmd.Parameters.AddWithValue("@Duree", nouvelleFormation.Duree);
+                    cmd.Parameters.AddWithValue("@IdTypeFormation", nouvelleFormation.TypeFormationId);
 
                     conn.Open();
                     int result = cmd.ExecuteNonQuery();

@@ -36,5 +36,15 @@ namespace AccessData.Models
 
 		public double Duree { get; set; }
 
+		/// <summary>
+		/// Type de formation.
+		/// Normalement c'est un ID, mais comme il n'y a qu'une donnée
+		/// dans l'autre table.
+		/// </summary>
+		public string TypeFormation { get; set; }
+
+
+		public int TypeFormationId { get; set; }
+
 	}
 }

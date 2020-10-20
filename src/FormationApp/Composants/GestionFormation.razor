@@ -53,6 +53,19 @@
 				<div>
 					<MatCheckbox Label="Est interne ?" @bind-Value="formationModel.EstInterne" />
 				</div>
+
+				<div>
+					<MatSelect Label="Type de formation" @bind-Value="formationModel.IdTypeFormation">
+						<MatOptionString></MatOptionString>
+						@foreach (var typeFormation in AllTypeFormations)
+						{
+							<MatOptionString Value="@typeFormation.IdTypeFormation.ToString()">@typeFormation.TitreTypeFormation</MatOptionString>
+						}
+						@*<MatOptionString Value="grains">Bread, Cereal, Rice, and Pasta</MatOptionString>
+						<MatOptionString Value="vegetables">Vegetables</MatOptionString>
+						<MatOptionString Value="fruit">Fruit</MatOptionString>*@
+					</MatSelect>
+				</div>
 			</MatDialogContent>
 
 
@@ -117,6 +130,9 @@
 				</EditTemplate>
 			</RadzenGridColumn>
 
+			<RadzenGridColumn TItem="CatalogueFormations" Property="TypeFormation" Title="Type formation" Filterable="false" Sortable="false">
+			</RadzenGridColumn>
+
 			<RadzenGridColumn TItem="CatalogueFormations" Property="DateDeFin" Title="Date de fin" Filterable="false" Sortable="false">
 				<Template Context="currentFormation">
 					@if (currentFormation.DateDeFin.HasValue)
@@ -167,21 +183,21 @@
 			@* NOTE: En commentaire, car techniquement il ne faut pas supprimer une formation.*@
 			@*Colonne pour la Suppression*@
 			@*<RadzenGridColumn TItem="CatalogueFormations" Context="currentFormation" Bubble="false" Filterable="false" Sortable="false" TextAlign="TextAlign.Center" Width="70px">
-					<Template Context="currentFormation">
-						<RadzenButton ButtonStyle="ButtonStyle.Danger"
-									  Icon="close"
-									  Size="ButtonSize.Small"
-									  Click="@(args => DeleteRow(currentFormation))">
-						</RadzenButton>
-					</Template>
-					<EditTemplate Context="currentFormation">
-						<RadzenButton ButtonStyle="ButtonStyle.Danger"
-									  Icon="close"
-									  Size="ButtonSize.Small"
-									  Click="@(args => DeleteRow(currentFormation))">
-						</RadzenButton>
-					</EditTemplate>
-				</RadzenGridColumn>*@
+			<Template Context="currentFormation">
+				<RadzenButton ButtonStyle="ButtonStyle.Danger"
+							  Icon="close"
+							  Size="ButtonSize.Small"
+							  Click="@(args => DeleteRow(currentFormation))">
+				</RadzenButton>
+			</Template>
+			<EditTemplate Context="currentFormation">
+				<RadzenButton ButtonStyle="ButtonStyle.Danger"
+							  Icon="close"
+							  Size="ButtonSize.Small"
+							  Click="@(args => DeleteRow(currentFormation))">
+				</RadzenButton>
+			</EditTemplate>
+		</RadzenGridColumn>*@
 
 		</Columns>
 	</RadzenGrid>
