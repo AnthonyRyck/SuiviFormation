@@ -465,9 +465,11 @@ namespace AccessData
         /// <returns></returns>
         public async Task<List<CatalogueFormations>> GetAllFormationsEncoreValideAsync()
         {
-            var commandText = @"SELECT IdFormation, Titre, DescriptionFormation, NomDeFichier, EstInterne, Duree FROM catalogueformation"
-                            + " WHERE DateDeFin IS NULL"
-                            + " OR DateDeFin > curdate();";
+            var commandText = @"SELECT catalogue.IdFormation, catalogue.Titre, catalogue.DescriptionFormation, catalogue.NomDeFichier, catalogue.EstInterne, catalogue.Duree, typeform.TitreType"
+                            + " FROM catalogueformation catalogue"
+                            + " INNER JOIN typeformation typeform ON typeform.IdTypeFormation = catalogue.IdTypeFormation"
+                            + " WHERE catalogue.DateDeFin IS NULL"
+                            + " OR catalogue.DateDeFin > curdate();";
 
             Func<MySqlCommand, List<CatalogueFormations>> funcCmd = (cmd) =>
             {
@@ -484,7 +486,8 @@ namespace AccessData
                             Description = reader.GetString(2),
                             NomDuFichier = reader.GetString(3),
                             EstInterne = reader.GetBoolean(4),
-                            Duree = reader.GetDouble(5)
+                            Duree = reader.GetDouble(5),
+                            TypeFormation = reader.GetString(6)
                         });
                     }
                 }
