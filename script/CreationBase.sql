@@ -115,6 +115,12 @@ Login VARCHAR(32) NOT NULL,
 IsExterne BIT(1) NOT NULL,
 PRIMARY KEY(IdPersonnel));
 
+CREATE TABLE TypeFormation
+(IdTypeFormation int NOT NULL AUTO_INCREMENT,
+TitreType VARCHAR(50) NOT NULL,
+DescriptionFormation LONGTEXT NOT NULL,
+PRIMARY KEY(IdTypeFormation));
+
 CREATE TABLE CatalogueFormation
 (IdFormation int NOT NULL AUTO_INCREMENT,
 Titre VARCHAR(50) NOT NULL,
@@ -124,6 +130,8 @@ FichierContenu LONGBLOB,
 NomDeFichier VARCHAR(45),
 EstInterne BIT(1) NOT NULL,
 Duree Double(5,2) NOT NULL,
+IdTypeFormation INT NOT NULL,
+FOREIGN KEY(IdTypeFormation) REFERENCES TypeFormation(IdTypeFormation),
 PRIMARY KEY(IdFormation));
 
 CREATE TABLE Formateur
