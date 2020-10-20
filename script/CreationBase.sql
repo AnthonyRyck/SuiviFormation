@@ -118,8 +118,12 @@ PRIMARY KEY(IdPersonnel));
 CREATE TABLE TypeFormation
 (IdTypeFormation int NOT NULL AUTO_INCREMENT,
 TitreType VARCHAR(50) NOT NULL,
-DescriptionFormation LONGTEXT NOT NULL,
 PRIMARY KEY(IdTypeFormation));
+
+INSERT INTO TypeFormation (TitreType)
+VALUES("Présentation"),
+("Travaux réflexion"),
+("Travaux pratique");
 
 CREATE TABLE CatalogueFormation
 (IdFormation int NOT NULL AUTO_INCREMENT,
