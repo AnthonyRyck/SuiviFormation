@@ -128,6 +128,16 @@
 			</RadzenGridColumn>
 
 			<RadzenGridColumn TItem="CatalogueFormations" Property="TypeFormation" Title="Type formation" Filterable="false" Sortable="false">
+
+				<EditTemplate Context="currentFormation">
+
+					<RadzenDropDown AllowClear="true" TValue="int"
+									Data="@AllTypeFormations"
+									TextProperty="TitreTypeFormation" 
+									ValueProperty="IdTypeFormation" 
+									Style="margin-bottom: 20px" 
+									@bind-Value="currentFormation.TypeFormationId" />
+				</EditTemplate>
 			</RadzenGridColumn>
 
 			<RadzenGridColumn TItem="CatalogueFormations" Property="DateDeFin" Title="Date de fin" Filterable="false" Sortable="false">

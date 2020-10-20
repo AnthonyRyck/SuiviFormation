@@ -114,7 +114,9 @@ namespace FormationApp.Composants
 			{
 				await SqlService.UpdateFormatioWithoutFilenAsync(currentFormation);
 			}
-						
+
+			currentFormation.TypeFormation = AllTypeFormations.FirstOrDefault(x => x.IdTypeFormation == currentFormation.TypeFormationId).TitreTypeFormation;
+
 			lineEnCoursModif = false;
 			StateHasChanged();
 		}

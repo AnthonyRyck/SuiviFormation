@@ -658,7 +658,7 @@ namespace AccessData
 					dateFin = null;
 
 
-				var commandUpdateFormation = @$"UPDATE catalogueformation SET Titre=@Titre, DescriptionFormation=@Description, DateDeFin=@dateFin, FichierContenu=@ContenuFormationN, NomDeFichier=@NomDuFichier, EstInterne=@EstInterne, Duree=@Duree"
+				var commandUpdateFormation = @$"UPDATE catalogueformation SET Titre=@Titre, DescriptionFormation=@Description, DateDeFin=@dateFin, FichierContenu=@ContenuFormationN, NomDeFichier=@NomDuFichier, EstInterne=@EstInterne, Duree=@Duree, IdTypeFormation=@IdType"
                                          + $" WHERE IdFormation=@IdFormation;";
 
                 using (var cmd = new MySqlCommand(commandUpdateFormation, conn))
@@ -671,6 +671,7 @@ namespace AccessData
                     cmd.Parameters.AddWithValue("@dateFin", dateFin);
                     cmd.Parameters.AddWithValue("@EstInterne", currentFormation.EstInterne);
                     cmd.Parameters.AddWithValue("@Duree", currentFormation.Duree);
+                    cmd.Parameters.AddWithValue("@IdType", currentFormation.TypeFormationId);
 
                     conn.Open();
                     int result = cmd.ExecuteNonQuery();
@@ -690,7 +691,7 @@ namespace AccessData
                     dateFin = null;
 
 
-                var commandUpdateFormation = @$"UPDATE catalogueformation SET Titre=@Titre, DescriptionFormation=@Description, DateDeFin=@dateFin, NomDeFichier=@NomDuFichier, EstInterne=@EstInterne, Duree=@Duree"
+                var commandUpdateFormation = @$"UPDATE catalogueformation SET Titre=@Titre, DescriptionFormation=@Description, DateDeFin=@dateFin, NomDeFichier=@NomDuFichier, EstInterne=@EstInterne, Duree=@Duree, IdTypeFormation=@IdType"
                                          + $" WHERE IdFormation=@IdFormation;";
 
                 using (var cmd = new MySqlCommand(commandUpdateFormation, conn))
@@ -702,6 +703,7 @@ namespace AccessData
                     cmd.Parameters.AddWithValue("@dateFin", dateFin);
                     cmd.Parameters.AddWithValue("@EstInterne", currentFormation.EstInterne);
                     cmd.Parameters.AddWithValue("@Duree", currentFormation.Duree);
+                    cmd.Parameters.AddWithValue("@IdType", currentFormation.TypeFormationId);
 
                     conn.Open();
                     int result = cmd.ExecuteNonQuery();
