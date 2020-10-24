@@ -21,6 +21,7 @@ using BlazorDownloadFile;
 using MatBlazor;
 using Radzen;
 using System.Globalization;
+using FormationApp.ViewModel;
 
 namespace FormationApp
 {
@@ -70,6 +71,9 @@ namespace FormationApp
 
 			services.AddHttpContextAccessor();
 			services.AddScoped<CurrentUserService>();
+
+
+			services.AddScoped<IGestionSalleViewModel, GestionSalleViewModel>();
 		}
 
 		// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

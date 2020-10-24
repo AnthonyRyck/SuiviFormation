@@ -1,19 +1,18 @@
 ﻿using AccessData;
 using AccessData.Models;
-using Microsoft.AspNetCore.Components;
 using Radzen.Blazor;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace FormationApp.Composants
+namespace FormationApp.ViewModel
 {
-	public partial class GestionSalle : ComponentBase
+	public class GestionSalleViewModel : IGestionSalleViewModel
 	{
 		#region Properties
 
-		[Inject]
+		
 		public SqlContext SqlService { get; set; }
 
 		public RadzenGrid<Salle> SallesViewGrid { get; set; }
@@ -37,41 +36,32 @@ namespace FormationApp.Composants
 		/// Nombre de place dans la nouvelle salle
 		/// </summary>	
 		public int NbrePlaceNew { get; set; }
-
+		public bool DialogIsOpenNewSalle { get ; set; }
 
 		#endregion
 
-		#region Héritage
-
-		protected override async Task OnInitializedAsync()
+		public GestionSalleViewModel(SqlContext sqlContext)
 		{
-			await LoadAllSalles();
+			SqlService = sqlContext;
+
+			LoadAllSalles().GetAwaiter().GetResult();
 		}
 
-		#endregion
 
-		#region Internal Methods
-
-		/// <summary>
-		/// Charge toutes les salles
-		/// </summary>
-		/// <returns></returns>
-		internal async Task LoadAllSalles()
+		public async Task LoadAllSalles()
 		{
 			AllSalles = await SqlService.GetAllSalleAsync();
-			StateHasChanged();
 		}
 
-		#endregion
 
 		#region Event sur DataGrid
 
-		internal void EditRow(Salle currentSalle)
+		public void EditRow(Salle currentSalle)
 		{
 			SallesViewGrid.EditRow(currentSalle);
 		}
 
-		internal void SaveRow(Salle currentSalle)
+		public void SaveRow(Salle currentSalle)
 		{
 			SallesViewGrid.UpdateRow(currentSalle);
 		}
@@ -80,13 +70,12 @@ namespace FormationApp.Composants
 		/// Sauvegarde en BDD des modifications
 		/// </summary>
 		/// <param name="currentSalle"></param>
-		internal async void OnUpdateRow(Salle currentSalle)
+		public async void OnUpdateRow(Salle currentSalle)
 		{
 			await SqlService.UpdateSalleAsync(currentSalle);
-			StateHasChanged();
 		}
 
-		internal async void CancelEdit(Salle currentSalle)
+		public async void CancelEdit(Salle currentSalle)
 		{
 			SallesViewGrid.CancelEditRow(currentSalle);
 
@@ -97,52 +86,19 @@ namespace FormationApp.Composants
 			AllSalles.Add(backup);
 		}
 
-		internal async void DeleteRow(Salle currentSalle)
+		public async void DeleteRow(Salle currentSalle)
 		{
 			await SqlService.DeleteSalle(currentSalle);
 			AllSalles.Remove(currentSalle);
 
-			SallesViewGrid.Reload();
+			await SallesViewGrid.Reload();
 		}
-
-		#endregion
-
-		#region MatDialog Suppression Salle
-
-		//public bool DialogIsOpen = false;
-		////public bool OkDelete = false;
-		//public string NomSalleToDelete = string.Empty;
-
-		//private Salle _salleToDelete = null;
-
-		//internal void OpenDialog()
-		//{
-		//	DialogIsOpen = true;
-		//}
-
-		//internal void OkClick()
-		//{
-		//	DialogIsOpen = false;
-
-		//	if(_salleToDelete != null)
-		//	{
-		//		SqlService.DeleteSalle(_salleToDelete).Wait();
-		//	}
-
-		//	NomSalleToDelete = string.Empty;
-		//	_salleToDelete = null;
-
-		//	//OkDelete = false;
-		//	SallesViewGrid.Reload();
-		//}
 
 		#endregion
 
 		#region MatDialog Ajouter salle
 
-		public bool DialogIsOpenNewSalle = false;
-
-		internal void OpenDialogNewSalle()
+		public void OpenDialogNewSalle()
 		{
 			DialogIsOpenNewSalle = true;
 		}
@@ -150,7 +106,7 @@ namespace FormationApp.Composants
 		/// <summary>
 		/// Ajout d'une nouvelle salle en BDD.
 		/// </summary>
-		internal async void OkClickNewSalle()
+		public async Task OkClickNewSalle()
 		{
 			Salle nouvelleSalle = new Salle()
 			{
@@ -163,12 +119,15 @@ namespace FormationApp.Composants
 
 			AllSalles.Add(nouvelleSalle);
 
-			SallesViewGrid.Reload();
+			await SallesViewGrid.Reload();
 
 			DialogIsOpenNewSalle = false;
-			StateHasChanged();
 		}
 
+
+
+
 		#endregion
+
 	}
 }

@@ -1,4 +1,7 @@
 ﻿@using AccessData.Models
+@using FormationApp.ViewModel
+
+@inject IGestionSalleViewModel SalleVM
 
 <br />
 <br />
@@ -6,25 +9,25 @@
 
 @*Pour Ajouter une salle*@
 <div>
-	<MatButton OnClick="@OpenDialogNewSalle" Raised="true">Ajouter une nouvelle salle</MatButton>
+	<MatButton OnClick="@SalleVM.OpenDialogNewSalle" Raised="true">Ajouter une nouvelle salle</MatButton>
 
-	<MatDialog @bind-IsOpen="@DialogIsOpenNewSalle">
+	<MatDialog @bind-IsOpen="@SalleVM.DialogIsOpenNewSalle">
 		<MatDialogTitle>Ajout d'une salle</MatDialogTitle>
 		
 		<MatDialogContent>
 			<div>
-				<MatTextField @bind-Value="@NomSalleNew" Label="Nom de la salle" />
-				<MatTextField @bind-Value="@NbrePlaceNew" Label="Nombre de place" />
+				<MatTextField @bind-Value="@SalleVM.NomSalleNew" Label="Nom de la salle" />
+				<MatTextField @bind-Value="@SalleVM.NbrePlaceNew" Label="Nombre de place" />
 			</div>
 
 			<div class="padding-top-10">
-				<MatTextField @bind-Value="@DescriptionNew" Label="Description" TextArea="true" FullWidth="true" />
+				<MatTextField @bind-Value="@SalleVM.DescriptionNew" Label="Description" TextArea="true" FullWidth="true" />
 			</div>
 		</MatDialogContent>
 
 		<MatDialogActions>
-			<MatButton OnClick="@OkClickNewSalle">Ajouter</MatButton>
-			<MatButton OnClick="@(e => { DialogIsOpenNewSalle = false; })">Annuler</MatButton>
+			<MatButton OnClick="@SalleVM.OkClickNewSalle">Ajouter</MatButton>
+			<MatButton OnClick="@(e => { SalleVM.DialogIsOpenNewSalle = false; })">Annuler</MatButton>
 		</MatDialogActions>
 	</MatDialog>
 
@@ -36,16 +39,16 @@
 
 @*Pour voir la liste des salles*@
 <div>
-	<RadzenGrid @ref="SallesViewGrid"
+	<RadzenGrid @ref="SalleVM.SallesViewGrid"
 				AllowFiltering="true"
 				FilterCaseSensitivity="FilterCaseSensitivity.Default"
 				AllowPaging="true"
 				PageSize="20"
 				AllowSorting="true"
-				Data="@AllSalles"
+				Data="@SalleVM.AllSalles"
 				TItem="Salle"
 				EmptyText="Aucune salle de connue"
-				RowUpdate="@OnUpdateRow"
+				RowUpdate="@SalleVM.OnUpdateRow"
 				ColumnWidth="200px">
 		<Columns>
 			<RadzenGridColumn TItem="Salle" Property="NomSalle" Title="Nom">
@@ -69,17 +72,17 @@
 			@*Colonne pour la modification*@
 			<RadzenGridColumn TItem="Salle" Bubble="false" Filterable="false" Sortable="false" TextAlign="TextAlign.Center" Width="100px">
 				<Template Context="currentSalle">
-					<RadzenButton Icon="edit" Size="ButtonSize.Small" Click="@(args => EditRow(currentSalle))">
+					<RadzenButton Icon="edit" Size="ButtonSize.Small" Click="@(args => SalleVM.EditRow(currentSalle))">
 					</RadzenButton>
 				</Template>
 
 				<EditTemplate Context="currentSalle">
 					<RadzenButton Icon="save" Size="ButtonSize.Small"
-								  Click="@((args) => SaveRow(currentSalle))" />
+								  Click="@((args) => SalleVM.SaveRow(currentSalle))" />
 
 					<RadzenButton Icon="cancel" Size="ButtonSize.Small"
 								  ButtonStyle="ButtonStyle.Secondary"
-								  Click="@((args) => CancelEdit(currentSalle))" />
+								  Click="@((args) => SalleVM.CancelEdit(currentSalle))" />
 				</EditTemplate>
 			</RadzenGridColumn>
 
@@ -89,14 +92,14 @@
 					<RadzenButton ButtonStyle="ButtonStyle.Danger"
 								  Icon="close"
 								  Size="ButtonSize.Small"
-								  Click="@(args => DeleteRow(currentSalle))">
+								  Click="@(args => SalleVM.DeleteRow(currentSalle))">
 					</RadzenButton>
 				</Template>
 				<EditTemplate Context="currentSalle">
 					<RadzenButton ButtonStyle="ButtonStyle.Danger"
 								  Icon="close"
 								  Size="ButtonSize.Small"
-								  Click="@(args => DeleteRow(currentSalle))">
+								  Click="@(args => SalleVM.DeleteRow(currentSalle))">
 					</RadzenButton>
 				</EditTemplate>
 			</RadzenGridColumn>
