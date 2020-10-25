@@ -201,7 +201,7 @@ namespace FormationApp.Composants
 
 			try
 			{
-				SqlService.AddSession(FormationSelected.IdFormation, FormateurSelected.IdPersonnel,
+				await SqlService.AddSession(FormationSelected.IdFormation, FormateurSelected.IdPersonnel,
 											SalleSelected.IdSalle, DateFormation, PlaceDispo);
 			}
 			catch (Exception)

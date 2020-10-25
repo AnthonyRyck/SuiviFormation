@@ -40,7 +40,7 @@ namespace AccessData
                                         + " WHERE sesion.IsArchive = 0";
                     MySqlCommand cmd = new MySqlCommand(commandText, conn);
 
-                    using (var reader = cmd.ExecuteReader())
+                    using (var reader = await cmd.ExecuteReaderAsync())
                     {
                         while (await reader.ReadAsync())
                         {
@@ -94,7 +94,7 @@ namespace AccessData
                                         + " WHERE sesion.DateSession > NOW();";
                     MySqlCommand cmd = new MySqlCommand(commandText, conn);
 
-                    using (var reader = cmd.ExecuteReader())
+                    using (var reader = await cmd.ExecuteReaderAsync())
                     {
                         while (await reader.ReadAsync())
                         {
@@ -147,7 +147,7 @@ namespace AccessData
                                         + $" WHERE sesion.IdSession = {idSession};";
                     MySqlCommand cmd = new MySqlCommand(commandText, conn);
 
-                    using (var reader = cmd.ExecuteReader())
+                    using (var reader = await cmd.ExecuteReaderAsync())
                     {
                         while (await reader.ReadAsync())
                         {
@@ -197,7 +197,7 @@ namespace AccessData
                                     + " WHERE sesion.DateSession > NOW();";
                     MySqlCommand cmd = new MySqlCommand(commandText, conn);
 
-                    using (var reader = cmd.ExecuteReader())
+                    using (var reader = await cmd.ExecuteReaderAsync())
                     {
                         while (await reader.ReadAsync())
                         {
@@ -235,7 +235,7 @@ namespace AccessData
 		/// <param name="dateFormation"></param>
 		/// <param name="nbrePlace"></param>
 		/// <returns></returns>
-		public void AddSession(int idFormation, string idFormateur, int idSalle, DateTime dateFormation, int nbrePlace)
+		public async Task AddSession(int idFormation, string idFormateur, int idSalle, DateTime dateFormation, int nbrePlace)
         {
 			try
 			{
@@ -255,7 +255,7 @@ namespace AccessData
                         cmd.Parameters.AddWithValue("@archive", false);
 
                         conn.Open();
-                        int result = cmd.ExecuteNonQuery();
+                        int result = await cmd.ExecuteNonQueryAsync();
                         conn.Close();
                     }
                 }
@@ -302,13 +302,13 @@ namespace AccessData
         {
             string commandText = $"SELECT IdSession, FileName FROM sessionformation WHERE IdSession={idSession}";
 
-            Func<MySqlCommand, Session> funcCmd = (cmd) =>
+            Func<MySqlCommand, Task<Session>> funcCmd = async(cmd) =>
             {
                 Session session = new Session();
                 
-                using (var reader = cmd.ExecuteReader())
+                using (var reader = await cmd.ExecuteReaderAsync())
                 {
-                    while (reader.Read())
+                    while (await reader.ReadAsync())
                     {
                         session.IdFormation = reader.GetInt32(0);
                         session.NomFichierEmargement = ConvertFromDBVal<string?>(reader.GetValue(1));
@@ -368,13 +368,13 @@ namespace AccessData
             var commandText = @"SELECT IdTypeFormation, TitreType"
                                 + " FROM typeformation;";                                
 
-            Func<MySqlCommand, List<TypeFormation>> funcCmd = (cmd) =>
+            Func<MySqlCommand, Task<List<TypeFormation>>> funcCmd = async (cmd) =>
             {
                 List<TypeFormation> listTypes = new List<TypeFormation>();
 
-                using (var reader = cmd.ExecuteReader())
+                using (var reader = await cmd.ExecuteReaderAsync())
                 {
-                    while (reader.Read())
+                    while (await reader.ReadAsync())
                     {
                         listTypes.Add(new TypeFormation()
                         {
@@ -415,28 +415,28 @@ namespace AccessData
                                 + " FROM catalogueformation catalogue"
                                 + " INNER JOIN typeformation typeform ON typeform.IdTypeFormation = catalogue.IdTypeFormation;";
 
-            Func<MySqlCommand, List<CatalogueFormations>> funcCmd = (cmd) =>
+            Func<MySqlCommand, Task<List<CatalogueFormations>>> funcCmdAsync = async (cmd) =>
             {
                 List<CatalogueFormations> listFormations = new List<CatalogueFormations>();
 
-                using (var reader = cmd.ExecuteReader())
+                using (var reader = await cmd.ExecuteReaderAsync())
                 {
-                    while (reader.Read())
+                    while (await reader.ReadAsync())
                     {
                         object tempDate = reader.GetValue(3);
                         DateTime? tempDateFin = ConvertFromDBVal<DateTime?>(tempDate);
 
                         listFormations.Add(new CatalogueFormations()
                         {
-                            IdFormation = reader.GetInt32(0),
-                            Titre = reader.GetString(1),
-                            Description = reader.GetString(2),
+                            IdFormation = await reader.GetFieldValueAsync<int>(0),
+                            Titre = await reader.GetFieldValueAsync<string>(1),
+                            Description = await reader.GetFieldValueAsync<string>(2),
                             DateDeFin = tempDateFin,
-                            NomDuFichier = reader.GetString(4),
+                            NomDuFichier = await reader.GetFieldValueAsync<string>(4),
                             EstInterne = reader.GetBoolean(5),
-                            Duree = reader.GetDouble(6),
-                            TypeFormation = reader.GetString(7),
-                            TypeFormationId = reader.GetInt32(8)
+                            Duree = await reader.GetFieldValueAsync<double>(6),
+                            TypeFormation = await reader.GetFieldValueAsync<string>(7),
+                            TypeFormationId = await reader.GetFieldValueAsync<int>(8)
                         });
                     }
                 }
@@ -448,7 +448,7 @@ namespace AccessData
 
             try
             {
-                listFormations = await GetCoreAsync(commandText, funcCmd);
+                listFormations = await GetCoreAsync(commandText, funcCmdAsync);
             }
             catch (Exception ex)
             {
@@ -471,13 +471,13 @@ namespace AccessData
                             + " WHERE catalogue.DateDeFin IS NULL"
                             + " OR catalogue.DateDeFin > curdate();";
 
-            Func<MySqlCommand, List<CatalogueFormations>> funcCmd = (cmd) =>
+            Func<MySqlCommand, Task<List<CatalogueFormations>>> funcCmd = async (cmd) =>
             {
                 List<CatalogueFormations> listFormations = new List<CatalogueFormations>();
 
-                using (var reader = cmd.ExecuteReader())
+                using (var reader = await cmd.ExecuteReaderAsync())
                 {
-                    while (reader.Read())
+                    while (await reader.ReadAsync())
                     {
                         listFormations.Add(new CatalogueFormations()
                         {
@@ -520,13 +520,13 @@ namespace AccessData
             var commandText = @"SELECT IdFormation, Titre, DescriptionFormation, DateDeFin, NomDeFichier, EstInterne, Duree FROM catalogueformation"
                                        + $" WHERE IdFormation={idFormation};";
 
-            Func<MySqlCommand, CatalogueFormations> funcCmd = (cmd) =>
+            Func<MySqlCommand, Task<CatalogueFormations>> funcCmd = async(cmd) =>
             {
                 CatalogueFormations formation = new CatalogueFormations();
 
-                using (var reader = cmd.ExecuteReader())
+                using (var reader = await cmd.ExecuteReaderAsync())
                 {
-                    while (reader.Read())
+                    while (await reader.ReadAsync())
                     {
                         object tempDate = reader.GetValue(3);
                         DateTime? tempDateFin = ConvertFromDBVal<DateTime?>(tempDate);
@@ -569,11 +569,11 @@ namespace AccessData
             var commandText = @"SELECT IdFormation, Titre, DescriptionFormation, EstInterne, Duree FROM catalogueformation"
                             + $" WHERE Titre LIKE '%{nomFormation}%';";
 
-            Func<MySqlCommand, List<CatalogueFormations>> funcCmd = (cmd) =>
+            Func<MySqlCommand, Task<List<CatalogueFormations>>> funcCmd = async (cmd) =>
             {
                 List<CatalogueFormations> formations = new List<CatalogueFormations>();
 
-                using (var reader = cmd.ExecuteReader())
+                using (var reader = await cmd.ExecuteReaderAsync())
                 {
                     while (reader.Read())
                     {
@@ -626,25 +626,32 @@ namespace AccessData
         /// <returns></returns>
 		public async Task InsertFormation(CatalogueFormations nouvelleFormation)
 		{
-            using (var conn = new MySqlConnection(ConnectionString))
-            {
-                using (var cmd = new MySqlCommand("INSERT INTO catalogueformation (Titre, DescriptionFormation, DateDeFin, FichierContenu, NomDeFichier, EstInterne, Duree, IdTypeFormation)"
-                                                + " VALUES (@Titre, @Description, NULL, @ContenuFormationN, @NomDuFichier, @EstInterne, @Duree, @IdTypeFormation);"
-                , conn))
+			try
+			{
+                using (var conn = new MySqlConnection(ConnectionString))
                 {
-                    cmd.Parameters.AddWithValue("@Titre", nouvelleFormation.Titre);
-                    cmd.Parameters.AddWithValue("@Description", nouvelleFormation.Description);
-                    cmd.Parameters.AddWithValue("@ContenuFormationN", nouvelleFormation.ContenuFormationN);
-                    cmd.Parameters.AddWithValue("@NomDuFichier", nouvelleFormation.NomDuFichier);
-                    cmd.Parameters.AddWithValue("@EstInterne", nouvelleFormation.EstInterne);
-                    cmd.Parameters.AddWithValue("@Duree", nouvelleFormation.Duree);
-                    cmd.Parameters.AddWithValue("@IdTypeFormation", nouvelleFormation.TypeFormationId);
+                    using (var cmd = new MySqlCommand("INSERT INTO catalogueformation (Titre, DescriptionFormation, DateDeFin, FichierContenu, NomDeFichier, EstInterne, Duree, IdTypeFormation)"
+                                                    + " VALUES (@Titre, @Description, NULL, @ContenuFormationN, @NomDuFichier, @EstInterne, @Duree, @IdTypeFormation);"
+                    , conn))
+                    {
+                        cmd.Parameters.AddWithValue("@Titre", nouvelleFormation.Titre);
+                        cmd.Parameters.AddWithValue("@Description", nouvelleFormation.Description);
+                        cmd.Parameters.AddWithValue("@ContenuFormationN", nouvelleFormation.ContenuFormationN);
+                        cmd.Parameters.AddWithValue("@NomDuFichier", nouvelleFormation.NomDuFichier);
+                        cmd.Parameters.AddWithValue("@EstInterne", nouvelleFormation.EstInterne);
+                        cmd.Parameters.AddWithValue("@Duree", nouvelleFormation.Duree);
+                        cmd.Parameters.AddWithValue("@IdTypeFormation", nouvelleFormation.TypeFormationId);
 
-                    conn.Open();
-                    int result = cmd.ExecuteNonQuery();
-                    conn.Close();
+                        conn.Open();
+                        int result = await cmd.ExecuteNonQueryAsync();
+                        conn.Close();
+                    }
                 }
             }
+			catch (Exception ex)
+			{
+				throw;
+			}
         }
 
         public async Task UpdateFormationAsync(CatalogueFormations currentFormation)
@@ -674,7 +681,7 @@ namespace AccessData
                     cmd.Parameters.AddWithValue("@IdType", currentFormation.TypeFormationId);
 
                     conn.Open();
-                    int result = cmd.ExecuteNonQuery();
+                    int result = await cmd.ExecuteNonQueryAsync();
                     conn.Close();
                 }
             }
@@ -706,7 +713,7 @@ namespace AccessData
                     cmd.Parameters.AddWithValue("@IdType", currentFormation.TypeFormationId);
 
                     conn.Open();
-                    int result = cmd.ExecuteNonQuery();
+                    int result = await cmd.ExecuteNonQueryAsync();
                     conn.Close();
                 }
             }
@@ -755,7 +762,7 @@ namespace AccessData
                 var commandText = @"SELECT IdSalle, NomSalle, Description, NombrePlace FROM Salle;";
                 MySqlCommand cmd = new MySqlCommand(commandText, conn);
 
-                using (var reader = cmd.ExecuteReader())
+                using (var reader = await cmd.ExecuteReaderAsync())
                 {
                     while (await reader.ReadAsync())
                     {
@@ -844,7 +851,7 @@ namespace AccessData
                 var commandText = $@"SELECT IdSalle, NomSalle, Description, NombrePlace FROM Salle WHERE IdSalle={idSalle};";
                 MySqlCommand cmd = new MySqlCommand(commandText, conn);
 
-                using (var reader = cmd.ExecuteReader())
+                using (var reader = await cmd.ExecuteReaderAsync())
                 {
                     while (await reader.ReadAsync())
                     {
@@ -880,7 +887,7 @@ namespace AccessData
 
                 MySqlCommand cmd = new MySqlCommand(commandText, conn);
 
-                using (var reader = cmd.ExecuteReader())
+                using (var reader = await cmd.ExecuteReaderAsync())
                 {
                     while (await reader.ReadAsync())
                     {
@@ -948,7 +955,7 @@ namespace AccessData
                     conn.Open();
                     MySqlCommand cmd = new MySqlCommand(commandInsert, conn);
 
-                    using (var reader = cmd.ExecuteReader())
+                    using (var reader = await cmd.ExecuteReaderAsync())
                     {
                         while (await reader.ReadAsync())
                         {
@@ -994,7 +1001,7 @@ namespace AccessData
                     conn.Open();
                     MySqlCommand cmd = new MySqlCommand(commandInsert, conn);
 
-                    using (var reader = cmd.ExecuteReader())
+                    using (var reader = await cmd.ExecuteReaderAsync())
                     {
                         while (await reader.ReadAsync())
                         {
@@ -1041,7 +1048,7 @@ namespace AccessData
 
                     conn.Open();
 
-                    using (var reader = cmd.ExecuteReader())
+                    using (var reader = await cmd.ExecuteReaderAsync())
                     {
                         while (await reader.ReadAsync())
                         {
@@ -1157,7 +1164,7 @@ namespace AccessData
 
                     conn.Open();
 
-                    using (var reader = cmd.ExecuteReader())
+                    using (var reader = await cmd.ExecuteReaderAsync())
                     {
                         while (await reader.ReadAsync())
                         {
@@ -1206,7 +1213,7 @@ namespace AccessData
                                     + $" WHERE IdSession={idSession}";
                     MySqlCommand cmd = new MySqlCommand(commandText, conn);
 
-                    using (var reader = cmd.ExecuteReader())
+                    using (var reader = await cmd.ExecuteReaderAsync())
                     {
                         while (await reader.ReadAsync())
                         {
@@ -1293,7 +1300,7 @@ namespace AccessData
                                         + $" AND inscrit.IdPersonnel = '{idUser}';";
                     MySqlCommand cmd = new MySqlCommand(commandText, conn);
 
-                    using (var reader = cmd.ExecuteReader())
+                    using (var reader = await cmd.ExecuteReaderAsync())
                     {
                         while (await reader.ReadAsync())
                         {
@@ -1350,7 +1357,7 @@ namespace AccessData
 
                     MySqlCommand cmd = new MySqlCommand(commandText, conn);
 
-                    using (var reader = cmd.ExecuteReader())
+                    using (var reader = await cmd.ExecuteReaderAsync())
                     {
                         while (await reader.ReadAsync())
                         {
@@ -1394,13 +1401,13 @@ namespace AccessData
                             + " INNER JOIN inscriptionformation inscription ON pers.IdPersonnel = inscription.IdPersonnel"
                             + $" WHERE inscription.IdSession = {idSession};";
 
-            Func<MySqlCommand, List<PersonnelInscritView>> funcCmd = (cmd) =>
+            Func<MySqlCommand, Task<List<PersonnelInscritView>>> funcCmd = async (cmd) =>
             {
                 List<PersonnelInscritView> personnelInscrits = new List<PersonnelInscritView>();
 
-                using (var reader = cmd.ExecuteReader())
+                using (var reader = await cmd.ExecuteReaderAsync())
                 {
-                    while (reader.Read())
+                    while (await reader.ReadAsync())
                     {
                         PersonnelInscritView personnel = new PersonnelInscritView()
                         {
@@ -1461,7 +1468,7 @@ namespace AccessData
                         cmd.Parameters.AddWithValue("@userId", userId);
 
                         conn.Open();
-                        int result = cmd.ExecuteNonQuery();
+                        int result = await cmd.ExecuteNonQueryAsync();
                         conn.Close();
                     }
                 }
@@ -1479,7 +1486,7 @@ namespace AccessData
         /// <param name="idSession"></param>
         /// <param name="idUser"></param>
         /// <returns></returns>
-        public void UpdateValidationUser(bool isValidate, int idSession, string idUser)
+        public async Task UpdateValidationUser(bool isValidate, int idSession, string idUser)
 		{
 				try
 				{
@@ -1494,7 +1501,7 @@ namespace AccessData
                             cmd.Parameters.AddWithValue("@valueValidate", isValidate);
 
                             conn.Open();
-                            int result = cmd.ExecuteNonQuery();
+                            int result = await cmd.ExecuteNonQueryAsync();
                             conn.Close();
                         }
                     }
@@ -1517,23 +1524,20 @@ namespace AccessData
         public async Task<int> InsertCompetence(Competence nouvelleCompetence)
         {
             // Pour insérer
-            await Task.Run(() => 
+            using (var conn = new MySqlConnection(ConnectionString))
             {
-                using (var conn = new MySqlConnection(ConnectionString))
+                string commandInsert = "INSERT INTO competences(Titre, DescriptionCompetence) "
+                                                + "VALUES(@titre, @descriptionCompetence);";
+
+                using (var cmd = new MySqlCommand(commandInsert, conn))
                 {
-                    string commandInsert = "INSERT INTO competences(Titre, DescriptionCompetence) "
-                                                    + "VALUES(@titre, @descriptionCompetence);";
+                    cmd.Parameters.AddWithValue("@titre", nouvelleCompetence.Titre);
+                    cmd.Parameters.AddWithValue("@descriptionCompetence", nouvelleCompetence.Description);
 
-                    using (var cmd = new MySqlCommand(commandInsert, conn))
-                    {
-                        cmd.Parameters.AddWithValue("@titre", nouvelleCompetence.Titre);
-                        cmd.Parameters.AddWithValue("@descriptionCompetence", nouvelleCompetence.Description);
-
-                        conn.Open();
-                        cmd.ExecuteNonQuery();
-                    }
+                    conn.Open();
+                    await cmd.ExecuteNonQueryAsync();
                 }
-            });
+            }
 
             // Pour récupérer l'ID de la ligne.
             string idCmd = "SELECT LAST_INSERT_ID();";
@@ -1549,39 +1553,36 @@ namespace AccessData
         public async Task InsertCompetenceFormation(int idCompetence, List<CatalogueFormations> formations)
         {
             // Pour insérer
-            await Task.Run(() =>
+            try
             {
-                try
+                if (formations.Count > 0)
                 {
-                    if(formations.Count > 0)
-					{
-                        string commandInsert = "INSERT INTO competenceformation(IdCompetence, IdFormation) VALUES ";
+                    string commandInsert = "INSERT INTO competenceformation(IdCompetence, IdFormation) VALUES ";
 
-                        int maxLine = formations.Count();
-                        for (int i = 0; i < maxLine; i++)
-                        {
-                            commandInsert += $"({idCompetence}, {formations[i].IdFormation})";
+                    int maxLine = formations.Count();
+                    for (int i = 0; i < maxLine; i++)
+                    {
+                        commandInsert += $"({idCompetence}, {formations[i].IdFormation})";
 
-                            if (i < (maxLine - 1))
-                                commandInsert += ", ";
-                        }
+                        if (i < (maxLine - 1))
+                            commandInsert += ", ";
+                    }
 
-                        commandInsert += ";";
+                    commandInsert += ";";
 
 
-                        using (var conn = new MySqlConnection(ConnectionString))
-                        {
-                            conn.Open();
-                            MySqlCommand cmd = new MySqlCommand(commandInsert, conn);
-                            cmd.ExecuteNonQuery();
-                        }
+                    using (var conn = new MySqlConnection(ConnectionString))
+                    {
+                        conn.Open();
+                        MySqlCommand cmd = new MySqlCommand(commandInsert, conn);
+                        await cmd.ExecuteNonQueryAsync();
                     }
                 }
-                catch (Exception ex)
-                {
-                    throw;
-                }
-            });
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
         }
 
         /// <summary>
@@ -1596,13 +1597,13 @@ namespace AccessData
                                 + "INNER JOIN catalogueformation formation ON formation.IdFormation = compform.IdFormation "
                                 + $"WHERE comp.IdCompetence={idCompetence}";
 
-            Func<MySqlCommand, CompetenceDetailView> funcCmd = (cmd) =>
+            Func<MySqlCommand, Task<CompetenceDetailView>> funcCmd = async(cmd) =>
             {
                 CompetenceDetailView competenceView = new CompetenceDetailView();
 
-                using (var reader = cmd.ExecuteReader())
+                using (var reader = await cmd.ExecuteReaderAsync())
                 {
-                    while (reader.Read())
+                    while (await reader.ReadAsync())
                     {
                         if(competenceView.Competence == null)
 						{
@@ -1662,13 +1663,13 @@ namespace AccessData
                                 + "INNER JOIN competenceformation compform ON compform.IdCompetence = comp.IdCompetence "
                                 + "INNER JOIN catalogueformation formation ON formation.IdFormation = compform.IdFormation";
 
-            Func<MySqlCommand, List<CompetenceView>> funcCmd = (cmd) =>
+            Func<MySqlCommand, Task<List<CompetenceView>>> funcCmd = async(cmd) =>
             {
                 List<CompetenceView> competences = new List<CompetenceView>();
 
-                using (var reader = cmd.ExecuteReader())
+                using (var reader = await cmd.ExecuteReaderAsync())
                 {
-                    while (reader.Read())
+                    while (await reader.ReadAsync())
                     {
                         Competence competence = new Competence()
                         {
@@ -1731,13 +1732,13 @@ namespace AccessData
             var commandText = @"SELECT comp.IdCompetence, comp.Titre, comp.DescriptionCompetence "
                                 + "FROM competences comp;";
 
-            Func<MySqlCommand, List<Competence>> funcCmd = (cmd) =>
+            Func<MySqlCommand, Task<List<Competence>>> funcCmd = async(cmd) =>
             {
                 List<Competence> competences = new List<Competence>();
 
-                using (var reader = cmd.ExecuteReader())
+                using (var reader = await cmd.ExecuteReaderAsync())
                 {
-                    while (reader.Read())
+                    while (await reader.ReadAsync())
                     {
                         Competence competence = new Competence()
                         {
@@ -1776,23 +1777,20 @@ namespace AccessData
         /// <returns></returns>
         public async Task UpdateCompetenceTitreDescription(int idCompetence, string titreCompetence, string descriptionCompetence)
         {
-            await Task.Run(() =>
+            using (var conn = new MySqlConnection(ConnectionString))
             {
-                using (var conn = new MySqlConnection(ConnectionString))
+                var commandUpdateCompetence = @$"UPDATE competences SET Titre=@titre, DescriptionCompetence=@description"
+                                      + $" WHERE IdCompetence={idCompetence};";
+
+                using (var cmd = new MySqlCommand(commandUpdateCompetence, conn))
                 {
-                    var commandUpdateCompetence = @$"UPDATE competences SET Titre=@titre, DescriptionCompetence=@description"
-                                          + $" WHERE IdCompetence={idCompetence};";
+                    cmd.Parameters.AddWithValue("@titre", titreCompetence);
+                    cmd.Parameters.AddWithValue("@description", descriptionCompetence);
 
-                    using (var cmd = new MySqlCommand(commandUpdateCompetence, conn))
-                    {
-                        cmd.Parameters.AddWithValue("@titre", titreCompetence);
-                        cmd.Parameters.AddWithValue("@description", descriptionCompetence);
-
-                        conn.Open();
-                        cmd.ExecuteNonQuery();
-                    }
+                    conn.Open();
+                    await cmd.ExecuteNonQueryAsync();
                 }
-            });
+            }
         }
 
         /// <summary>
@@ -1820,13 +1818,13 @@ namespace AccessData
                             + "FROM competenceformation comp "
                             + $"WHERE comp.IdFormation = {idFormation};";
 
-            Func<MySqlCommand, List<int>> funcCmd = (cmd) =>
+            Func<MySqlCommand, Task<List<int>>> funcCmd = async(cmd) =>
             {
                 List<int> competences = new List<int>();
 
-                using (var reader = cmd.ExecuteReader())
+                using (var reader = await cmd.ExecuteReaderAsync())
                 {
-                    while (reader.Read())
+                    while (await reader.ReadAsync())
                     {
                         int idCompetence = reader.GetInt32(0);
                         competences.Add(idCompetence);
@@ -1862,13 +1860,13 @@ namespace AccessData
                             + "FROM competenceformation comp "
                             + $"WHERE comp.IdCompetence = {idCompetence};";
 
-            Func<MySqlCommand, List<int>> funcCmd = (cmd) =>
+            Func<MySqlCommand, Task<List<int>>> funcCmd = async(cmd) =>
             {
                 List<int> idFormations = new List<int>();
 
-                using (var reader = cmd.ExecuteReader())
+                using (var reader = await cmd.ExecuteReaderAsync())
                 {
-                    while (reader.Read())
+                    while (await reader.ReadAsync())
                     {
                         int idFormation = reader.GetInt32(0);
                         idFormations.Add(idFormation);
@@ -1905,13 +1903,13 @@ namespace AccessData
                                 + $"WHERE pers.IdSession = {idSession} "
                                 + "AND pers.IsSessionValidate = true;";
 
-            Func<MySqlCommand, List<string>> funcCmd = (cmd) =>
+            Func<MySqlCommand, Task<List<string>>> funcCmd = async(cmd) =>
             {
                 List<string> users = new List<string>();
 
-                using (var reader = cmd.ExecuteReader())
+                using (var reader = await cmd.ExecuteReaderAsync())
                 {
-                    while (reader.Read())
+                    while (await reader.ReadAsync())
                     {
                         string idUser = reader.GetString(0);
                         users.Add(idUser);
@@ -1950,13 +1948,13 @@ namespace AccessData
                              + $"WHERE inscrit.IdPersonnel = '{user}' "
                              + "AND inscrit.IsSessionValidate = true;";
 
-            Func<MySqlCommand, List<int>> funcCmd = (cmd) =>
+            Func<MySqlCommand, Task<List<int>>> funcCmd = async(cmd) =>
             {
                 List<int> allFormationsValidate = new List<int>();
 
-                using (var reader = cmd.ExecuteReader())
+                using (var reader = await cmd.ExecuteReaderAsync())
                 {
-                    while (reader.Read())
+                    while (await reader.ReadAsync())
                     {
                         int idFormation = reader.GetInt32(0);
                         allFormationsValidate.Add(idFormation);
@@ -1996,13 +1994,13 @@ namespace AccessData
                                 + " ON suivi.IdCompetence = competence.IdCompetence"
                                 + $" WHERE suivi.IdPersonnel = '{userId}';";
 
-            Func<MySqlCommand, List<CompetenceUserView>> funcCmd = (cmd) =>
+            Func<MySqlCommand, Task<List<CompetenceUserView>>> funcCmd = async(cmd) =>
             {
                 List<CompetenceUserView> allCompetencesValidate = new List<CompetenceUserView>();
 
-                using (var reader = cmd.ExecuteReader())
+                using (var reader = await cmd.ExecuteReaderAsync())
                 {
-                    while (reader.Read())
+                    while (await reader.ReadAsync())
                     {
                         int idCompetence = reader.GetInt32(0);
 
@@ -2089,61 +2087,48 @@ namespace AccessData
         /// <returns></returns>
         public async Task AddCompetenceToUser(string user, int idCompetence, int idSame, DateTime now)
         {
-            await Task.Factory.StartNew(() => 
+            using (var conn = new MySqlConnection(ConnectionString))
             {
-                using (var conn = new MySqlConnection(ConnectionString))
+                using (var cmd = new MySqlCommand("INSERT INTO suivisame (IdPersonnel, IdCompetence, IdSame, DateObtention)"
+                                                + " VALUES (@user, @idCompetence, @same, @date);"
+                , conn))
                 {
-                    using (var cmd = new MySqlCommand("INSERT INTO suivisame (IdPersonnel, IdCompetence, IdSame, DateObtention)"
-                                                    + " VALUES (@user, @idCompetence, @same, @date);"
-                    , conn))
-                    {
-                        cmd.Parameters.AddWithValue("@user", user);
-                        cmd.Parameters.AddWithValue("@idCompetence", idCompetence);
-                        cmd.Parameters.AddWithValue("@same", idSame);
-                        cmd.Parameters.AddWithValue("@date", now);
+                    cmd.Parameters.AddWithValue("@user", user);
+                    cmd.Parameters.AddWithValue("@idCompetence", idCompetence);
+                    cmd.Parameters.AddWithValue("@same", idSame);
+                    cmd.Parameters.AddWithValue("@date", now);
 
-                        conn.Open();
-                        int result = cmd.ExecuteNonQuery();
-                        conn.Close();
-                    }
+                    conn.Open();
+                    int result = await cmd.ExecuteNonQueryAsync();
+                    conn.Close();
                 }
-            });
+            }
         }
 
         #endregion
 
         #region Private Methods
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="commandSql"></param>
-        /// <param name="func"></param>
-        /// <returns></returns>
-        private async Task<List<T>> GetCoreAsync<T>(string commandSql, Func<MySqlCommand, List<T>> func)
+        private async Task<List<T>> GetCoreAsync<T>(string commandSql, Func<MySqlCommand, Task<List<T>>> func)
             where T : new()
         {
-            return await Task.Run(() =>
+            List<T> result = new List<T>();
+
+            try
             {
-                List<T> result = new List<T>();
-
-                try
+                using (var conn = new MySqlConnection(ConnectionString))
                 {
-                    using (var conn = new MySqlConnection(ConnectionString))
-                    {
-                        MySqlCommand cmd = new MySqlCommand(commandSql, conn);
-                        conn.Open();
-                        result = func.Invoke(cmd);
-                    }
+                    MySqlCommand cmd = new MySqlCommand(commandSql, conn);
+                    conn.Open();
+                    result = await func.Invoke(cmd);
                 }
-                catch (Exception ex)
-                {
-                    throw;
-                }
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
 
-                return result;
-            });
+            return result;
         }
 
         /// <summary>
@@ -2153,29 +2138,26 @@ namespace AccessData
         /// <param name="commandSql"></param>
         /// <param name="func"></param>
         /// <returns></returns>
-        private async Task<T> GetCoreAsync<T>(string commandSql, Func<MySqlCommand, T> func)
+        private async Task<T> GetCoreAsync<T>(string commandSql, Func<MySqlCommand, Task<T>> func)
             where T : new()
         {
-            return await Task.Run(() =>
+            T result = new T();
+
+            try
             {
-                T result = new T();
-
-                try
+                using (var conn = new MySqlConnection(ConnectionString))
                 {
-                    using (var conn = new MySqlConnection(ConnectionString))
-                    {
-                        MySqlCommand cmd = new MySqlCommand(commandSql, conn);
-                        conn.Open();
-                        result = func.Invoke(cmd);
-                    }
+                    MySqlCommand cmd = new MySqlCommand(commandSql, conn);
+                    conn.Open();
+                    result = await func.Invoke(cmd);
                 }
-                catch (Exception ex)
-                {
-                    throw;
-                }
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
 
-                return result;
-            });
+            return result;
         }
 
         /// <summary>

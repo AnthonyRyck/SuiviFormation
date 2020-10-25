@@ -259,6 +259,7 @@ namespace FormationApp.Composants
 		public byte[] Contenu { get; set; }
 
 		[Required(ErrorMessage = "Il faut le contenu de la formation")]
+		[StringLength(40, ErrorMessage = "Le nom du fichier est trop long, 40 caractères avec l'extension .xxx")]
 		public string FileName { get; set; }
 
 		public bool EstInterne { get; set; }

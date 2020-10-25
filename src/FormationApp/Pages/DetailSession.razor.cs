@@ -138,12 +138,12 @@ namespace FormationApp.Pages
 			PersonnelViewGrid.EditRow(currentPersonnel);
 		}
 
-		internal void SaveRow(PersonnelInscritView currentPersonnel)
+		internal async void SaveRow(PersonnelInscritView currentPersonnel)
 		{
 			//SqlService.UpdateValidationUser(currentPersonnel.IsSessionValidate, UserService.SessionView.IdSession, currentPersonnel.IdPersonnel);
 
-			SqlService.UpdateValidationUser(currentPersonnel.IsSessionValidate, Id, currentPersonnel.IdPersonnel);
-			PersonnelViewGrid.UpdateRow(currentPersonnel);
+			await SqlService.UpdateValidationUser(currentPersonnel.IsSessionValidate, Id, currentPersonnel.IdPersonnel);
+			await PersonnelViewGrid.UpdateRow(currentPersonnel);
 		}
 
 		/// <summary>
