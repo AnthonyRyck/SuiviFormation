@@ -1,11 +1,6 @@
 ﻿using AccessData;
 using AccessData.Models;
 using MatBlazor;
-using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Radzen;
 using Radzen.Blazor;
 using System;
 using System.Collections.Generic;
@@ -14,44 +9,41 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace FormationApp.Composants
+namespace FormationApp.ViewModel
 {
-	public partial class GestionFormation : ComponentBase
+	public class GestionFormationViewModel : IGestionFormation
 	{
-
 		#region Properties
 
-		[Inject]
 		public SqlContext SqlService { get; set; }
 
 		public RadzenGrid<CatalogueFormations> FormationViewGrid { get; set; }
 
 		public List<CatalogueFormations> AllFormations { get; set; }
 
+		public bool LineEnCoursModif { get; set; }
+
+		public CatalogueFormations CurrentLine { get; set; }
+
 		#region Pour nouvelle formation
 
-		protected FormationModel formationModel = new FormationModel();
+		public FormationModel FormationModel { get; set; } = new FormationModel();
 
 		public List<TypeFormation> AllTypeFormations { get; set; }
 
-		#endregion
+		public bool DialogIsOpenNewFormation { get; set; } = false;
 
 		#endregion
-
-		#region Héritage
-
-		protected override async Task OnInitializedAsync()
-		{
-			await LoadAllFormations();
-		}
 
 		#endregion
 
 		#region Constructeur
 
-		public GestionFormation()
+		public GestionFormationViewModel(SqlContext sqlContext)
 		{
+			SqlService = sqlContext;
 			AllTypeFormations = new List<TypeFormation>();
+			LoadAllFormations().GetAwaiter().GetResult();
 		}
 
 		#endregion
@@ -62,21 +54,12 @@ namespace FormationApp.Composants
 		/// Charge toutes les salles
 		/// </summary>
 		/// <returns></returns>
-		internal async Task LoadAllFormations()
+		public async Task LoadAllFormations()
 		{
 			AllTypeFormations = await SqlService.GetAllTypeFormations();
 			AllFormations = await SqlService.GetAllFormationsAsync();
-			StateHasChanged();
 		}
-
-		protected bool lineEnCoursModif;
-
-		//internal string AddCurrentLineToUpdate(CatalogueFormations currentLine)
-		//{
-		//	ElementsModifies.Add(currentLine);
-		//	return string.Empty;
-		//}
-
+		
 		#endregion
 
 		#region Event sur DataGrid
@@ -85,16 +68,14 @@ namespace FormationApp.Composants
 		/// Lors du click sur le bouton Edit
 		/// </summary>
 		/// <param name="currentFormation"></param>
-		internal void EditRow(CatalogueFormations currentFormation)
+		public void EditRow(CatalogueFormations currentFormation)
 		{
-			lineEnCoursModif = true;
-
+			LineEnCoursModif = true;
 			CurrentLine = currentFormation;
-
 			FormationViewGrid.EditRow(currentFormation);
 		}
 
-		internal void SaveRow(CatalogueFormations currentFormation)
+		public void SaveRow(CatalogueFormations currentFormation)
 		{
 			FormationViewGrid.UpdateRow(currentFormation);
 		}
@@ -103,10 +84,10 @@ namespace FormationApp.Composants
 		/// Sauvegarde en BDD des modifications
 		/// </summary>
 		/// <param name="currentFormation"></param>
-		internal async void OnUpdateRow(CatalogueFormations currentFormation)
+		public async Task OnUpdateRow(CatalogueFormations currentFormation)
 		{
 			// Indicateur que le fichier à été mis à jour.
-			if(CurrentLine.ContenuFormationN != null && CurrentLine.ContenuFormationN.Any())
+			if (CurrentLine.ContenuFormationN != null && CurrentLine.ContenuFormationN.Any())
 			{
 				await SqlService.UpdateFormationAsync(currentFormation);
 			}
@@ -117,32 +98,31 @@ namespace FormationApp.Composants
 
 			currentFormation.TypeFormation = AllTypeFormations.FirstOrDefault(x => x.IdTypeFormation == currentFormation.TypeFormationId).TitreTypeFormation;
 
-			lineEnCoursModif = false;
-			StateHasChanged();
+			LineEnCoursModif = false;
 		}
 
 		/// <summary>
 		/// 
 		/// </summary>
 		/// <param name="currentFormation"></param>
-		internal async void CancelEdit(CatalogueFormations currentFormation)
+		public async Task CancelEdit(CatalogueFormations currentFormation)
 		{
 			FormationViewGrid.CancelEditRow(currentFormation);
-			
+
 			// récupération de la valeur en BDD
 			CatalogueFormations backup = await SqlService.GetFormationAsync(currentFormation.IdFormation);
 
 			AllFormations.Remove(currentFormation);
 			AllFormations.Add(backup);
 
-			lineEnCoursModif = false;
+			LineEnCoursModif = false;
 		}
 
 		/// <summary>
 		/// 
 		/// </summary>
 		/// <param name="currentFormation"></param>
-		internal async void DeleteRow(CatalogueFormations currentFormation)
+		public async Task DeleteRow(CatalogueFormations currentFormation)
 		{
 			await SqlService.DeleteFormation(currentFormation);
 			AllFormations.Remove(currentFormation);
@@ -150,15 +130,12 @@ namespace FormationApp.Composants
 			await FormationViewGrid.Reload();
 		}
 
-		public CatalogueFormations CurrentLine { get; set; }
-
-
 		/// <summary>
 		/// Recoit les fichiers qui sont Uploader par l'utilisateur
 		/// </summary>
 		/// <param name="files">Liste des fichiers</param>
 		/// <returns></returns>
-		public async void UploadFilePourMiseAJour(IMatFileUploadEntry[] files)
+		public async Task UploadFilePourMiseAJour(IMatFileUploadEntry[] files)
 		{
 			if (files.Count() >= 1)
 			{
@@ -178,9 +155,9 @@ namespace FormationApp.Composants
 
 		#region MatDialog Ajouter une formation
 
-		public bool DialogIsOpenNewFormation = false;
+		
 
-		internal void OpenDialogNewFormation()
+		public void OpenDialogNewFormation()
 		{
 			DialogIsOpenNewFormation = true;
 		}
@@ -188,9 +165,9 @@ namespace FormationApp.Composants
 		/// <summary>
 		/// Méthode levé quand le model est validé.
 		/// </summary>
-		protected async void HandleValidSubmit()
+		public async Task HandleValidSubmit()
 		{
-			CatalogueFormations nouvelleFormation = formationModel.ToFormation();
+			CatalogueFormations nouvelleFormation = FormationModel.ToFormation();
 			nouvelleFormation.TypeFormation = AllTypeFormations.FirstOrDefault(x => x.IdTypeFormation == nouvelleFormation.TypeFormationId).TitreTypeFormation;
 
 			await SqlService.InsertFormation(nouvelleFormation);
@@ -199,19 +176,18 @@ namespace FormationApp.Composants
 			await FormationViewGrid.Reload();
 
 			// Remise à zéro de l'objet.
-			formationModel = new FormationModel();
+			FormationModel = new FormationModel();
 
 			DialogIsOpenNewFormation = false;
-			StateHasChanged();
 		}
 
 		/// <summary>
 		/// Ajout d'une nouvelle salle en BDD.
 		/// </summary>
-		internal void AnnulationClickNewFormation()
+		public void AnnulationClickNewFormation()
 		{
 			// Remise à zéro de l'objet.
-			formationModel = new FormationModel();
+			FormationModel = new FormationModel();
 			DialogIsOpenNewFormation = false;
 		}
 
@@ -220,32 +196,25 @@ namespace FormationApp.Composants
 		/// </summary>
 		/// <param name="files">Liste des fichiers</param>
 		/// <returns></returns>
-		public async void UploadFiles(IMatFileUploadEntry[] files)
+		public async Task UploadFiles(IMatFileUploadEntry[] files)
 		{
 			if (files.Count() >= 1)
 			{
 				IMatFileUploadEntry fileMat = files.FirstOrDefault();
-				formationModel.FileName = Path.GetFileName(fileMat.Name);
+				FormationModel.FileName = Path.GetFileName(fileMat.Name);
 
 				using (var stream = new MemoryStream())
 				{
 					await fileMat.WriteToStreamAsync(stream);
 					stream.Seek(0, SeekOrigin.Begin);
-					formationModel.Contenu = stream.ToArray();
+					FormationModel.Contenu = stream.ToArray();
 				}
 			}
 		}
 
 		#endregion
-
-
-		#region Private methods
-
-
-
-		#endregion
-
 	}
+
 
 	public class FormationModel
 	{

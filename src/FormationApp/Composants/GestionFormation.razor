@@ -1,5 +1,8 @@
 ﻿@using AccessData.Models
+@using FormationApp.ViewModel 
 @attribute [Authorize(Roles = "Administrateur, Gestionnaire")]
+
+@inject IGestionFormation GestionFormationVM
 
 <br />
 <br />
@@ -7,10 +10,10 @@
 
 @*Pour Ajouter une nouvelle formation*@
 <div>
-	<MatButton OnClick="@OpenDialogNewFormation" Raised="true">Ajouter une formation au catalogue</MatButton>
+	<MatButton OnClick="@GestionFormationVM.OpenDialogNewFormation" Raised="true">Ajouter une formation au catalogue</MatButton>
 
-	<EditForm Model="@formationModel" OnValidSubmit="HandleValidSubmit">
-		<MatDialog @bind-IsOpen="@DialogIsOpenNewFormation">
+	<EditForm Model="@GestionFormationVM.FormationModel" OnValidSubmit="GestionFormationVM.HandleValidSubmit">
+		<MatDialog @bind-IsOpen="@GestionFormationVM.DialogIsOpenNewFormation">
 			<MatDialogTitle>Ajout d'une formation</MatDialogTitle>
 
 			<MatDialogContent>
@@ -18,11 +21,11 @@
 				<ValidationSummary />
 
 				<div class="padding-top-10">
-					<MatTextField @bind-Value="formationModel.Titre" Label="Titre de la formation" Outlined="true" />
+					<MatTextField @bind-Value="GestionFormationVM.FormationModel.Titre" Label="Titre de la formation" Outlined="true" />
 				</div>
 
 				<div class="padding-top-10">
-					<MatTextField @bind-Value="formationModel.Description" Label="Description" TextArea="true" FullWidth="true" />
+					<MatTextField @bind-Value="GestionFormationVM.FormationModel.Description" Label="Description" TextArea="true" FullWidth="true" />
 				</div>
 
 				<br />
@@ -33,31 +36,31 @@
 								   Step="0.1"
 								   Min="0"
 								   Placeholder="Durée"
-								   @bind-Value="@formationModel.Duree" />
+								   @bind-Value="@GestionFormationVM.FormationModel.Duree" />
 				</div>
 
 				<div>
-					<MatFileUpload OnChange="@UploadFiles"
+					<MatFileUpload OnChange="@GestionFormationVM.UploadFiles"
 								   title="Ajouter le contenu de formation"
 								   Label="Contenu de la formation" />
 				</div>
 
 				<div>
-					@if (!string.IsNullOrEmpty(formationModel.FileName))
+					@if (!string.IsNullOrEmpty(GestionFormationVM.FormationModel.FileName))
 					{
-						@formationModel.FileName
+						@GestionFormationVM.FormationModel.FileName
 					}
 				</div>
 
 
 				<div>
-					<MatCheckbox Label="Est interne ?" @bind-Value="formationModel.EstInterne" />
+					<MatCheckbox Label="Est interne ?" @bind-Value="GestionFormationVM.FormationModel.EstInterne" />
 				</div>
 
 				<div>
-					<MatSelect Label="Type de formation" @bind-Value="formationModel.IdTypeFormation">
+					<MatSelect Label="Type de formation" @bind-Value="GestionFormationVM.FormationModel.IdTypeFormation">
 						<MatOptionString></MatOptionString>
-						@foreach (var typeFormation in AllTypeFormations)
+						@foreach (var typeFormation in GestionFormationVM.AllTypeFormations)
 						{
 							<MatOptionString Value="@typeFormation.IdTypeFormation.ToString()">@typeFormation.TitreTypeFormation</MatOptionString>
 						}
@@ -68,7 +71,7 @@
 
 			<MatDialogActions>
 				<MatButton Type="submit">Ajouter</MatButton>
-				<MatButton OnClick="@AnnulationClickNewFormation" Type="reset">Annuler</MatButton>
+				<MatButton OnClick="@GestionFormationVM.AnnulationClickNewFormation" Type="reset">Annuler</MatButton>
 			</MatDialogActions>
 		</MatDialog>
 	</EditForm>
@@ -80,16 +83,16 @@
 
 @*Pour voir la liste des formations*@
 <div>
-	<RadzenGrid @ref="FormationViewGrid"
+	<RadzenGrid @ref="GestionFormationVM.FormationViewGrid"
 				AllowFiltering="true"
 				FilterCaseSensitivity="FilterCaseSensitivity.Default"
 				AllowPaging="true"
 				PageSize="20"
 				AllowSorting="true"
-				Data="@AllFormations"
+				Data="@GestionFormationVM.AllFormations"
 				TItem="CatalogueFormations"
 				EmptyText="Il y a aucune formation"
-				RowUpdate="@OnUpdateRow"
+				RowUpdate="@GestionFormationVM.OnUpdateRow"
 				ColumnWidth="200px">
 		<Columns>
 			<RadzenGridColumn TItem="CatalogueFormations" Property="Titre" Title="Titre">
@@ -132,7 +135,7 @@
 				<EditTemplate Context="currentFormation">
 
 					<RadzenDropDown AllowClear="true" TValue="int"
-									Data="@AllTypeFormations"
+									Data="@GestionFormationVM.AllTypeFormations"
 									TextProperty="TitreTypeFormation" 
 									ValueProperty="IdTypeFormation" 
 									Style="margin-bottom: 20px" 
@@ -160,7 +163,7 @@
 			<RadzenGridColumn TItem="CatalogueFormations" Property="NomDuFichier" Title="Fichier de contenu" Filterable="false" Sortable="false">
 
 				<EditTemplate Context="currentFormation">
-					<MatFileUpload OnChange="@UploadFilePourMiseAJour"
+					<MatFileUpload OnChange="@GestionFormationVM.UploadFilePourMiseAJour"
 								   title="Sélectionner"
 								   Label="Déposer ou ouvrir un fichier">
 					</MatFileUpload>
@@ -172,17 +175,17 @@
 				<Template Context="currentFormation">
 					<RadzenButton Icon="edit"
 								  Size="ButtonSize.Small"
-								  Click="@(args => EditRow(currentFormation))"
-								  Disabled="lineEnCoursModif" />
+								  Click="@(args => GestionFormationVM.EditRow(currentFormation))"
+								  Disabled="GestionFormationVM.LineEnCoursModif" />
 				</Template>
 
 				<EditTemplate Context="currentFormation">
 					<RadzenButton Icon="save" Size="ButtonSize.Small"
-								  Click="@((args) => SaveRow(currentFormation))" />
+								  Click="@((args) => GestionFormationVM.SaveRow(currentFormation))" />
 
 					<RadzenButton Icon="cancel" Size="ButtonSize.Small"
 								  ButtonStyle="ButtonStyle.Secondary"
-								  Click="@((args) => CancelEdit(currentFormation))" />
+								  Click="@((args) => GestionFormationVM.CancelEdit(currentFormation))" />
 				</EditTemplate>
 			</RadzenGridColumn>
 

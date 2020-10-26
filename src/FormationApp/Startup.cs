@@ -74,6 +74,7 @@ namespace FormationApp
 
 
 			services.AddScoped<IGestionSalleViewModel, GestionSalleViewModel>();
+			services.AddScoped<IGestionFormation, GestionFormationViewModel>();
 		}
 
 		// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
