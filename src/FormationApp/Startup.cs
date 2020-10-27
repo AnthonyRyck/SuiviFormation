@@ -75,6 +75,7 @@ namespace FormationApp
 
 			services.AddScoped<IGestionSalleViewModel, GestionSalleViewModel>();
 			services.AddScoped<IGestionFormation, GestionFormationViewModel>();
+			services.AddScoped<ICatalogueCompetence, CatalogueCompetenceViewModel>();
 		}
 
 		// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

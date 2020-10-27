@@ -1,20 +1,20 @@
 ﻿@page "/CatalogueCompetence"
-
+@inject ICatalogueCompetence competenceViewModel
 
 <h1>Catalogue des compétences</h1>
 
 <br />
 
-@if(AllCompetences == null)
+@if(competenceViewModel.AllCompetences == null)
 {
 	<div class="spinner" />
 }
 else
 {
 <div class="formation-flex">
-	@foreach (var competence in AllCompetences)
+	@foreach (var competence in competenceViewModel.AllCompetences)
 	{
-		<div class="card-formation grow" @onclick="@(e =>  ClickOnCompetence(competence))">
+		<div class="card-formation grow" @onclick="@(e =>  competenceViewModel.ClickOnCompetence(competence))">
 			<h2 class="card-header-formation">@competence.Titre</h2>
 			<div class="card-formation-description">@competence.Description</div>
 		</div>
