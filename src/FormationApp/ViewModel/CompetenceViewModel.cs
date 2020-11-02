@@ -2,28 +2,18 @@
 using AccessData.Models;
 using AccessData.Views;
 using BlazorDownloadFile;
-using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
-namespace FormationApp.Pages
+namespace FormationApp.ViewModel
 {
-	public partial class CompetencePage
+	public class CompetenceViewModel : ICompetence
 	{
 		#region Properties
 
-		[Parameter]
-		public int IdCompetence { get; set; }
+		SqlContext SqlService { get; set; }
 
-		[Inject]
-		public SqlContext SqlService { get; set; }
-
-		[Inject]
 		IBlazorDownloadFileService BlazorDownloadFileService { get; set; }
-
 
 		public CompetenceDetailView CompetenceView { get; set; }
 
@@ -33,26 +23,26 @@ namespace FormationApp.Pages
 
 		#endregion
 
-		#region Héritage
+		#region Constructeur
 
-		protected async override Task OnInitializedAsync()
+		public CompetenceViewModel(SqlContext sqlContext, IBlazorDownloadFileService blazorDownloadFileService)
 		{
-			await LoadCompetence();
+			SqlService = sqlContext;
+			BlazorDownloadFileService = blazorDownloadFileService;
 		}
 
 		#endregion
 
-		#region Private methods
+		#region Public methods
 
 		/// <summary>
 		/// Charge les informations sur la compétence.
 		/// </summary>
 		/// <returns></returns>
-		private async Task LoadCompetence()
+		public async Task LoadCompetence(int idCompetence)
 		{
-			CompetenceView = await SqlService.GetCompetenceView(IdCompetence);
+			CompetenceView = await SqlService.GetCompetenceView(idCompetence);
 		}
-
 
 		/// <summary>
 		/// Event sur un click pour DL un fichier.
@@ -77,7 +67,7 @@ namespace FormationApp.Pages
 		/// </summary>
 		/// <param name="e"></param>
 		/// <param name="id">ID de la formation.</param>
-		public async void CloseDetail(MouseEventArgs e)
+		public void CloseDetail(MouseEventArgs e)
 		{
 			DisplayDetail = false;
 		}

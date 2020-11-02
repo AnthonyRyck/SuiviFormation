@@ -1,22 +1,24 @@
 ﻿@page "/competence/{IdCompetence:int}"
 @using FormationApp.Composants
 
-@if (CompetenceView == null)
+@inject ICompetence CompetenceViewModel 
+
+@if (CompetenceViewModel.CompetenceView == null)
 {
 	<div class="spinner"></div>
 }
 else
 {
 
-	@if (DisplayDetail)
+	@if (CompetenceViewModel.DisplayDetail)
 	{
-		<DetailFormation Formation="@SelectedFormation"
-						 OnClickToDownload="@(e => DownloadOnClick(e, SelectedFormation.IdFormation, SelectedFormation.NomDuFichier))"
-						 OnClickToClose="@(e => CloseDetail(e))" />
+		<DetailFormation Formation="@CompetenceViewModel.SelectedFormation"
+						 OnClickToDownload="@(e => CompetenceViewModel.DownloadOnClick(e, CompetenceViewModel.SelectedFormation.IdFormation, CompetenceViewModel.SelectedFormation.NomDuFichier))"
+						 OnClickToClose="@(e => CompetenceViewModel.CloseDetail(e))" />
 	}
 
 	<div class="title-detail cadre">
-		<h2><b>@CompetenceView.Competence.Titre</b></h2>
+		<h2><b>@CompetenceViewModel.CompetenceView.Competence.Titre</b></h2>
 
 		@*information sur la compétence*@
 		<div class="padding-5">
@@ -24,7 +26,7 @@ else
 				<u>Description</u> :
 			</div>
 			<div>
-				@CompetenceView.Competence.Description
+				@CompetenceViewModel.CompetenceView.Competence.Description
 			</div>
 		</div>
 	</div>
@@ -34,9 +36,9 @@ else
 		<h2>Liste des formations</h2>
 
 		<div class="formation-flex">
-			@foreach (var formation in CompetenceView.Formations)
+			@foreach (var formation in CompetenceViewModel.CompetenceView.Formations)
 			{
-				<div class="card-formation grow" @onclick="@(e =>  ClickOnFormation(formation))">
+				<div class="card-formation grow" @onclick="@(e =>  CompetenceViewModel.ClickOnFormation(formation))">
 					<h2 class="card-header-formation">@formation.Titre</h2>
 					<div class="card-formation-description">@formation.Description</div>
 				</div>
@@ -48,4 +50,11 @@ else
 
 @code {
 
+	[Parameter]
+	public int IdCompetence { get; set; }
+
+	protected async override Task OnInitializedAsync()
+	{
+		await CompetenceViewModel.LoadCompetence(IdCompetence);
+	}
 }
