@@ -1,29 +1,25 @@
 ﻿using AccessData;
 using AccessData.Models;
-using FormationApp.Codes.Extensions;
 using FormationApp.Data;
 using MatBlazor;
-using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using FormationApp.Codes.Extensions;
 
-namespace FormationApp.Pages
+namespace FormationApp.ViewModel
 {
-	public partial class DetailCompetence
+	public class DetailCompetenceViewModel : IDetailCompetence
 	{
 		#region Properties
 
-		[Inject]
-		public SqlContext SqlService { get; set; }
+		SqlContext SqlService { get; set; }
 
-		[Inject]
 		protected IMatToaster Toaster { get; set; }
 
-		[Inject]
-		protected CurrentUserService UserService { get; set; }
+		public CurrentUserService UserService { get; set; }
 
 
 		public bool IsDisabled { get; set; }
@@ -42,22 +38,31 @@ namespace FormationApp.Pages
 
 		#region Contructeur
 
-		public DetailCompetence()
+		public DetailCompetenceViewModel(SqlContext sqlContext, IMatToaster toaster, CurrentUserService userService)
 		{
 			IsDisabled = true;
 			CanDisplayFormationSearch = false;
 
 			NouvelleFormations = new List<CatalogueFormations>();
 			IdDeleteFormation = new List<int>();
-		}
+
+			SqlService = sqlContext;
+			Toaster = toaster;
+			UserService = userService;
 
 
-		protected override void OnInitialized()
-		{
 			TitreCompetence = UserService.CompetenceView.Competence.Titre;
 			DescriptionCompetence = UserService.CompetenceView.Competence.Description;
 			TempFormationViews = UserService.CompetenceView.FormationViews.ToList();
 		}
+
+
+		//protected override void OnInitialized()
+		//{
+		//	TitreCompetence = UserService.CompetenceView.Competence.Titre;
+		//	DescriptionCompetence = UserService.CompetenceView.Competence.Description;
+		//	TempFormationViews = UserService.CompetenceView.FormationViews.ToList();
+		//}
 
 		#endregion
 
@@ -126,10 +131,10 @@ namespace FormationApp.Pages
 			CanDisplayFormationSearch = true;
 		}
 
-		internal void GetFormation(CatalogueFormations formation)
+		public void GetFormation(CatalogueFormations formation)
 		{
 			// Vérifier pour ne pas ajouter 2 fois la même formation.
-			if(TempFormationViews.Any(x => x.IdFormation == formation.IdFormation))
+			if (TempFormationViews.Any(x => x.IdFormation == formation.IdFormation))
 			{
 				Toaster.Add("Cette formation est déjà dans la liste.", MatToastType.Warning);
 			}
@@ -151,7 +156,7 @@ namespace FormationApp.Pages
 			{
 				await SqlService.InsertCompetenceFormation(UserService.CompetenceView.Competence.IdCompetence, NouvelleFormations);
 				UserService.CompetenceView.FormationViews.AddRange(NouvelleFormations.Select(x => x.ToFormationView()));
-				
+
 				Toaster.Add("Sauvegarde OK.", MatToastType.Success);
 			}
 			catch (Exception)
@@ -167,7 +172,7 @@ namespace FormationApp.Pages
 		/// Supprime une ligne
 		/// </summary>
 		/// <param name="currentFormation"></param>
-		internal async void DeleteRow(FormationView currentFormation)
+		public async void DeleteRow(FormationView currentFormation)
 		{
 			try
 			{
@@ -188,7 +193,7 @@ namespace FormationApp.Pages
 				TempFormationViews = UserService.CompetenceView.FormationViews.ToList();
 				Toaster.Add("Erreur sur la sauvegarde.", MatToastType.Danger);
 			}
-						
+
 			//SallesViewGrid.Reload();
 		}
 

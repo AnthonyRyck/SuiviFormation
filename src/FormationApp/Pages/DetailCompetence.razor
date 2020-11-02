@@ -1,11 +1,13 @@
 ﻿@using AccessData.Models
 @using FormationApp.Composants
 
+@inject IDetailCompetence DetailCompetenceVM
+
 @page "/detailcompetence"
 
 @attribute [Authorize(Roles = "Administrateur, Gestionnaire")]
 
-<h3>Détail de la compétence <b>@UserService.CompetenceView.Competence.Titre</b></h3>
+<h3>Détail de la compétence <b>@DetailCompetenceVM.UserService.CompetenceView.Competence.Titre</b></h3>
 
 <div>
 	<RadzenCard Style="min-width:400px;">
@@ -13,9 +15,9 @@
 		<div class="row">
 			<Radzen.Blazor.RadzenLabel Text="Titre compétence :"
 									   Style="margin-top: 10px;" />
-			<RadzenTextBox @bind-Value="@TitreCompetence"
+			<RadzenTextBox @bind-Value="@DetailCompetenceVM.TitreCompetence"
 						   MaxLength="50"
-						   Disabled="@IsDisabled"
+						   Disabled="@DetailCompetenceVM.IsDisabled"
 						   Style="margin-left: 10px" />
 		</div>
 
@@ -23,23 +25,29 @@
 			<Radzen.Blazor.RadzenLabel Text="Description :"
 									   Style="margin-top: 10px;" />
 
-			<MatTextField @bind-Value="@DescriptionCompetence" 
+			<MatTextField @bind-Value="@DetailCompetenceVM.DescriptionCompetence" 
 						Style="margin-left:10px;" 
-						Disabled="@IsDisabled"
+						Disabled="@DetailCompetenceVM.IsDisabled"
 						FullWidth="true"
 						TextArea="true" />
 
 		</div>
 
 		<div class="row margin-top-10px">
-			@if (IsDisabled)
+			@if (DetailCompetenceVM.IsDisabled)
 			{
-				<RadzenButton Click="@UpdateTitreOnClick" Icon="update" Style="margin-left: 5px; width: 40px; background-color:gray" />
+			<span>
+				Modifier : 
+				<RadzenButton Click="@DetailCompetenceVM.UpdateTitreOnClick"
+							  Icon="update"
+							  Style="margin-left: 5px; width: 40px; background-color:gray" />
+
+			</span>
 			}
 			else
 			{
-				<RadzenButton Click="@ValidateTitreOnClick" Icon="done" Style="margin-left: 5px; width: 40px; background-color:green;" />
-				<RadzenButton Click="@CancelTitreOnClick" Icon="highlight_off" Style="margin-left: 5px; width: 40px; background-color:orangered" />
+				<RadzenButton Click="@DetailCompetenceVM.ValidateTitreOnClick" Icon="done" Style="margin-left: 5px; width: 40px; background-color:green;" />
+				<RadzenButton Click="@DetailCompetenceVM.CancelTitreOnClick" Icon="highlight_off" Style="margin-left: 5px; width: 40px; background-color:orangered" />
 			}
 		</div>
 	</RadzenCard>
@@ -55,7 +63,7 @@
 						AllowPaging="true"
 						PageSize="10"
 						AllowSorting="true"
-						Data="@TempFormationViews"
+						Data="@DetailCompetenceVM.TempFormationViews"
 						TItem="FormationView"
 						EmptyText="Il n'y a aucune formation"
 						Style="width:350px;">
@@ -70,40 +78,40 @@
 							<RadzenButton ButtonStyle="ButtonStyle.Danger"
 										  Icon="close"
 										  Size="ButtonSize.Small"
-										  Click="@(args => DeleteRow(formation))">
+										  Click="@(args => DetailCompetenceVM.DeleteRow(formation))">
 							</RadzenButton>
 						</Template>
 					</RadzenGridColumn>
 				</Columns>
 			</RadzenGrid>
 
-			@if (CanDisplayFormationSearch)
+			@if (DetailCompetenceVM.CanDisplayFormationSearch)
 			{
 				<div class="row margin-top-10px">
 					<RadzenButton Text="Valider" 
 									Icon="done" 
 									Style="width: 150px; background-color:green;"
-									Click="@ValidateFormationsOnClick" />
+									Click="@DetailCompetenceVM.ValidateFormationsOnClick" />
 					<RadzenButton Text="Annuler" 
 									Icon="highlight_off" 
 									Style="margin-left: 20px; width: 150px; background-color:orangered;"
-									Click="@CancelFormationOnClick" />
+									Click="@DetailCompetenceVM.CancelFormationOnClick" />
 				</div>
 			}
 		</div>
 
 		<div class="col-8">
-			@if(CanDisplayFormationSearch)
+			@if(DetailCompetenceVM.CanDisplayFormationSearch)
 			{
-				<RechercheFormation OnSelectFormationClick="GetFormation" />
+				<RechercheFormation OnSelectFormationClick="DetailCompetenceVM.GetFormation" />
 			}
 		</div>
 	</div>
 
 	<div class="margin-top-10px">
-		@if (!CanDisplayFormationSearch)
+		@if (!DetailCompetenceVM.CanDisplayFormationSearch)
 		{
-			<MatButton OnClick="@AddFormationOnClick" Raised="true">Ajouter une formation</MatButton>
+			<MatButton OnClick="@DetailCompetenceVM.AddFormationOnClick" Raised="true">Ajouter une formation</MatButton>
 		}
 	</div>
 
