@@ -72,7 +72,7 @@ namespace FormationApp
 			services.AddHttpContextAccessor();
 			services.AddScoped<CurrentUserService>();
 
-
+			services.AddScoped<IAccueil, AccueilViewModel>();
 			services.AddScoped<IGestionSalleViewModel, GestionSalleViewModel>();
 			services.AddScoped<IGestionFormation, GestionFormationViewModel>();
 			services.AddScoped<ICatalogueCompetence, CatalogueCompetenceViewModel>();

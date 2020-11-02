@@ -1,5 +1,7 @@
 ﻿@page "/"
 
+@inject IAccueil AccueilVm
+
 @using AccessData.Models
 
 @*** Visible par tous
@@ -8,7 +10,7 @@
 	
 	<br />
 
-	<RadzenScheduler Data="@ProchaineSessions"
+	<RadzenScheduler Data="@AccueilVm.ProchaineSessions"
 					 TItem="DataSession"
 					 StartProperty="Start" EndProperty="End" TextProperty="Text"
 					 TodayText="Aujourd'hui"
