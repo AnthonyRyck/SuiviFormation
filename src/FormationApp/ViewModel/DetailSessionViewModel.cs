@@ -1,41 +1,30 @@
 ﻿using AccessData;
 using AccessData.Models;
 using BlazorDownloadFile;
-using FormationApp.Data;
+using BlazorInputFile;
 using MatBlazor;
-using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
-using Microsoft.EntityFrameworkCore.Internal;
 using Radzen.Blazor;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Radzen;
-using BlazorInputFile;
 
-namespace FormationApp.Pages
+namespace FormationApp.ViewModel
 {
-	public partial class DetailSession : ComponentBase
+	public class DetailSessionViewModel : IDetailSession
 	{
 		#region Properties
 
-		[Inject]
 		IBlazorDownloadFileService BlazorDownloadFileService { get; set; }
 
-		[Inject]
-		public SqlContext SqlService { get; set; }
+		SqlContext SqlService { get; set; }
 
-		[Inject]
-		protected IMatToaster Toaster { get; set; }
+		IMatToaster Toaster { get; set; }
 
 		public Session InfoSession { get; set; }
 
-		[Parameter]
 		public int Id { get; set; }
 
 		/// <summary>
@@ -59,9 +48,18 @@ namespace FormationApp.Pages
 
 		#endregion
 
+
+
 		#region Protected Methods
 
-		protected async override Task OnInitializedAsync()
+		public DetailSessionViewModel(SqlContext sqlContext, IMatToaster toaster, IBlazorDownloadFileService downloadFileService)
+		{
+			SqlService = sqlContext;
+			Toaster = toaster;
+			BlazorDownloadFileService = downloadFileService;
+		}
+
+		public async Task LoadData()
 		{
 			// Chargement pour savoir s'il y a un fichier d'émargement.
 			Session = await SqlService.GetSessionAsync(Id);
@@ -89,7 +87,7 @@ namespace FormationApp.Pages
 				{
 					var fileMat = files.FirstOrDefault();
 					FileNameEmergement = Path.GetFileName(fileMat.Name);
-					
+
 					var stream = await fileMat.ReadAllAsync();
 					stream.Seek(0, SeekOrigin.Begin);
 
@@ -100,10 +98,6 @@ namespace FormationApp.Pages
 			{
 				FileNameEmergement = string.Empty;
 				Toaster.Add("Erreur sur la sauvegarde du fichier d'émargement.", MatToastType.Danger);
-			}
-			finally
-			{
-				StateHasChanged();
 			}
 		}
 
@@ -132,46 +126,25 @@ namespace FormationApp.Pages
 		/// Lors du click sur le bouton Edit
 		/// </summary>
 		/// <param name="currentPersonnel"></param>
-		internal void EditRow(PersonnelInscritView currentPersonnel)
+		public void EditRow(PersonnelInscritView currentPersonnel)
 		{
-			//CurrentLine = currentPersonnel;
 			PersonnelViewGrid.EditRow(currentPersonnel);
 		}
 
-		internal async void SaveRow(PersonnelInscritView currentPersonnel)
+		public async void SaveRow(PersonnelInscritView currentPersonnel)
 		{
-			//SqlService.UpdateValidationUser(currentPersonnel.IsSessionValidate, UserService.SessionView.IdSession, currentPersonnel.IdPersonnel);
-
 			await SqlService.UpdateValidationUser(currentPersonnel.IsSessionValidate, Id, currentPersonnel.IdPersonnel);
 			await PersonnelViewGrid.UpdateRow(currentPersonnel);
-		}
-
-		/// <summary>
-		/// Sauvegarde en BDD des modifications
-		/// </summary>
-		/// <param name="currentFormation"></param>
-		internal async void OnUpdateRow(PersonnelInscritView currentPersonnel)
-		{
-			StateHasChanged();
 		}
 
 		/// <summary>
 		/// 
 		/// </summary>
 		/// <param name="currentFormation"></param>
-		internal async void CancelEdit(PersonnelInscritView currentPersonnel)
+		public void CancelEdit(PersonnelInscritView currentPersonnel)
 		{
 			PersonnelViewGrid.CancelEditRow(currentPersonnel);
-
-			// récupération de la valeur en BDD
-			//PersonnelInscritView backup = await SqlService.GetFormationAsync(currentFormation.IdFormation);
-
-			//AllFormations.Remove(currentFormation);
-			//AllFormations.Add(backup);
 		}
-
-
-
 
 		#endregion
 
@@ -189,7 +162,7 @@ namespace FormationApp.Pages
 				// 02 - Récupère les ID formations, pour chaque compétence. 
 				//Dictionary <int,List<int>> - idCompetence, List idFormation
 				Dictionary<int, List<int>> competencesValuePairsFormations = new Dictionary<int, List<int>>();
-				
+
 				foreach (var idCompetence in idsCompetence)
 				{
 					List<int> idsFormations = await SqlService.GetFormationsByCompetence(idCompetence);
@@ -215,14 +188,14 @@ namespace FormationApp.Pages
 						foreach (var formation in formationsIsValidate)
 						{
 							// Si l'utilisateur a validé cette formation.
-							if(idFormationValide.Contains(formation.IdFormation))
+							if (idFormationValide.Contains(formation.IdFormation))
 							{
 								formation.IsValidate = true;
 							}
 						}
 
 						// Si ne contient pas 1 seul FALSE, valider la compétence.
-						if(!formationsIsValidate.Any(x => x.IsValidate == false))
+						if (!formationsIsValidate.Any(x => x.IsValidate == false))
 						{
 							// Vérifier que l'utilisateur n'a pas déjà validé cette compétence.
 							if (!await SqlService.IsCompetenceValidate(user, item.Key))
@@ -240,13 +213,10 @@ namespace FormationApp.Pages
 			{
 				Toaster.Add("Erreur sur l'archivage de la session.", MatToastType.Danger);
 			}
-
-			StateHasChanged();
 		}
 
 		#endregion
 	}
-
 
 	internal class FormationIsValidate
 	{

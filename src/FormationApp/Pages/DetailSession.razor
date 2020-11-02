@@ -1,5 +1,7 @@
 ﻿@page "/detailsession/{Id:int}"
 
+@inject IDetailSession DetailSessionVM
+
 @using AccessData.Models
 @using FormationApp.Composants
 @attribute [Authorize(Roles = "Administrateur, Gestionnaire")]
@@ -9,28 +11,28 @@
 @*Affichage des informations sur le session de formation*@
 <div class="row border">
 	<div class="col-4">
-		<div><u>Formation</u> : @Session.TitreFormation</div>
-		<div><u>Date</u> : @Session.DateDebutSession.ToString("d")</div>
-		<div><u>Durée</u> : @Session.NombreDeJour jour(s)</div>
-		<div><u>Place dispo</u> : @Session.NombreDePlaceDispo</div>
+		<div><u>Formation</u> : @DetailSessionVM.Session.TitreFormation</div>
+		<div><u>Date</u> : @DetailSessionVM.Session.DateDebutSession.ToString("d")</div>
+		<div><u>Durée</u> : @DetailSessionVM.Session.NombreDeJour jour(s)</div>
+		<div><u>Place dispo</u> : @DetailSessionVM.Session.NombreDePlaceDispo</div>
 	</div>
 
 	<div class="col-4">
-		<div><u>Formateur</u> : @Session.Nom @Session.Prenom</div>
-		<div><u>Salle</u> : @Session.NomDeLaSalle</div>
+		<div><u>Formateur</u> : @DetailSessionVM.Session.Nom @DetailSessionVM.Session.Prenom</div>
+		<div><u>Salle</u> : @DetailSessionVM.Session.NomDeLaSalle</div>
 	</div>
 
 	<div class="col-4">
 		<div>Ajouter le fichier d'émargement</div>
 
-		@if (string.IsNullOrEmpty(FileNameEmergement))
+		@if (string.IsNullOrEmpty(DetailSessionVM.FileNameEmergement))
 		{
 			<div>
 				@*<MatFileUpload OnChange="@UploadFiles"
 							   title="Ajouter emargement"
 							   Label="Fichier émargement" />*@
 
-				<InputFile OnChange="HandleFileSelected" />
+				<InputFile OnChange="DetailSessionVM.HandleFileSelected" />
 			</div>
 		}
 		else
@@ -38,21 +40,21 @@
 			<div>
 				<MatButton Icon="attachment"
 						   Label="Télécharger"
-						   @onclick="@(e => DownloadOnClick(e))" />
+						   @onclick="@(e => DetailSessionVM.DownloadOnClick(e))" />
 			</div>
 		}
-		<div>Nom du fichier : @FileNameEmergement</div>
+		<div>Nom du fichier : @DetailSessionVM.FileNameEmergement</div>
 	</div>
 </div>
 
 <br />
 <div>
-	<RadzenButton Click="@((args) => ClickArchiver(args))"
+	<RadzenButton Click="@((args) => DetailSessionVM.ClickArchiver(args))"
 				  Text="Archiver"
 				  ButtonStyle="ButtonStyle.Danger"
-				  Disabled="@IsArchiver" />
+				  Disabled="@DetailSessionVM.IsArchiver" />
 	<div>
-		@if (IsArchiver)
+		@if (DetailSessionVM.IsArchiver)
 		{
 			<i>Session archivée.</i>
 		}
@@ -73,11 +75,11 @@
 				AllowPaging="true"
 				PageSize="10"
 				AllowSorting="true"
-				Data="@PersonnelsInscrit"
+				Data="@DetailSessionVM.PersonnelsInscrit"
 				TItem="PersonnelInscritView"
 				EmptyText="Aucun personnel inscrit"
 				ColumnWidth="150px"
-				@ref="PersonnelViewGrid">
+				@ref="DetailSessionVM.PersonnelViewGrid">
 		<Columns>
 			<RadzenGridColumn TItem="PersonnelInscritView" Property="Nom" Title="Nom" Filterable="true" Sortable="true" />
 			<RadzenGridColumn TItem="PersonnelInscritView" Property="Prenom" Title="Prénom" Filterable="true" Sortable="true" />
@@ -122,16 +124,16 @@
 				<Template Context="currentPersonnel">
 					<RadzenButton Icon="edit"
 								  Size="ButtonSize.Small"
-								  Click="@(args => EditRow(currentPersonnel))" />
+								  Click="@(args => DetailSessionVM.EditRow(currentPersonnel))" />
 				</Template>
 
 				<EditTemplate Context="currentPersonnel">
 					<RadzenButton Icon="save" Size="ButtonSize.Small"
-								  Click="@((args) => SaveRow(currentPersonnel))" />
+								  Click="@((args) => DetailSessionVM.SaveRow(currentPersonnel))" />
 
 					<RadzenButton Icon="cancel" Size="ButtonSize.Small"
 								  ButtonStyle="ButtonStyle.Secondary"
-								  Click="@((args) => CancelEdit(currentPersonnel))" />
+								  Click="@((args) => DetailSessionVM.CancelEdit(currentPersonnel))" />
 				</EditTemplate>
 			</RadzenGridColumn>
 		</Columns>
@@ -139,5 +141,15 @@
 </div>
 
 @code {
+
+	[Parameter]
+	public int Id { get; set; }
+
+	protected override async Task OnInitializedAsync()
+	{
+		DetailSessionVM.Id = Id;
+		await DetailSessionVM.LoadData();
+		base.OnInitialized();
+	}
 
 }
