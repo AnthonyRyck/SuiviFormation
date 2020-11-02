@@ -1,20 +1,21 @@
 ﻿@page "/catalogueFormation"
 @using FormationApp.Composants
 
+@inject ICatalogueFormation CatalogueFormationVM
 
 <h1>Catalogue des formations</h1>
 
 <br />
 
-@if (DisplayDetail)
+@if (CatalogueFormationVM.DisplayDetail)
 {
-	<DetailFormation Formation="@SelectedFormation"
-					 OnClickToDownload="@(e => DownloadOnClick(e, SelectedFormation.IdFormation, SelectedFormation.NomDuFichier))"
-					 OnClickToClose="@(e => CloseDetail(e))" />
+	<DetailFormation Formation="@CatalogueFormationVM.SelectedFormation"
+					 OnClickToDownload="@(e => CatalogueFormationVM.DownloadOnClick(e, CatalogueFormationVM.SelectedFormation.IdFormation, CatalogueFormationVM.SelectedFormation.NomDuFichier))"
+					 OnClickToClose="@(e => CatalogueFormationVM.CloseDetail(e))" />
 }
 
 
-@if (AllFormations == null)
+@if (CatalogueFormationVM.AllFormations == null)
 {
 	<div class="spinner" />
 }
@@ -22,9 +23,9 @@ else
 {
 	@*Affichage des formations sous formes de card*@
 	<div class="formation-flex">
-		@foreach (var formation in AllFormations)
+		@foreach (var formation in CatalogueFormationVM.AllFormations)
 		{
-			<div class="card-formation grow" @onclick="@(e =>  ClickOnFormation(formation))">
+			<div class="card-formation grow" @onclick="@(e =>  CatalogueFormationVM.ClickOnFormation(formation))">
 				<h2 class="card-header-formation">@formation.Titre</h2>
 				<div class="card-formation-description">@formation.Description</div>
 			</div>

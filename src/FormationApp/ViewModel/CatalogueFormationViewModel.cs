@@ -1,39 +1,38 @@
 ﻿using AccessData;
 using AccessData.Models;
 using BlazorDownloadFile;
-using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
-namespace FormationApp.Pages
+namespace FormationApp.ViewModel
 {
-	public partial class CatalogueFormation : ComponentBase
+	public class CatalogueFormationViewModel : ICatalogueFormation
 	{
-
 		#region Properties
 
-		[Inject]
 		public SqlContext SqlService { get; set; }
-				
 
-		[Inject] 
 		IBlazorDownloadFileService BlazorDownloadFileService { get; set; }
 
 		public List<CatalogueFormations> AllFormations { get; set; }
+
+		public CatalogueFormations SelectedFormation { get; set; }
+
+		public bool DisplayDetail { get; set; }
 
 		#endregion
 
 		#region Constructeur
 
-
-		#endregion
-
-		#region Héritage
-
-		protected override async Task OnInitializedAsync()
+		public CatalogueFormationViewModel(SqlContext sqlContext, IBlazorDownloadFileService blazorDownloadFileService)
 		{
-			await LoadAllFormations();
+			SqlService = sqlContext;
+			BlazorDownloadFileService = blazorDownloadFileService;
+
+			LoadAllFormations().GetAwaiter().GetResult();
 		}
 
 		#endregion
@@ -47,7 +46,6 @@ namespace FormationApp.Pages
 		internal async Task LoadAllFormations()
 		{
 			AllFormations = await SqlService.GetAllFormationsEncoreValideAsync();
-			StateHasChanged();
 		}
 
 		#endregion
@@ -78,22 +76,12 @@ namespace FormationApp.Pages
 		/// </summary>
 		/// <param name="e"></param>
 		/// <param name="id">ID de la formation.</param>
-		public async void CloseDetail(MouseEventArgs e)
+		public void CloseDetail(MouseEventArgs e)
 		{
 			DisplayDetail = false;
 		}
 
-
-		public CatalogueFormations SelectedFormation { get; set; }
-		public bool DisplayDetail { get; set; }
-
-		#endregion
-
-		#region Private methods
-
-
 		#endregion
 
 	}
-
 }
