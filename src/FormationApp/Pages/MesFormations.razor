@@ -1,5 +1,7 @@
 ﻿@page "/mesFormations"
 
+@inject IMesFormations MesFormationVM
+
 @using AccessData.Models
 
 <h1>Mes formations</h1>
@@ -14,7 +16,7 @@
 			AllowPaging="true"
 			PageSize="10"
 			AllowSorting="true"
-			Data="@AllSessions"
+			Data="@MesFormationVM.AllSessions"
 			TItem="SessionView"
 			EmptyText="Vous n'êtes inscrit à aucune formation"
 			ColumnWidth="150px">
@@ -50,7 +52,7 @@
 
 		<RadzenGridColumn TItem="SessionView" Title="Désinscrire ?" Filterable="false" Sortable="false" Width="80px">
 			<Template Context="data">
-				<MatIconButton Icon="remove_circle" @onclick="(args => DesinscriptionOnClick(args, data.IdSession))" Style="color:red" />
+				<MatIconButton Icon="remove_circle" @onclick="(args => MesFormationVM.DesinscriptionOnClick(args, data.IdSession))" Style="color:red" />
 			</Template>
 		</RadzenGridColumn>
 
@@ -71,7 +73,7 @@
 			AllowPaging="true"
 			PageSize="10"
 			AllowSorting="true"
-			Data="@SessionInscritUserViews"
+			Data="@MesFormationVM.SessionInscritUserViews"
 			TItem="SessionInscritUserView"
 			EmptyText="Vous n'avez fini aucune formation">
 	<Columns>
@@ -112,7 +114,7 @@
 				}
 				else if (data.IsFormationValide)
 				{
-					<MatButton OnClick="@(args => OpenDialogNewNote(data.IdSession))" Raised="true">Donner une note</MatButton>
+					<MatButton OnClick="@(args => MesFormationVM.OpenDialogNewNote(data.IdSession))" Raised="true">Donner une note</MatButton>
 				}
 				else
 				{
@@ -142,7 +144,7 @@
 </RadzenGrid>
 
 
-<MatDialog @bind-IsOpen="@DialogIsOpenNewNote">
+<MatDialog @bind-IsOpen="@MesFormationVM.DialogIsOpenNewNote">
 	<MatDialogTitle>Donner une note</MatDialogTitle>
 
 	<MatDialogContent>
@@ -154,19 +156,19 @@
 			<label>Evaluation : </label>
 			<span>
 				<RadzenRating Stars="5"
-							  @bind-Value="@NotePourFormation"
+							  @bind-Value="@MesFormationVM.NotePourFormation"
 							  Style="margin-bottom: 20px" />
 			</span>
 		</div>
 
 		<div class="padding-top-10">
-			<MatTextField @bind-Value="@CommentairePourFormation" Label="Commentaire" TextArea="true" FullWidth="true" />
+			<MatTextField @bind-Value="@MesFormationVM.CommentairePourFormation" Label="Commentaire" TextArea="true" FullWidth="true" />
 		</div>
 	</MatDialogContent>
 
 	<MatDialogActions>
-		<MatButton OnClick="@OkClickNewNote">Ajouter</MatButton>
-		<MatButton OnClick="@AnnulerClickNewNote">Annuler</MatButton>
+		<MatButton OnClick="@MesFormationVM.OkClickNewNote">Ajouter</MatButton>
+		<MatButton OnClick="@MesFormationVM.AnnulerClickNewNote">Annuler</MatButton>
 	</MatDialogActions>
 </MatDialog>
 
@@ -174,14 +176,14 @@
 
 <h1>Mes Compétences</h1>
 
-@if (CompetencesUser == null)
+@if (MesFormationVM.CompetencesUser == null)
 {
 	<div class="spinner" />
 }
 else
 {
 	<div class="formation-flex">
-		@foreach (var competence in CompetencesUser)
+		@foreach (var competence in MesFormationVM.CompetencesUser)
 		{
 			<div class="card-formation grow">
 				<h2 class="card-header-formation">@competence.Titre</h2>
