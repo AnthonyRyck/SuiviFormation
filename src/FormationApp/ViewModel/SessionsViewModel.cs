@@ -2,26 +2,21 @@
 using AccessData.Models;
 using FormationApp.Data;
 using MatBlazor;
-using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 
-namespace FormationApp.Pages
+namespace FormationApp.ViewModel
 {
-	public partial class Sessions : ComponentBase
+	public class SessionsViewModel : ISessions
 	{
 		#region Properties
 
-		[Inject]
-		public SqlContext SqlService { get; set; }
+		SqlContext SqlService { get; set; }
 
-		[Inject]
-		protected IMatToaster Toaster { get; set; }
+		IMatToaster Toaster { get; set; }
 
-		[Inject]
 		public CurrentUserService UserService { get; set; }
 
 		/// <summary>
@@ -33,15 +28,19 @@ namespace FormationApp.Pages
 
 		#region Override methods
 
-		protected async override Task OnInitializedAsync()
+		public SessionsViewModel(SqlContext sqlContext, IMatToaster toaster, CurrentUserService currentUser)
 		{
+			SqlService = sqlContext;
+			Toaster = toaster;
+			UserService = currentUser;
+
 			try
 			{
-				AllSessions = await SqlService.GetAllOpenSessionAsync();
+				AllSessions = SqlService.GetAllOpenSessionAsync().GetAwaiter().GetResult();
 
 				foreach (var session in AllSessions)
 				{
-					var tempIdUserInscrit = await SqlService.GetInscriptionAsync(session.IdSession);
+					var tempIdUserInscrit = SqlService.GetInscriptionAsync(session.IdSession).GetAwaiter().GetResult();
 					session.UsersInscrits = tempIdUserInscrit.Select(x => x.IdPersonnel).ToList();
 				}
 			}
@@ -70,7 +69,6 @@ namespace FormationApp.Pages
 				AllSessions.FirstOrDefault(x => x.IdSession == idSession).UsersInscrits.Add(UserService.UserId);
 
 				Toaster.Add("Inscription effectuée.", MatToastType.Success);
-				StateHasChanged();
 			}
 			catch (Exception ex)
 			{
@@ -93,7 +91,6 @@ namespace FormationApp.Pages
 				AllSessions.FirstOrDefault(x => x.IdSession == idSession).UsersInscrits.Remove(UserService.UserId);
 
 				Toaster.Add("Désinscription effectuée.", MatToastType.Success);
-				StateHasChanged();
 			}
 			catch (Exception ex)
 			{

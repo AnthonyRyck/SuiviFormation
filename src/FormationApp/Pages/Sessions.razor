@@ -1,5 +1,7 @@
 ﻿@page "/sessions"
 
+@inject ISessions SessionsVM
+
 @using AccessData.Models
 
 <h1>Liste des sessions</h1>
@@ -12,7 +14,7 @@
 			AllowPaging="true"
 			PageSize="10"
 			AllowSorting="true"
-			Data="@AllSessions"
+			Data="@SessionsVM.AllSessions"
 			TItem="SessionView"
 			EmptyText="Il n'y a aucune session"
 			ColumnWidth="150px">
@@ -50,13 +52,13 @@
 			<Template Context="data">
 				<AuthorizeView>
 					<Authorized>
-							@if (data.UsersInscrits.Contains(UserService.UserId))
+							@if (data.UsersInscrits.Contains(SessionsVM.UserService.UserId))
 							{
-								<MatIconButton Icon="remove_circle" @onclick="(args => DesinscriptionOnClick(args, data.IdSession))" Style="color:red" />
+								<MatIconButton Icon="remove_circle" @onclick="(args => SessionsVM.DesinscriptionOnClick(args, data.IdSession))" Style="color:red" />
 							}
 							else
 							{
-								<MatIconButton Icon="add_circle" @onclick="(args => InscriptionOnClick(args, data.IdSession))" Style="color:green" />
+								<MatIconButton Icon="add_circle" @onclick="(args => SessionsVM.InscriptionOnClick(args, data.IdSession))" Style="color:green" />
 							}
 						
 					</Authorized>
