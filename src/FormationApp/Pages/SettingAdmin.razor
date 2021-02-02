@@ -3,18 +3,19 @@
 @attribute [Authorize(Roles = "Administrateur")]
 
 @using FormationApp.Codes.ViewModel
+@inject IAdminSettingsViewModel ViewModel
 
 <h3>Paramètre administrateur</h3>
 
-<RadzenGrid @ref="UsersViewGrid"
+<RadzenGrid @ref="ViewModel.UsersViewGrid"
 			AllowFiltering="true"
 			FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
 			AllowPaging="true"
 			PageSize="5"
 			AllowSorting="true"
-			Data="@UsersList"
+			Data="@ViewModel.UsersList"
 			TItem="UtilisateurView"
-			RowUpdate="@OnUpdateRow"
+			RowUpdate="@ViewModel.OnUpdateRow"
 			ColumnWidth="200px">
 	<Columns>
 		<RadzenGridColumn TItem="UtilisateurView" Property="Personnel.Nom" Title="Nom" />
@@ -31,17 +32,23 @@
 			</EditTemplate>
 		</RadzenGridColumn>
 
+		<RadzenGridColumn TItem="UtilisateurView" Bubble="false" Filterable="false" Sortable="false" TextAlign="TextAlign.Center" Width="100px">
+			<Template Context="userView">
+				<RadzenButton Text="Réinit MDP" Size="ButtonSize.Small" Click="@(args => ViewModel.ReinitMdp(userView))" />
+			</Template>
+		</RadzenGridColumn>
+
 		@*Colonne pour la modification*@
 		<RadzenGridColumn TItem="UtilisateurView" Bubble="false" Filterable="false" Sortable="false" TextAlign="TextAlign.Center" Width="100px">
 			<Template Context="userView">
-				<RadzenButton Icon="edit" Size="ButtonSize.Small" Click="@(args => EditRow(userView))">
+				<RadzenButton Icon="edit" Size="ButtonSize.Small" Click="@(args => ViewModel.EditRow(userView))">
 				</RadzenButton>
 			</Template>
 
 			<EditTemplate Context="userView">
-				<RadzenButton Icon="save" Size="ButtonSize.Small" Click="@((args) => SaveRow(userView))">
+				<RadzenButton Icon="save" Size="ButtonSize.Small" Click="@((args) => ViewModel.SaveRow(userView))">
 				</RadzenButton>
-				<RadzenButton Icon="cancel" Size="ButtonSize.Small" ButtonStyle="ButtonStyle.Secondary" Click="@((args) => CancelEdit(userView))">
+				<RadzenButton Icon="cancel" Size="ButtonSize.Small" ButtonStyle="ButtonStyle.Secondary" Click="@((args) => ViewModel.CancelEdit(userView))">
 				</RadzenButton>
 			</EditTemplate>
 		</RadzenGridColumn>
@@ -51,4 +58,9 @@
 
 @code {
 
+
+	protected override async Task OnInitializedAsync()
+	{
+		await ViewModel.LoadAllUsers();
+	}
 }
