@@ -1,5 +1,168 @@
-﻿<h3>GestionHistorique</h3>
+﻿@using FormationApp.ModelsValidation
+
+
+@inject IGestionHistoriqueViewModel ViewModel
+
+<h3>
+Créer une session "historique".
+</h3>
+
+<div class="row">
+	<div class="col-3">
+		<EditForm OnValidSubmit="@ViewModel.CreateHistoriqueSubmit"
+				  Context="ValideHisto"
+				  EditContext="@ViewModel.EditContextValidation">
+
+			<DataAnnotationsValidator />
+
+			<div class="margin5px">
+				<ValidationMessage For="@(() => ((HistoriqueModelValidation)ViewModel.EditContextValidation.Model).DateDeSession)" />
+				<MatDatePicker @bind-Value="ViewModel.HistoriqueModelValidation.DateDeSession"
+							   Format="dd/MM/yyyy"></MatDatePicker>
+			</div>
+
+			<div class="mat-elevation-z5 margin5px">
+				<div>
+					<ValidationMessage For="@(() => ((HistoriqueModelValidation)ViewModel.EditContextValidation.Model).Formation)" />
+					<u>Nom de la formation</u> :
+				</div>
+				<div>
+					@if (ViewModel.HistoriqueModelValidation.Formation != null)
+					{
+						<div>@ViewModel.HistoriqueModelValidation.Formation.Titre</div>
+					}
+				</div>
+				<MatButton OnClick="@ViewModel.CanDisplayRechercheFormation"
+						   Raised="true"
+						   Type="">Rechercher une formation</MatButton>
+			</div>
+
+			@*//Affichage du formateur sélectionné*@
+			@if (ViewModel.HistoriqueModelValidation.Formation != null)
+			{
+				<div class="mat-elevation-z5">
+					<div class="margin5px">
+
+						<ValidationMessage For="@(() => ((HistoriqueModelValidation)ViewModel.EditContextValidation.Model).Formateur)" />
+						<span>
+							<MatButton Outlined="true"
+									   TrailingIcon="add_circle"
+									   OnClick="@ViewModel.CanDisplayRechercheFormateur">Choisir un formateur</MatButton>
+							@if (ViewModel.HistoriqueModelValidation.Formateur != null)
+							{
+								<MatIcon Icon="check" />
+							}
+						</span>
+
+						<h5>Formateur : </h5>
+
+						@if (ViewModel.HistoriqueModelValidation.Formateur != null)
+						{
+							<div>
+								<label>Nom : @ViewModel.HistoriqueModelValidation.Formateur.Nom</label>
+							</div>
+						}
+						else
+						{
+							<label>Aucun formateur sélectionné</label>
+						}
+
+					</div>
+				</div>
+			}
+
+
+			@*//Affichage de la salle sélectionnée*@
+			<div class="mat-elevation-z5">
+				<div class="margin5px">
+					<span>
+						<ValidationMessage For="@(() => ((HistoriqueModelValidation)ViewModel.EditContextValidation.Model).Salle)" />
+						<MatButton Outlined="true" TrailingIcon="add_circle" OnClick="@ViewModel.CanDisplayRechercheSalle">Choisir une salle</MatButton>
+						@if (ViewModel.HistoriqueModelValidation.Salle != null)
+						{
+							<MatIcon Icon="check" />
+						}
+					</span>
+
+					<h5>Salle : </h5>
+					@if (ViewModel.HistoriqueModelValidation.Salle != null)
+					{
+						<div>
+							<label>Nom : @ViewModel.HistoriqueModelValidation.Salle.NomSalle</label>
+						</div>
+						<div>
+							<label>@ViewModel.HistoriqueModelValidation.Salle.NombreDePlace places</label>
+						</div>
+					}
+					else
+					{
+						<label>Aucune salle sélectionnée</label>
+					}
+				</div>
+			</div>
+
+			<div>
+				<ValidationMessage For="@(() => ((HistoriqueModelValidation)ViewModel.EditContextValidation.Model).PersonnelsInscrit)" />
+				<div>
+					<div><u>Personnel(s) dans cette session</u> :</div>
+
+					<MatButton OnClick="@ViewModel.CanDisplayRecherchePersonnel"
+							   Raised="true">Rechercher des personnels</MatButton>
+
+					@if (ViewModel.HistoriqueModelValidation.PersonnelsInscrit != null)
+					{
+						@foreach (var personnel in ViewModel.HistoriqueModelValidation.PersonnelsInscrit)
+						{
+							<div>@personnel.Nom  @personnel.Prenom</div>
+						}
+					}
+
+				</div>
+			</div>
+
+			<div class="row">
+				<MatButton Type="submit">Ajouter</MatButton>
+				<MatButton Type="reset">Annuler</MatButton>
+			</div>
+
+		</EditForm>
+
+	</div>
+
+
+	<div class="col-9">
+		<div>
+			@if (ViewModel.DisplayRechercheFormation)
+			{
+				<RechercheFormation OnSelectFormationClick="@ViewModel.GetFormationAction" />
+			}
+
+			@if (ViewModel.DisplayRecherchePersonnel)
+			{
+				<RecherchePersonnel GetPersonnel="@ViewModel.GetPersonnelAction" />
+			}
+
+			@if (ViewModel.DisplayRechercheSalle)
+			{
+				<RechercheSalle GetSalle="@ViewModel.GetSalle" />
+			}
+
+			@if (ViewModel.DisplayRechercheFormateur)
+			{
+				<RechercheFormateur GetFormateur="@ViewModel.GetFormateur"
+									IdFormation="@ViewModel.HistoriqueModelValidation.Formation.IdFormation"
+									TitreFormation="@ViewModel.HistoriqueModelValidation.Formation.Titre" />
+			}
+
+		</div>
+		
+	</div>
+</div>
 
 @code {
 
+	protected override void OnInitialized()
+	{
+		ViewModel.StateHasChangedDelegate = StateHasChanged;
+	}
 }

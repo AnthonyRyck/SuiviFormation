@@ -267,6 +267,50 @@ namespace AccessData
         }
 
         /// <summary>
+		/// Ajout une session en base de donné.
+		/// </summary>
+		/// <param name="idFormation"></param>
+		/// <param name="idFormateur"></param>
+		/// <param name="idSalle"></param>
+		/// <param name="dateFormation"></param>
+		/// <param name="nbrePlace"></param>
+		/// <returns></returns>
+		public async Task<int> CreateSessionHistorique(int idFormation, string idFormateur, int idSalle, DateTime dateFormation)
+        {
+            try
+            {
+                using (var conn = new MySqlConnection(ConnectionString))
+                {
+                    string command = "INSERT INTO sessionformation (IdFormateur, IdFormation, IdSalle, DateSession, PlaceDispo, IsArchive)"
+                             + " VALUES (@idFormateur, @idFormation, @idSalle, @dateSession, @placeDispo, @archive);";
+
+                    using (var cmd = new MySqlCommand(command, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@idFormateur", idFormateur);
+                        cmd.Parameters.AddWithValue("@idFormation", idFormation);
+                        cmd.Parameters.AddWithValue("@idSalle", idSalle);
+                        cmd.Parameters.AddWithValue("@dateSession", dateFormation);
+                        cmd.Parameters.AddWithValue("@placeDispo", 0);
+                        cmd.Parameters.AddWithValue("@archive", false);
+
+                        conn.Open();
+                        int result = await cmd.ExecuteNonQueryAsync();
+                        conn.Close();
+                    }
+                }
+
+                string commandId = " SELECT LAST_INSERT_ID();";
+                int idSession = await GetIntCore(commandId);
+
+                return idSession;
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+        }
+
+        /// <summary>
         /// Ajoute le fichier d'emargement pour la session.
         /// </summary>
         /// <param name="idSession"></param>

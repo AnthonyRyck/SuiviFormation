@@ -204,4 +204,4 @@ DateObtention DATE,
 PRIMARY KEY (IdPersonnel, IdCompetence, IdSame),
 FOREIGN KEY(IdPersonnel) REFERENCES Personnel(IdPersonnel),
 FOREIGN KEY(IdCompetence) REFERENCES Competences(IdCompetence),
-FOREIGN KEY(IdPersonnel) REFERENCES Personnel(IdPersonnel));
+FOREIGN KEY(IdSame) REFERENCES Same(IdSame));
