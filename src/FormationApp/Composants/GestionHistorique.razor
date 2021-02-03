@@ -15,13 +15,13 @@ Créer une session "historique".
 
 			<DataAnnotationsValidator />
 
-			<div class="margin5px">
+			<div class="margin5px padding-5">
 				<ValidationMessage For="@(() => ((HistoriqueModelValidation)ViewModel.EditContextValidation.Model).DateDeSession)" />
 				<MatDatePicker @bind-Value="ViewModel.HistoriqueModelValidation.DateDeSession"
 							   Format="dd/MM/yyyy"></MatDatePicker>
 			</div>
 
-			<div class="mat-elevation-z5 margin5px">
+			<div class="mat-elevation-z5 margin5px padding-5">
 				<div>
 					<ValidationMessage For="@(() => ((HistoriqueModelValidation)ViewModel.EditContextValidation.Model).Formation)" />
 					<u>Nom de la formation</u> :
