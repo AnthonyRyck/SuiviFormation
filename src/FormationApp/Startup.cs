@@ -84,7 +84,7 @@ namespace FormationApp
 			services.AddScoped<IMesFormations, MesFormationsViewModel>();
 			services.AddScoped<ISessions, SessionsViewModel>();
 			services.AddScoped<IGestionHistoriqueViewModel, GestionHistoriqueViewModel>();
-
+			services.AddScoped<ISuiviPersonnelViewModel, SuiviPersonnelViewModel>();
 		}
 
 		// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

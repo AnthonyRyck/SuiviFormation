@@ -1,0 +1,148 @@
+﻿@page "/suiviPersonnels"
+
+@attribute [Authorize(Roles = "Administrateur, Gestionnaire")]
+
+@using FormationApp.Codes.ViewModel
+@using AccessData.Models
+@inject ISuiviPersonnelViewModel ViewModel
+
+<h2>Suivi des formations du personnel</h2>
+
+<div class="row">
+	<div class="col-6">
+		<h3>Liste du personnel</h3>
+
+		@if (ViewModel.UsersList == null)
+		{
+			<div>Chargement des personnels en cours...</div>
+			<div><img src="~/css/ajaxloader.gif" /> </div>
+		}
+		else
+		{
+
+			<div>
+				<RadzenGrid @ref="ViewModel.UsersViewGrid"
+							AllowFiltering="true"
+							FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+							AllowPaging="true"
+							PageSize="15"
+							AllowSorting="true"
+							Data="@ViewModel.UsersList"
+							TItem="UtilisateurView"
+							ColumnWidth="200px"
+							EmptyText="Aucune formation suivie"
+							RowSelect="@(user => ViewModel.LoadFormationsCompetences(user.Personnel.IdPersonnel))">
+					<Columns>
+						<RadzenGridColumn TItem="UtilisateurView" Property="Personnel.Nom" Title="Nom" />
+						<RadzenGridColumn TItem="UtilisateurView" Property="Personnel.Prenom" Title="Prénom" />
+						<RadzenGridColumn TItem="UtilisateurView" Property="Personnel.Service" Title="Service" />
+						<RadzenGridColumn TItem="UtilisateurView" Property="UserIdentity.Email" Title="Email" />
+					</Columns>
+				</RadzenGrid>
+			</div>
+
+		}
+	</div>
+
+	@*Affichage des formations suivis*@
+	<div class="col-6">
+
+		<h3><u>Personnel</u> : 
+			@if (ViewModel.UserSelected == null)
+			{
+			   <span>Aucun personnel de sélectionné</span>
+			}
+			else
+			{
+				<span>@ViewModel.UserSelected.Personnel.Nom  @ViewModel.UserSelected.Personnel.Prenom</span>
+			}
+		</h3>
+
+		<RadzenTabs>
+			<Tabs>
+				<RadzenTabsItem Text="Formations">
+					<RadzenGrid AllowFiltering="true" AllowPaging="true" 
+								AllowSorting="true" 
+								Data="@ViewModel.FormationUser" 
+								TItem="SessionInscritUserView"
+								EmptyText="Aucune formation de trouvée">
+						<Columns>
+							<RadzenGridColumn TItem="SessionInscritUserView" Property="TitreFormation" Title="Formation" Filterable="true" Sortable="false" Width="100px" />
+							<RadzenGridColumn TItem="SessionInscritUserView" Property="DateDeLaFormation" Title="Date" Filterable="true" Sortable="false" Width="80px">
+								<Template Context="data">
+									@String.Format("{0:d}", data.DateDeLaFormation)
+								</Template>
+							</RadzenGridColumn>
+							<RadzenGridColumn TItem="SessionInscritUserView" Property="NombreJourFormation" Title="Jour" Filterable="false" Sortable="false" Width="40px" />
+							<RadzenGridColumn TItem="SessionInscritUserView" Title="Formateur" Filterable="false" Sortable="false" Width="40px">
+								<Template Context="data">
+									<div>
+										@data.NomFormateur
+									</div>
+									<div>
+										@data.PrenomFormateur
+									</div>
+								</Template>
+							</RadzenGridColumn>
+							<RadzenGridColumn TItem="SessionInscritUserView" Property="IsExterne" Title="Externe MinDef" Filterable="true" Sortable="false" Width="80px">
+								<Template Context="data">
+									<div class="center-content">
+										<MatCheckbox Disabled="true" @bind-Value="data.IsExterne" Style="margin-left: auto; margin-right: auto;" />
+									</div>
+								</Template>
+							</RadzenGridColumn>
+						</Columns>
+					</RadzenGrid>
+				</RadzenTabsItem>
+
+				<RadzenTabsItem Text="Compétences">
+					@if (ViewModel.CompetenceUser == null || !ViewModel.CompetenceUser.Any())
+					{
+						<div>Aucune compétence de validée</div>
+					}
+					else
+					{
+						<RadzenDataList WrapItems="true"
+										AllowPaging="true"
+										Data="@ViewModel.CompetenceUser"
+										TItem="CompetenceUserView"
+										PageSize="10">
+							<Template Context="detailCompetence">
+								<RadzenCard Style="width:100px;height:100px">
+									<div>
+										<u>Titre</u> : <b>@detailCompetence?.Titre</b>
+									</div>
+									<div>
+										<div>
+											<u>Niveau SAME : </u>
+										</div>
+
+										@foreach (var same in detailCompetence?.Same)
+										{
+											<div>
+												<span>@same.TitreSame  - @same.DateObtention.ToString("d")</span>
+											</div>
+										}
+									</div>
+								</RadzenCard>
+							</Template>
+						</RadzenDataList>
+					}
+				</RadzenTabsItem>
+			</Tabs>
+		</RadzenTabs>
+	</div>
+</div>
+
+
+
+
+@code {
+
+	protected override async Task OnInitializedAsync()
+	{
+		await ViewModel.LoadAllUsers();
+		base.OnInitialized();
+	}
+
+}
