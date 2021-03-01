@@ -9,7 +9,8 @@ namespace FormationApp.Codes
 	{
 		Agent,
 		Administrateur,
-		Gestionnaire
+		Gestionnaire,
+		Chef
 	}
 
 
@@ -24,6 +25,9 @@ namespace FormationApp.Codes
 
 				case "Gestionnaire":
 					return Role.Gestionnaire;
+
+				case "Chef":
+					return Role.Chef;
 
 				default:
 					return Role.Agent;

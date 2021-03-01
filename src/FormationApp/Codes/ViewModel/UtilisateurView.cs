@@ -31,6 +31,7 @@ namespace FormationApp.Codes.ViewModel
 			{
 				Role.Agent.ToString(),
 				Role.Gestionnaire.ToString(),
+				Role.Chef.ToString(),
 				Role.Administrateur.ToString()
 			};
 

@@ -88,7 +88,8 @@ INSERT INTO aspnetroles
 (Id, Name, NormalizedName, ConcurrencyStamp)
 VALUES
 (uuid(), 'Administrateur', 'ADMINISTRATEUR', uuid()),
-(uuid(), 'Gestionnaire', 'GESTIONNAIRE', uuid());
+(uuid(), 'Gestionnaire', 'GESTIONNAIRE', uuid()),
+(uuid(), 'Chef', 'CHEF', uuid());
 
 COMMIT;
 
