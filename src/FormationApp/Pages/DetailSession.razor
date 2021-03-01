@@ -28,10 +28,6 @@
 		@if (string.IsNullOrEmpty(DetailSessionVM.FileNameEmergement))
 		{
 			<div>
-				@*<MatFileUpload OnChange="@UploadFiles"
-							   title="Ajouter emargement"
-							   Label="Fichier émargement" />*@
-
 				<BlazorInputFile.InputFile OnChange="DetailSessionVM.HandleFileSelected" />
 			</div>
 		}
@@ -52,7 +48,7 @@
 	<RadzenButton Click="@((args) => DetailSessionVM.ClickArchiver(args))"
 				  Text="Archiver"
 				  ButtonStyle="ButtonStyle.Danger"
-				  Disabled="@DetailSessionVM.IsArchiver" />
+				  Disabled="@(DetailSessionVM.IsArchiver || DetailSessionVM.CanArchiver)" />
 	<div>
 		@if (DetailSessionVM.IsArchiver)
 		{

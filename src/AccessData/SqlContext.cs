@@ -32,12 +32,12 @@ namespace AccessData
                 using (var conn = new MySqlConnection(ConnectionString))
                 {
                     conn.Open();
-                    var commandText = @"SELECT pers.IdPersonnel, pers.Nom, pers.Prenom, pers.IsExterne, catalogue.IdFormation, catalogue.Titre, sesion.IdSession, catalogue.Duree, sesion.DateSession, sal.IdSalle, sal.NomSalle, sesion.PlaceDispo"
+                    var commandText = @"SELECT pers.IdPersonnel, pers.Nom, pers.Prenom, pers.IsExterne, catalogue.IdFormation, catalogue.Titre, sesion.IdSession, catalogue.Duree, sesion.DateSession, sal.IdSalle, sal.NomSalle, sesion.PlaceDispo, sesion.IsArchive"
                                         + " FROM sessionformation sesion"
                                         + " INNER JOIN personnel pers ON pers.IdPersonnel = sesion.IdFormateur"
                                         + " INNER JOIN catalogueformation catalogue ON catalogue.IdFormation = sesion.IdFormation"
-                                        + " INNER JOIN salle sal ON sal.IdSalle = sesion.IdSalle"
-                                        + " WHERE sesion.IsArchive = 0";
+                                        + " INNER JOIN salle sal ON sal.IdSalle = sesion.IdSalle";
+                                        //+ " WHERE sesion.IsArchive = 0";
                     MySqlCommand cmd = new MySqlCommand(commandText, conn);
 
                     using (var reader = await cmd.ExecuteReaderAsync())
@@ -57,7 +57,8 @@ namespace AccessData
                                 DateDebutSession = await reader.GetFieldValueAsync<DateTime>(8),
                                 IdSalle = await reader.GetFieldValueAsync<int>(9),
                                 NomDeLaSalle = await reader.GetFieldValueAsync<string>(10),
-                                NombreDePlaceDispo = await reader.GetFieldValueAsync<int>(11)
+                                NombreDePlaceDispo = await reader.GetFieldValueAsync<int>(11),
+                                IsArchive = reader.GetBoolean(12)
                             }) ;
                         }
                     }
@@ -139,7 +140,7 @@ namespace AccessData
                 using (var conn = new MySqlConnection(ConnectionString))
                 {
                     conn.Open();
-                    var commandText = @"SELECT pers.IdPersonnel, pers.Nom, pers.Prenom, pers.IsExterne, catalogue.Titre, sesion.IdSession, catalogue.Duree, sesion.DateSession, sal.IdSalle, sal.NomSalle, sesion.PlaceDispo, sesion.IdFormation"
+                    var commandText = @"SELECT pers.IdPersonnel, pers.Nom, pers.Prenom, pers.IsExterne, catalogue.Titre, sesion.IdSession, catalogue.Duree, sesion.DateSession, sal.IdSalle, sal.NomSalle, sesion.PlaceDispo, sesion.IdFormation, sesion.IsArchive"
                                         + " FROM sessionformation sesion"
                                         + " INNER JOIN personnel pers ON pers.IdPersonnel = sesion.IdFormateur"
                                         + " INNER JOIN catalogueformation catalogue ON catalogue.IdFormation = sesion.IdFormation"
@@ -164,7 +165,8 @@ namespace AccessData
                                 IdSalle = await reader.GetFieldValueAsync<int>(8),
                                 NomDeLaSalle = await reader.GetFieldValueAsync<string>(9),
                                 NombreDePlaceDispo = await reader.GetFieldValueAsync<int>(10),
-                                IdFormation = await reader.GetFieldValueAsync<int>(11)
+                                IdFormation = await reader.GetFieldValueAsync<int>(11),
+                                IsArchive = reader.GetBoolean(12)
                             };
                         }
                     }

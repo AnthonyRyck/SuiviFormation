@@ -44,11 +44,12 @@ namespace FormationApp.ViewModel
 		/// </summary>
 		public bool IsArchiver { get; set; }
 
+		/// <see cref="IDetailSession.CanArchiver"/>
+		public bool CanArchiver { get; set; }
+
 		public SessionView Session { get; set; }
 
 		#endregion
-
-
 
 		#region Protected Methods
 
@@ -63,12 +64,17 @@ namespace FormationApp.ViewModel
 		{
 			// Chargement pour savoir s'il y a un fichier d'émargement.
 			Session = await SqlService.GetSessionAsync(Id);
+			CanArchiver = CanArchiveSession(Session.DateDebutSession, Session.NombreDeJour, DateTime.Now);
+			IsArchiver = Session.IsArchive;
+
 			InfoSession = await SqlService.GetFileNameEmargementAsync(Id);
 			PersonnelsInscrit = await SqlService.GetPersonnelsInscritSession(Id);
 
 			if (!string.IsNullOrEmpty(InfoSession.NomFichierEmargement))
 				FileNameEmergement = InfoSession.NomFichierEmargement;
 		}
+
+
 
 		#endregion
 
@@ -213,6 +219,15 @@ namespace FormationApp.ViewModel
 			{
 				Toaster.Add("Erreur sur l'archivage de la session.", MatToastType.Danger);
 			}
+		}
+
+		#endregion
+
+		#region Private methods
+
+		private bool CanArchiveSession(DateTime dateDebutSession, double nombreDeJour, DateTime now)
+		{
+			return DateTime.Compare(dateDebutSession.AddDays(nombreDeJour), now) > 0;
 		}
 
 		#endregion

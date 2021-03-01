@@ -83,41 +83,22 @@ namespace FormationApp.ViewModel
 			{
 				case "Agent":
 					// Suppression de tous les rôles.
-					//await UserManager.RemoveFromRoleAsync(userModifie.UserIdentity, "Administrateur");
-					//await UserManager.RemoveFromRoleAsync(userModifie.UserIdentity, "Gestionnaire");
-					
 					await UserManager.RemoveFromRoleAsync(userModifie.UserIdentity, Role.Gestionnaire.ToString());
 					await UserManager.RemoveFromRoleAsync(userModifie.UserIdentity, Role.Administrateur.ToString());
 					await UserManager.RemoveFromRoleAsync(userModifie.UserIdentity, Role.Chef.ToString());
 
-					//await UserManager.RemoveFromRolesAsync(userModifie.UserIdentity, new List<string>()
-					//																	{ Role.Administrateur.ToString(),
-					//																		Role.Chef.ToString(),
-					//																		Role.Gestionnaire.ToString()
-					//																	});
 					break;
 
 				case "Administrateur":
-					//await UserManager.RemoveFromRoleAsync(userModifie.UserIdentity, "Gestionnaire");
 					await UserManager.RemoveFromRoleAsync(userModifie.UserIdentity, Role.Chef.ToString());
 					await UserManager.RemoveFromRoleAsync(userModifie.UserIdentity, Role.Gestionnaire.ToString());
-
-					await UserManager.RemoveFromRolesAsync(userModifie.UserIdentity, new List<string>()
-																						{ Role.Chef.ToString(),
-																							Role.Gestionnaire.ToString()
-																						});
 
 					await UserManager.AddToRoleAsync(userModifie.UserIdentity, Role.Administrateur.ToString());
 					break;
 
 				case "Gestionnaire":
-					//await UserManager.RemoveFromRoleAsync(userModifie.UserIdentity, "Administrateur");
 					await UserManager.RemoveFromRoleAsync(userModifie.UserIdentity, Role.Administrateur.ToString());
 					await UserManager.RemoveFromRoleAsync(userModifie.UserIdentity, Role.Chef.ToString());
-					//await UserManager.RemoveFromRolesAsync(userModifie.UserIdentity, new List<string>()
-					//																	{ Role.Administrateur.ToString(),
-					//																		Role.Chef.ToString()
-					//																	});
 
 					await UserManager.AddToRoleAsync(userModifie.UserIdentity, Role.Gestionnaire.ToString());
 					break;
@@ -125,11 +106,6 @@ namespace FormationApp.ViewModel
 				case "Chef":
 					await UserManager.RemoveFromRoleAsync(userModifie.UserIdentity, Role.Administrateur.ToString());
 					await UserManager.RemoveFromRoleAsync(userModifie.UserIdentity, Role.Gestionnaire.ToString());
-
-					//await UserManager.RemoveFromRolesAsync(userModifie.UserIdentity, new List<string>()
-					//																	{ Role.Administrateur.ToString(),
-					//																		Role.Gestionnaire.ToString()
-					//																	});
 
 					await UserManager.AddToRoleAsync(userModifie.UserIdentity, Role.Chef.ToString());
 					break;

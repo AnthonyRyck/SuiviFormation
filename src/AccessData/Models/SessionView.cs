@@ -18,6 +18,11 @@ namespace AccessData.Models
 		/// </summary>
 		public int NombreDePlaceDispo { get; set; }
 
+		/// <summary>
+		/// Indique si la session est archivé.
+		/// </summary>
+		public bool IsArchive { get; set; }
+
 		#region Lié au catalogue de formation
 
 		public int IdFormation { get; set; }

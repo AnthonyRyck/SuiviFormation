@@ -10,7 +10,7 @@
 	<br />
 
 	<div>
-		<div>Sessions en cours</div>
+		<div>Liste de toutes les Sessions</div>
 
 		<RadzenGrid AllowFiltering="true"
 					FilterCaseSensitivity="FilterCaseSensitivity.Default"
@@ -45,6 +45,14 @@
 						</div>
 						<div>
 							@data.Prenom
+						</div>
+					</Template>
+				</RadzenGridColumn>
+
+				<RadzenGridColumn TItem="SessionView" Property="IsArchive" Title="Est archivé ?" Filterable="true" Sortable="true" Width="80px"> 
+					<Template Context="data">
+						<div>
+							<MatCheckbox Disabled="true" @bind-Value="data.IsArchive" Style="margin-left: auto; margin-right: auto;" />
 						</div>
 					</Template>
 				</RadzenGridColumn>
