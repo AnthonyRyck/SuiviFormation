@@ -23,5 +23,9 @@ namespace FormationApp.ViewModel
 		Task LoadAllUsers();
 
 		Task LoadFormationsCompetences(string idPersonnel);
+
+		Task ExportAllToExcel();
+
+		Task ExportPersonnelToExcel(string idPersonnel);
 	}
 }
