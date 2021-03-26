@@ -91,8 +91,8 @@ namespace FormationApp.Areas.Identity.Pages.Account
             public string Service { get; set; }
 
             [Required]
-            [Display(Name = "Est externe MinDef ?")]
-            public bool IsExterneMindef { get; set; }
+            [Display(Name = "Est externe au service ?")]
+            public bool IsExterneService { get; set; }
         }
 
         public async Task OnGetAsync(string returnUrl = null)
@@ -114,7 +114,7 @@ namespace FormationApp.Areas.Identity.Pages.Account
                 
                 if (result.Succeeded)
                 {
-                    _logger.LogInformation("Utilisateur crée un nouveau compt avec mot de passe.");
+                    _logger.LogInformation("Utilisateur crée un nouveau compte avec mot de passe.");
 
                     var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
                     code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
@@ -164,7 +164,7 @@ namespace FormationApp.Areas.Identity.Pages.Account
             {
                 IdPersonnel = IdUser,
                 IsActif = true,
-                IsExterne = inputModel.IsExterneMindef,
+                IsExterne = inputModel.IsExterneService,
                 Nom = inputModel.Nom,
                 Prenom = inputModel.Prenom,
                 Login = inputModel.Login,
