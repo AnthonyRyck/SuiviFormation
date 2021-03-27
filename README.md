@@ -7,8 +7,9 @@ Au lancement de l'application, je crée l'utilisateur "root", avec le rôle admi
 * login : root
 * mdp : Azerty123!
 
-Je me base sur les autorisations sur les rôles :
+Les autorisations sont basés sur les rôles :
 * **Rôle gestionnaire** : il permet de créer des salles, des formations dans le catalogue, des compétences, de nouvelle session de formation.
+* **Rôle chef** : permet de suivre les formations et compétences des utilisateurs.
 * **Rôle administrateur** : il peut faire comme le rôle gestionnaire, en plus il peut changer les rôles des utilisateurs.
 
 ## Ajout d'une formation au catalogue ##
