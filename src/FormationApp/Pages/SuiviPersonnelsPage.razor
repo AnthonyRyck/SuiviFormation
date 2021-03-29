@@ -64,6 +64,7 @@
 
 		<div class="margin5px">
 			<RadzenButton Text="Export"
+							Disabled="@(ViewModel.UserSelected == null)"
 						  ButtonStyle="ButtonStyle.Secondary"
 						  Click="@(() => ViewModel.ExportPersonnelToExcel(ViewModel.UserSelected.Personnel.IdPersonnel))" />
 		</div>
