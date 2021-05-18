@@ -2,6 +2,14 @@
 Application en Blazor pour faire le suivi des formations d'un service, d'une équipe.
 J'ai fait cette application pour mon service. Il voulait une application qui permettait de suivre les différentes formations que les personnels avaient suivis. Quand ? Avec quel formateur ? Ont-ils validés la formation ?<br/>La contrainte était sur la base de donnée, __que__ sur MySQL. Le schéma de base de donnée est fournis dans SuiviFormation/Script.
 
+NOTE :  
+Il faut que la base de donnée MySQL est la configuration :
+```
+[mysqld]
+lower_case_table_names=1
+```
+Sinon aucune requête ne peut passer.
+
 ## Lancement de l'application ##
 Au lancement de l'application, je crée l'utilisateur "root", avec le rôle administrateur.
 * login : root
